@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Using the new OneToMany Collections > Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 42167
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Embedded\x20Form\x20Collections <i class="fa fa-play"></i>',
+            'url': '/screencast/collections/embedded-form-collection#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="With the [basic of Doctrine relations](http://knpuniversity.com/screencast/doctrine-relations)
+behind us, it&#039;s time to dive deeper and get our hands dirty with some real-world,
+but complex collections. Honestly, this is the *hardest* part of Doctrine: so
+let&#039;s get it *right*:
+
+* Creating ManyToMany associations
+* Querying on ManyToMany relations
+* Mapping the inverse (collection) side of a relation
+* (bonus) Using DoctrineExtension for clean URL slugs
+* Keeping the owning &amp; inverse sides in-sync
+* Using `orphanRemoval` to delete items in a collection
+* Using `cascade` to save items in a collection
+* Counting collections in the `EXTRA_LAZY` way
+* Rendering relationship data from both sides
+* Filtering collections efficiently with Criteria (mind will be blown)
+* Dealing with complex collection forms
+* Adding &quot;extra&quot; data to the &quot;join table&quot;
+
+Doctrine relationships take a little bit more work to get setup. So let&#039;s
+master this stuff, setup our relationships to win, and get back to work.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Using the new OneToMany Collections">
+<meta property="og:description" content="With the [basic of Doctrine relations](http://knpuniversity.com/screencast/doctrine-relations)
+behind us, it&amp;#039;s time to dive deeper and get our hands dirty with some real-world,
+but complex collections">
+<meta property="og:url" content="http://knpuniversity.com/screencast/collections/refactoring-for-new-collections">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/collections:c6f9bb103a37193c3e0e994da8386d9e09bd1ed3/symfony-collections.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="refactoring-for-new-collections#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        18.
+                            Using the new OneToMany Collecti...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="clean-url-slugs" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Give me Clean URL Strings (slugs!)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="doctrine-extensions-sluggable" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        DoctrineExtensions: Sluggable
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:59</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="refactoring-carefully" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Refactoring Carefully
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-many-setup" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        ManyToMany Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="insert-many-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Inserting into a ManyToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fetch-collection-items" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Fetching Items from a ManyToMany Collection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:45</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-many-inverse" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        ManyToMany: The Inverse Side of the Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:45</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="removing-items" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Removing a ManyToMany Item
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="hooking-up-remove-scientist-js" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Hooking up the Scientist Removal JavaScript
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:50</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-many-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        ManyToMany &amp; Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:30</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="joins-and-extra-lazy-fetch" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Joining Across a ManyToMany + EXTRA_LAZY Fetch
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:34</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="entity-type-checkboxes" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        EntityType Check Boxes with ManyToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="saving-inverse-side-collection" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Saving the Inverse Side of a ManyToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="by-reference-adder-remover" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Form by_reference + Adder and Remover
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="synchronizing-mapping-inverse" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Synchronizing Owning &amp; Inverse Sides
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-many-extra-fields" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        ManyToMany with Extra Fields
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 8:20</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="join-entity-refactoring" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        Join Entity App Refactoring
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="refactoring-for-new-collections" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Using the new OneToMany Collections
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="embedded-form-collection" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Embedded Form Collections
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:36</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="collection-allow-delete" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        Collection Delete &amp; allow_delete
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:49</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="collection-delete-orphan-removal" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                21.
+                        Deleting an Item from a Collection: orphanRemoval
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="add-new-collection-prototype" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                22.
+                        CollectionType: Adding New with the Prototype
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="add-new-collection-cascade-persist" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                23.
+                        Adding to a Collection: Cascade Persist
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="embedded-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                24.
+                        Embedded Form Validation with @Valid
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="customizing-prototype" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                25.
+                        Customizing the Collection Form Prototype
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:56</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="form-events-readonly-embedded-field" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                26.
+                        Form Events: A readonly Embedded Field
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="easy-collection-filtering" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                27.
+                        Collection Filtering: The Easy Way
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="criteria-collection-filtering" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                28.
+                        Criteria System: Champion Collection Filtering
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/collections" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Using the new OneToMany Collections</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="embedded-form-collection#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="refactoring-for-new-collections#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="refactoring-for-new-collections#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/extra-doctrine-collections/refactoring-for-new-collections.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Open up the <code>genus/show.html.twig</code> template. Actually, let's start in the <code>Genus</code>
+class itself. Find <code>getGenusScientists()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3f72a8f236">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-204" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            204 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-195" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 195
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="196"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="197"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@return</span> ArrayCollection|User[]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="198"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="199"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getGenusScientists</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="200"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="201"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;genusScientists;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="202"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="203"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This method is lying! It does not return an array of <code>User</code> objects, it returns
+an array of <code>GenusScientist</code> objects!</p>
+<p><div class="code-block-wrapper" data-code-block-guid="11a5c8f4d0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-204" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            204 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-195" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 195
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="196"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="197"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@return</span> ArrayCollection|GenusScientist[]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="198"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="199"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getGenusScientists</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="200"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="201"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;genusScientists;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="202"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="203"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>In the template, when we loop over <code>genus.genusScientists</code>, <code>genusScientist</code> is <em>not</em>
+a <code>User</code> anymore. Update to <code>genusScientist.user.fullName</code>, and above, for the <code>user_show</code>
+route, change this to <code>genusScientist.user.id</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ec45fde385">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-92" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            92 lines <span class="meta-divider"></span> <span title="app/Resources/views/genus/show.html.twig">app/Resources/views/genus/show.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"sea-creature-container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-photo"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">dl</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details-list"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="12-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 12 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">                    <span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">                        </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">for</span></span> genusScientist in genus.genusScientists %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group-item js-scientist-item"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">                                <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{ path('user_show', {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">                                    'id': genusScientist.user.id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">                                }) }}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">                                    </span><span class="hljs-template-variable">{{ genusScientist.user.fullName }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-30" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 30
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">                                <span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="32-41" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 32 - 41
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">                        </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endfor</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">                    <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">dl</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"js-notes-wrapper"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="51-92" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 51 - 92
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+ </p>
+<p>Then, in the link, let's show off our new <code>yearsStudied</code> field: <code>{{ genusScientist.yearsStudied }}</code>
+then years:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ddc0242634">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-92" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            92 lines <span class="meta-divider"></span> <span title="app/Resources/views/genus/show.html.twig">app/Resources/views/genus/show.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"sea-creature-container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-photo"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">dl</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details-list"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="12-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 12 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">                    <span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">                        </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">for</span></span> genusScientist in genus.genusScientists %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group-item js-scientist-item"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">                                <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{ path('user_show', {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">                                    'id': genusScientist.user.id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">                                }) }}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">                                    </span><span class="hljs-template-variable">{{ genusScientist.user.fullName }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">                                    (</span><span class="hljs-template-variable">{{ genusScientist.yearsStudied }}</span><span class="xml"> years)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">                                <span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="32-41" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 32 - 41
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">                        </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endfor</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">                    <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">dl</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"js-notes-wrapper"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="51-92" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 51 - 92
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>We still need to fix the remove link, but let's see how it looks so far!</p>
+<p>Refresh! It's way less broken! Well, until you click to view the user!</p>
+<h2 id="updating-the-user-template">Updating the User Template <a class="headerlink" href="refactoring-for-new-collections#updating-the-user-template" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>To fix this, start by opening <code>User</code> and finding <code>getStudiedGenuses()</code>. Change the
+PHPDoc to advertise that this <em>now</em> returns an array of <code>GenusScientist</code> objects:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="656651b8a8">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-243" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            243 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-214" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 19 - 214
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="215"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="216"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@return</span> ArrayCollection|GenusScientist[]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="217"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="218"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getStudiedGenuses</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="219"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="220"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;studiedGenuses;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="221"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="222-241" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 222 - 241
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="242"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, go fix the template: <code>user/show.html.twig</code>. Hmm, let's rename this variable
+to be a bit more clear: <code>genusScientist</code>, to match the type of object it is. Now,
+update <code>slug</code> to be <code>genusScientist.genus.slug</code>. And print <code>genusScientist.genus.name</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3cfed09d22">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-56" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            56 lines <span class="meta-divider"></span> <span title="app/Resources/views/user/show.html.twig">app/Resources/views/user/show.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"row"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-38" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 38
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col-xs-4"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">h3</span>&gt;</span>Genus Studied<span class="hljs-tag">&lt;/<span class="hljs-name">h3</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">                    </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">for</span></span> genusScientist in user.studiedGenuses %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">                        <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group-item"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{ path('genus_show', {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">                                'slug': genusScientist.genus.slug</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">                            }) }}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">                                </span><span class="hljs-template-variable">{{ genusScientist.genus.name }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">                        <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">                    </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endfor</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="55"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Try it! Page is alive!</p>
+<h2 id="updating-the-delete-link">Updating the Delete Link <a class="headerlink" href="refactoring-for-new-collections#updating-the-delete-link" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Back on the genus page, the other thing we need to fix is this remove link. In the
+<code>show.html.twig</code> template for genus, update the <code>userId</code> part of the URL:
+<code>genusScientist.user.id</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a640e8f884">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-92" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            92 lines <span class="meta-divider"></span> <span title="app/Resources/views/genus/show.html.twig">app/Resources/views/genus/show.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"sea-creature-container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-photo"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">dl</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details-list"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="12-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 12 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">                    <span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">                        </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">for</span></span> genusScientist in genus.genusScientists %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"list-group-item js-scientist-item"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="26-32" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 26 - 32
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">                                <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"#"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">                                   <span class="hljs-attr">class</span>=<span class="hljs-string">"btn btn-link btn-xs pull-right js-remove-scientist-user"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">                                   <span class="hljs-attr">data-url</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{ path('genus_scientists_remove', {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">                                       genusId: genus.id,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">                                       userId: genusScientist.user.id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">                                   }) }}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">                                &gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">                                    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"fa fa-close"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">                                <span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">                            <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">                        </span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endfor</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">                    <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">dl</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"js-notes-wrapper"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="51-92" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 51 - 92
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, find this endpoint in <code>GenusController</code>: <code>removeGenusScientistAction()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="4d3701ff7b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-153" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            153 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-126" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 126
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="127"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">removeGenusScientistAction</span><span class="hljs-params">($genusId, $userId)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="128"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="129"></td>
+            <td class="blob-code">        $em = <span class="hljs-keyword">$this</span>-&gt;getDoctrine()-&gt;getManager();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="130"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="131"></td>
+            <td class="blob-code">        <span class="hljs-comment">/** <span class="hljs-doctag">@var</span> Genus $genus */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">        $genus = $em-&gt;getRepository(<span class="hljs-string">'AppBundle:Genus'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="133"></td>
+            <td class="blob-code">            -&gt;find($genusId);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="134"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="135"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!$genus) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="136"></td>
+            <td class="blob-code">            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">$this</span>-&gt;createNotFoundException(<span class="hljs-string">'genus not found'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="137"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="138"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="139"></td>
+            <td class="blob-code">        $genusScientist = $em-&gt;getRepository(<span class="hljs-string">'AppBundle:User'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="140"></td>
+            <td class="blob-code">            -&gt;find($userId);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="141"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="142"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!$genusScientist) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="143"></td>
+            <td class="blob-code">            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">$this</span>-&gt;createNotFoundException(<span class="hljs-string">'scientist not found'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="144"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="145"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="146"></td>
+            <td class="blob-code">        $genus-&gt;removeGenusScientist($genusScientist);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="147"></td>
+            <td class="blob-code">        $em-&gt;persist($genus);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="148"></td>
+            <td class="blob-code">        $em-&gt;flush();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="149"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="150"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Response(<span class="hljs-keyword">null</span>, <span class="hljs-number">204</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="151"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="152"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>It's about to get <em>way</em> nicer. Kill the queries for <code>Genus</code> and <code>User</code>. Replace them with
+<code>$genusScientist = $em-&gt;getRepository('AppBundle:GenusScientist')</code> and <code>findOneBy()</code>,
+passing it <code>user</code> set to <code>$userId</code> and <code>genus</code> set to <code>$genusId</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="612145b530">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-143" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            143 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-126" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 126
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="127"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">removeGenusScientistAction</span><span class="hljs-params">($genusId, $userId)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="128"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="129"></td>
+            <td class="blob-code">        $em = <span class="hljs-keyword">$this</span>-&gt;getDoctrine()-&gt;getManager();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="130"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="131"></td>
+            <td class="blob-code">        $genusScientist = $em-&gt;getRepository(<span class="hljs-string">'AppBundle:GenusScientist'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">            -&gt;findOneBy([</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="133"></td>
+            <td class="blob-code">                <span class="hljs-string">'user'</span> =&gt; $userId,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="134"></td>
+            <td class="blob-code">                <span class="hljs-string">'genus'</span> =&gt; $genusId</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="135"></td>
+            <td class="blob-code">            ]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="136-140" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 136 - 140
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="141"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="142"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Then, instead of removing this link from <code>Genus</code>, we simply delete the entity:
+<code>$em-&gt;remove($genusScientist)</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="12e53699c2">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-143" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            143 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-126" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 126
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="127"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">removeGenusScientistAction</span><span class="hljs-params">($genusId, $userId)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="128"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="129"></td>
+            <td class="blob-code">        $em = <span class="hljs-keyword">$this</span>-&gt;getDoctrine()-&gt;getManager();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="130"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="131"></td>
+            <td class="blob-code">        $genusScientist = $em-&gt;getRepository(<span class="hljs-string">'AppBundle:GenusScientist'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">            -&gt;findOneBy([</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="133"></td>
+            <td class="blob-code">                <span class="hljs-string">'user'</span> =&gt; $userId,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="134"></td>
+            <td class="blob-code">                <span class="hljs-string">'genus'</span> =&gt; $genusId</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="135"></td>
+            <td class="blob-code">            ]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="136"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="137"></td>
+            <td class="blob-code">        $em-&gt;remove($genusScientist);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="138"></td>
+            <td class="blob-code">        $em-&gt;flush();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="139"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="140"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Response(<span class="hljs-keyword">null</span>, <span class="hljs-number">204</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="141"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="142"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And celebrate!</p>
+<p>Go try it! Quick, delete that scientist! It disappears in dramatic fashion, <em>and</em>,
+when we refresh, it's <em>definitely</em> gone.</p>
+<p>Phew! We're almost done. By the way, you can see that this refactoring takes some work.
+If you know that your join table will probably need extra fields on it, you can save
+yourself this work by setting up the join entity from the very beginning and avoiding
+<code>ManyToMany</code>. But, if you definitely won't have extra fields, <code>ManyToMany</code> is way
+nicer.</p>
+<h2 id="updating-the-fixtures">Updating the Fixtures <a class="headerlink" href="refactoring-for-new-collections#updating-the-fixtures" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The <em>last</em> thing to fix is the fixtures. We won't set the <code>genusScientists</code> property
+up here anymore. Instead, scroll down and add a new <code>AppBundle\Entity\GenusScientist</code>
+section:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="41052d004b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-44" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            44 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-38" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 38
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">AppBundle\Entity\GenusScientist:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="40-44" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 40 - 44
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>It's simple: we'll just build new <code>GenusScientist</code> objects ourselves, just
+like we did via <code>newAction()</code> in PHP code earlier. Add <code>genus.scientist_{1..50}</code>
+to create 50 links. Then, assign <code>user</code> to a random <code>@user.aquanaut_*</code> and <code>genus</code>
+to a random <code>@genus_*</code>. And hey, set <code>yearsStudied</code> to something random too:
+<code>&lt;numberBetween(1, 30)&gt;</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="cc9592c232">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-44" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            44 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-38" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 38
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">AppBundle\Entity\GenusScientist:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">    genus.scientist_{1..50}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        user:</span> <span class="hljs-string">'@user.aquanaut_*'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code"><span class="hljs-attr">        genus:</span> <span class="hljs-string">'@genus_*'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code"><span class="hljs-attr">        yearsStudied:</span> &lt;numberBetween(<span class="hljs-number">1</span>, <span class="hljs-number">30</span>)<span class="hljs-string">&gt;</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Nice! Go find your terminal and reload!</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:fixtures:load</div></code></pre>
+<p>Ok, go back to <code>/genus</code>... and click one of them. We have scientists!</p>
+<p>So our app is fixed, right? Well, not so fast. Go to <code>/admin/genus</code>: you might need
+to log back in - password <code>iliketurtles</code>. Our genus form is still <em>totally</em> broken.
+Ok, no error: but it doesn't even make sense anymore: our relationship is now more
+complex than checkboxes can handle. For example, how would I set the <code>yearsStudied</code>?</p>
+<p>Time to take this form up a level.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_refactoring-for-new-collections';var disqus_url = 'https://knpuniversity.com/screencast/collections/refactoring-for-new-collections';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="embedded-form-collection#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/collections/refactoring-for-new-collections" addthis:title="Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"collections","courseIsOwned":false,"chapter":"Using the new OneToMany Collections","chapterNumber":18,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations';
+        Core.courseId = 88
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'collections';
+                    Core.chapterTitle = 'Using the new OneToMany Collections';
+            Core.chapterNumber = 18;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'refactoring-for-new-collections';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

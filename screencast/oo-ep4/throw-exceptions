@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Throwing an Exception (and a Party) > OOP (course 4): Static methods, Namespaces, Exceptions &amp; Traits! Woh! | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 37328
+        };
+
+                        window.video.nextDetails = {
+            'type': 'activity',
+            'title': 'Let\'s go to the Challenge!',
+            'url': '/screencast/oo-ep4/throw-exceptions/activity/339'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Finally, we can really *unload* and see all the *cool* OOP stuff
+that we haven&#039;t covered yet. These are the last missing pieces that
+are standing between you and understanding any OO code you meet.
+
+* Static methods
+* Class constants
+* Namespaces
+* Autoloading (RIP `require` statements)
+* `__toString` &amp; the other magic functions
+* Treat that `$object[1]` like an array (`ArrayAccess`)
+* Throwing and catching ~~a baseball~~ Exceptions
+* Traits! Horizontal code re-use
+* Composition Versus Inheritance: Dressing your classes for success
+
+Finally, you&#039;re going to start to see some *serious* pay-off from
+these new, crazy OO skills you&#039;ve got. In this tutorial, OO is here
+to impress *us*. Dig in.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Throwing an Exception (and a Party)">
+<meta property="og:description" content="Finally, we can really *unload* and see all the *cool* OOP stuff
+that we haven&amp;#039;t covered yet. These are the last missing pieces that
+are standing between you and understanding any OO code you meet">
+<meta property="og:url" content="http://knpuniversity.com/screencast/oo-ep4/throw-exceptions">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/oo-ep4:3181db3484a02aea3caa63f30ae5fb85b13e9da3/oo-ep4.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="throw-exceptions#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        9.
+                            Throwing an Exception (and a Par...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">OOP (course 4): Static methods, Namespaces, Exceptions &amp; Traits! Woh!</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="class-constants" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        The Wonder of Class Constants
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 9:09</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/class-constants/activity/319" title="Challenge 1.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/class-constants/activity/320" title="Challenge 1.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/class-constants/activity/321" title="Challenge 1.3: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/class-constants/activity/322" title="Challenge 1.4: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">4 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="static-vs-non-static-and-self" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Static Methods
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:12</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/static-vs-non-static-and-self/activity/323" title="Challenge 2.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/static-vs-non-static-and-self/activity/324" title="Challenge 2.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="static-methods" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Static Methods
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:25</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/static-methods/activity/325" title="Challenge 3.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/static-methods/activity/326" title="Challenge 3.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/static-methods/activity/327" title="Challenge 3.3: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">3 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="namespaces-make-class-names-longer" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Namespaces make Class Names Longer
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:57</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/namespaces-make-class-names-longer/activity/328" title="Challenge 4.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/namespaces-make-class-names-longer/activity/329" title="Challenge 4.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/namespaces-make-class-names-longer/activity/330" title="Challenge 4.3: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/namespaces-make-class-names-longer/activity/331" title="Challenge 4.4: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">4 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="autoloading-awesomeness" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Autoloading Awesomeness
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/autoloading-awesomeness/activity/332" title="Challenge 5.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/autoloading-awesomeness/activity/333" title="Challenge 5.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="more-with-use-statements" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        More Fun with use Statements
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:26</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/more-with-use-statements/activity/334" title="Challenge 6.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/more-with-use-statements/activity/335" title="Challenge 6.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="namespaces-core-php-classes" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Namespaces and Core PHP Classes
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:58</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/namespaces-core-php-classes/activity/336" title="Challenge 7.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/namespaces-core-php-classes/activity/337" title="Challenge 7.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="composer-autoloading" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Composer Autoloading
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="throw-exceptions" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Throwing an Exception (and a Party)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/throw-exceptions/activity/339" title="Challenge 9.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/throw-exceptions/activity/340" title="Challenge 9.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="exception-classes" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Different Exception Classes
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:51</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/exception-classes/activity/341" title="Challenge 10.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/exception-classes/activity/342" title="Challenge 10.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="magic-methods" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Magic Methods: __toString() __get, __set()
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:48</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/magic-methods/activity/343" title="Challenge 11.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/magic-methods/activity/344" title="Challenge 11.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/magic-methods/activity/345" title="Challenge 11.3: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">3 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="array-access" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        ArrayAccess: Treat your Object like an Array
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:56</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/array-access/activity/346" title="Challenge 12.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/array-access/activity/347" title="Challenge 12.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="iterator-aggregate" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        IteratorAggregate: Loop over an Object!?
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:26</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/iterator-aggregate/activity/348" title="Challenge 13.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/iterator-aggregate/activity/349" title="Challenge 13.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="traits-reuse" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Traits: &quot;Horizontal&quot; Reuse
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:31</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/traits-reuse/activity/350" title="Challenge 14.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/traits-reuse/activity/351" title="Challenge 14.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="composition-ftw" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Object Composition FTW!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:48</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/composition-ftw/activity/352" title="Challenge 15.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/composition-ftw/activity/353" title="Challenge 15.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/oo-ep4/composition-ftw/activity/354" title="Challenge 15.3: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">3 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/oo-ep4" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Throwing an Exception (and a Party)</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>OOP (course 4): Static methods, Namespaces, Exceptions &amp; Traits! Woh! Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $10.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="http://knpuniversity.com/screencast/oo-ep4/throw-exceptions/activity/339">
+            Next Challenge <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="throw-exceptions#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="throw-exceptions#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/oo/edit/master/knpu/episode4/throw-exceptions.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Let's talk about something totally different: a powerful part of object-oriented
+code called <em>exceptions</em>.</p>
+<p>In <code>index.php</code>, we create a <code>BrokenShip</code> object. I'm going to do something crazy,
+guys. I'm going to say, <code>$brokenShip-&gt;setStrength()</code> and pass it... <code>banana</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6b0f099ba4">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-146" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            146 lines <span class="meta-divider"></span> <span title="index.php">index.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Model</span>\<span class="hljs-title">BrokenShip</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">$brokenShip = <span class="hljs-keyword">new</span> BrokenShip(<span class="hljs-string">'Just a hunk of metal'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">$brokenShip-&gt;setStrength(<span class="hljs-string">'banana'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="16-146" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 16 - 146
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That strength makes no sense. And if we try to battle using this ship, we should
+get <em>some</em> sort of error. But when we refresh... well, it <em>is</em> an error: but not
+exactly what I expected.</p>
+<p>This error is coming from <code>AbstractShip</code> line 65. Open that up. I want you to look
+at 2 exceptional things here:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fcda6833b7">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-125" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            125 lines <span class="meta-divider"></span> <span title="lib/Model/AbstractShip.php">lib/Model/AbstractShip.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractShip</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-44" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 44
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setStrength</span><span class="hljs-params">($number)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!is_numeric($number)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(<span class="hljs-string">'Strength must be a number, duh!'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;strength = $number;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="53-123" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 53 - 123
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="124"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>First, we planned ahead. When we created the <code>setStrength()</code> method, we said:</p>
+<blockquote><p>You know what? This needs to be a number, so if somebody passes something
+  dumb like "banana," then let's check for that and trigger an error.</p>
+</blockquote>
+<p>Second, in order to trigger an error, we threw an <em>exception</em>. And that's actually
+what I want to talk about: Exceptions are classes, but they're completely special.</p>
+<p>But first, <code>Exception</code> is a core PHP class, and when we added a <code>namespace</code> to this
+file, we forgot to change it to <code>\Exception</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fcda6833b7">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-125" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            125 lines <span class="meta-divider"></span> <span title="lib/Model/AbstractShip.php">lib/Model/AbstractShip.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractShip</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-44" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 44
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setStrength</span><span class="hljs-params">($number)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!is_numeric($number)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(<span class="hljs-string">'Strength must be a number, duh!'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;strength = $number;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="53-123" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 53 - 123
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="124"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That's better. Now refresh again. <em>This</em> is a much better error:</p>
+<blockquote><p>Uncaught <code>Exception</code>: Invalid strength passed: "banana"</p>
+</blockquote>
+<h2 id="when-things-go-wrong-throw-an-exception">When things go Wrong: Throw an Exception <a class="headerlink" href="throw-exceptions#when-things-go-wrong-throw-an-exception" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>When things go wrong, we throw exceptions. Why? Well, first: it stops execution of
+the page and immediately shows us a nice error.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>If you install the XDebug extension, exception messages are more helpful, prettier
+and will fix your code for you (ok, that last part is a lie).</p>
+</div><h2 id="catching-exceptions-much-better-than-catching-a-cold">Catching Exceptions: Much Better than Catching a Cold <a class="headerlink" href="throw-exceptions#catching-exceptions-much-better-than-catching-a-cold" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Second, exceptions are <em>catchable</em>. Here's what that means.</p>
+<p>Suppose that I wanted to kill the page right here with an error. I actually have
+two options: I can throw an exception, <em>or</em> I could print some error message and
+use a <code>die</code> statement to stop execution.</p>
+<p>But when you use a <code>die</code> statement, your script is <em>truly</em> done: none of your other
+code executes. But with an exception, you can actually try to <em>recover</em> and keep
+going!</p>
+<p>Let's look at how. Open up <code>PdoShipStorage</code>. Inside <code>fetchAllShipsData()</code>, change the
+table name to <code>fooooo</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ca6690c5bb">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="lib/Service/PdoShipStorage.php">lib/Service/PdoShipStorage.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PdoShipStorage</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ShipStorageInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fetchAllShipsData</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        $statement = <span class="hljs-keyword">$this</span>-&gt;pdo-&gt;prepare(<span class="hljs-string">'SELECT * FROM FOOOOO'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="21-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 21 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That clearly will <em>not</em> work. This method is called by <code>ShipLoader</code>, inside <code>getShips()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="89cfe0200e">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-67" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            67 lines <span class="meta-divider"></span> <span title="lib/Service/ShipLoader.php">lib/Service/ShipLoader.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ShipLoader</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-20" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 20
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getShips</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="23-24" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 23 - 24
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">        $shipsData = <span class="hljs-keyword">$this</span>-&gt;queryForShips();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="26-31" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 26 - 31
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="33-60" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 33 - 60
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="61"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">queryForShips</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="63"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;shipStorage-&gt;fetchAllShipsData();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="64"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="65"></td>
+            <td class="blob-code">}</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="66"></td>
+            <td class="blob-code"></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When we try to run this, we get an <em>exception</em>:</p>
+<blockquote><p>Base table or view not found</p>
+</blockquote>
+<p>The error is coming from <code>PdoShipStorage</code> on line 18, but we can also see the line
+that called this: <code>ShipLoader</code> line 23.</p>
+<p>Now, what if we knew that <em>sometimes</em>, for some reason, an exception like this might
+be thrown when we call <code>fetchAllShipsData()</code>. And when that happens, we <em>don't</em> want
+to kill the page or show an error. Instead, we want to - temporarily - render the
+page with zero ships.</p>
+<p>How can we do this? First, surround the line - or lines - that might fail with a
+try-catch block. In the <code>catch</code>, add <code>\Exception $e</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="8c4ace315b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-72" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            72 lines <span class="meta-divider"></span> <span title="lib/Service/ShipLoader.php">lib/Service/ShipLoader.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ShipLoader</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-60" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 60
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="61"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">queryForShips</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="63"></td>
+            <td class="blob-code">        <span class="hljs-keyword">try</span> {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="64"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;shipStorage-&gt;fetchAllShipsData();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="65"></td>
+            <td class="blob-code">        } <span class="hljs-keyword">catch</span> (\<span class="hljs-keyword">Exception</span> $e) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="66-67" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 66 - 67
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="68"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="69"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="70"></td>
+            <td class="blob-code">}</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code"></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Now, if the <code>fetchAllShipsData()</code> method throws an exception, the page will <em>not</em> die.
+Instead, the code inside <code>catch</code> will be called and then execution will keep going like normal:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="7dccd14a6b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-72" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            72 lines <span class="meta-divider"></span> <span title="lib/Service/ShipLoader.php">lib/Service/ShipLoader.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ShipLoader</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-60" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 60
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="61"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">queryForShips</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="63"></td>
+            <td class="blob-code">        <span class="hljs-keyword">try</span> {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="64"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;shipStorage-&gt;fetchAllShipsData();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="65"></td>
+            <td class="blob-code">        } <span class="hljs-keyword">catch</span> (\<span class="hljs-keyword">Exception</span> $e) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="66"></td>
+            <td class="blob-code">            <span class="hljs-comment">// if all else fails, just return an empty array</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="67"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> [];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="68"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="69"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="70"></td>
+            <td class="blob-code">}</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code"></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That means, we can say <code>$shipData = array()</code>.</p>
+<h2 id="using-the-exception-object">Using the Exception Object <a class="headerlink" href="throw-exceptions#using-the-exception-object" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>And just like that, the page works. That's the power of exceptions. When you throw
+an exception, any code that calls your code has the opportunity to catch the exception
+and say:</p>
+<blockquote><p>No no no, I don't want the page to die. Instead, let's do something else.</p>
+</blockquote>
+<p>Of course, we probably also don't want this to fail silently without us knowing,
+so you might trigger an error and print the message for our logs. Notice, in catch,
+we have access to the <code>Exception</code> object, and every exception has a <code>getMessage()</code>
+method on it. Use that to trigger an error to our logs:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a625dfb99a">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-73" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            73 lines <span class="meta-divider"></span> <span title="lib/Service/ShipLoader.php">lib/Service/ShipLoader.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ShipLoader</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-60" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 60
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="61"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">queryForShips</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="63"></td>
+            <td class="blob-code">        <span class="hljs-keyword">try</span> {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="64"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;shipStorage-&gt;fetchAllShipsData();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="65"></td>
+            <td class="blob-code">        } <span class="hljs-keyword">catch</span> (\<span class="hljs-keyword">Exception</span> $e) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="66"></td>
+            <td class="blob-code">            trigger_error(<span class="hljs-string">'Exception! '</span>.$e-&gt;getMessage());</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="67"></td>
+            <td class="blob-code">            <span class="hljs-comment">// if all else fails, just return an empty array</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="68"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> [];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="69"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="70"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="72"></td>
+            <td class="blob-code"></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, refresh! Right now, we see the error on top of the page. But that's just because
+of our error_reporting settings in <code>php.ini</code>. On production, this wouldn't display,
+but <em>would</em> write a line to our logs.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2968393903" id="dsq-comment-2968393903">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_gQPoYRRcKl/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2968393903">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-25</span>
+	                            <span class="dsq-commenter-name">Max</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2968393903" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2968393903" class="dsq-comment-text">
+	                                <p>Wow! Thank you so much for this detailed and helpful explanation! I'm going to use the try-catch-possibility wisely ;)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2966945667" id="dsq-comment-2966945667">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2966945667">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-24</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2966945667" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2966945667" class="dsq-comment-text">
+	                                <p>Hey Max!</p><p>In practice, not really. But GREAT question - and I realize that are example isn't the best for answering this :). Most of the time I just call functions and *allow* them to throw an exception (which *will* cause an error on the page). The reason is that most exceptions are... quite exceptional and rare. In the rare cases that something crazy happens, I actually *do* want the exception to be thrown and "uncaught" so that the page has an error. Since I use Symfony, I configure my framework to send me messages (I do this via Slack) whenever there is an exception. That way, yes, one user might see an error (like the 502 error that you saw on the challenge) but I'm notified :). If you try/catch everything, and try to recover, even when something crazy is happening, it's not really a great policy.</p><p>In reality, you should use a try-catch when you know that you might call a method, and it might throw an exception under some reasonable/normal conditions. I'll give you 2 examples from our site :).</p><p>1) We use Stripe for ecommerce. When you talk to Stripe's API using their PHP library, and a credit card is declined, their library throws a Stripe\Card\Error exception. Since that's a normal/predictable situation, we catch that error and show the user a really nice error.</p><p>2) We use Guzzle in many places to make API requests to other sites. Occasionally, we make a request to a site and we *know* that the endpoint *might* return a 400 status code instead of 200 under normal conditions (the details why this is normal for us aren't important - the point is, we *expect* this behavior sometimes). Guzzle throws an exception when a 400 status is returned. So, we try-catch those calls so that we can take action when the status is 400.</p><p>So you really need to ask could calling this function under normal conditions result in a predictable exception? Or would an exception happen only in crazy situations. The example in this chapter would actually be a case where I would *not* catch the exception... unless you're having crazy database situations where you expect your database to fail routinely (which is not a great situation).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2966722331" id="dsq-comment-2966722331">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_gQPoYRRcKl/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2966722331">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-24</span>
+	                            <span class="dsq-commenter-name">Max</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2966722331" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2966722331" class="dsq-comment-text">
+	                                <p>So basically it is obligatory to try-catch every function that throws an exception?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2966567866" id="dsq-comment-2966567866">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_gQPoYRRcKl/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2966567866">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-24</span>
+	                            <span class="dsq-commenter-name">Max</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2966567866" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2966567866" class="dsq-comment-text">
+	                                <p>Right, I got that message (and refreshed I think...) Anyway: Challenge done :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2965670150" id="dsq-comment-2965670150">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2965670150">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-24</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2965670150" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2965670150" class="dsq-comment-text">
+	                                <p>It should work if you try it again :). It looks like the temporary machine we create for you had shutdown *right* as you answered the question (for security, the machines are temporary - we try to keep them alive, but they have a max life of 20 minutes). Sorry you hit that - I got a report in our logs about it actually - it happens occasionally (that a user submits *right* when it shuts down).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2964688523" id="dsq-comment-2964688523">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_gQPoYRRcKl/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2964688523">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-23</span>
+	                            <span class="dsq-commenter-name">Max</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2964688523" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2964688523" class="dsq-comment-text">
+	                                <p>I get a 502 at challenge one using your solution.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_throw-exceptions';var disqus_url = 'https://knpuniversity.com/screencast/oo-ep4/throw-exceptions';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="http://knpuniversity.com/screencast/oo-ep4/throw-exceptions/activity/339">
+            Next Challenge <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/oo-ep4/throw-exceptions" addthis:title="OOP (course 4): Static methods, Namespaces, Exceptions &amp; Traits! Woh!">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"oo-ep4","courseIsOwned":false,"chapter":"Throwing an Exception (and a Party)","chapterNumber":9,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'OOP (course 4): Static methods, Namespaces, Exceptions &amp; Traits! Woh!';
+        Core.courseId = 82
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'oo-ep4';
+                    Core.chapterTitle = 'Throwing an Exception (and a Party)';
+            Core.chapterNumber = 9;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'throw-exceptions';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

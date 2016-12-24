@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Bootstrapping Micro-Symfony > The Symfony Micro-Framework | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 5320
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: AppBundle,\x20Routing\x20and\x20Annotations <i class="fa fa-play"></i>',
+            'url': '/screencast/micro-symfony/app-bundle-annotations#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="So you love microframeworks like Silex. Yep - me too. Being able
+to create a single file and immediately code up some routes is awesome.
+
+But Symfony is a *big* framework, right? *Wrong*! Symfony can be as
+small as a *single* file!
+
+In this tutorial, we&#039;ll bootstrap a project using Symfony as a micro-framework:
+something that looks more like Silex, but with the tools you&#039;re used to.
+This means:
+
+* Small: A project structure with *very* few files
+* Simple: Create pages by touching one file
+* Familiar: It&#039;s still Symfony :)
+* Powerful: Enable/disable any bundles you need
+* Evolve: Grow from micro to full-sized as your app succeeds
+
+So if your next project is perfect for a micro-framework, you
+can still use Symfony.
+
+Oh, and thanks to Benjamin Eberlei for his blog post and work - 
+[Symfony All The Things (Web)](http://www.whitewashing.de/2014/10/26/symfony_all_the_things_web.html)
+that served as motivation.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Bootstrapping Micro-Symfony">
+<meta property="og:description" content="So you love microframeworks like Silex. Yep - me too">
+<meta property="og:url" content="http://knpuniversity.com/screencast/micro-symfony/bootstrap">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/micro-symfony:a9f0b6fa53c8753c5cae99e940f05483e9b0d386/micro-symfony.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="bootstrap#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        1.
+                            Bootstrapping Micro-Symfony
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">The Symfony Micro-Framework</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="bootstrap" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Bootstrapping Micro-Symfony
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 9:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="app-bundle-annotations" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        AppBundle, Routing and Annotations
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:53</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="container-twig" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Container, Twig: All Smooth
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="web-debug-toolbar" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Web Debug Toolbar and Profiler
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dotenv" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        dotenv: Environmental Variables
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="environments" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Environments
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="console" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Where&#039;s my app/console
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:59</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="logging-tools" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Logging and Adding other Tools
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/micro-symfony" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Bootstrapping Micro-Symfony</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>The Symfony Micro-Framework Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered "
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/536906824_960x600.jpg">
+        <source src="http://player.vimeo.com/external/140091212.hd.mp4?s=b258b7fe6fc42c7ea3dd7b54c50524b9&amp;profile_id=113&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/140091212.sd.mp4?s=60d18bf54d78dd69f83fd0dcdaccd52c&amp;profile_id=112&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="bootstrap#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../tag/symfony" class="btn btn-lg btn-success">Back to the <i>Symfony 3</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="bootstrap#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="app-bundle-annotations#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="bootstrap#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="bootstrap#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/micro-symfony/edit/master/knpu/bootstrap.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Inspiration strikes! You've just come up with a crazy awesome idea - the kind of idea
+that's sure to save the world and impress your friends all at once. Now all you need
+to do is start coding.</p>
+<p>Of course, Symfony - the fully-featured full-stack framework will be perfect for this.
+Then again, what if we used Silex? The micro-framework approach might be a better
+way to get started so the world can quickly find out what its been missing!</p>
+<p>But Silex isn't Symfony: it lacks a lot of the tools. And if your project grows, it 
+can't easily evolve into a Symfony app: they're just too different.</p>
+<p>There's another option: use Symfony as a micro-framework, meaning with as few files,
+directories and complications as possible, without sacrificing features. And since
+no official Symfony micro-framework exists right now, let's create one.</p>
+<h2 id="composer-bootstrap">Composer Bootstrap <a class="headerlink" href="bootstrap#composer-bootstrap" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Start with a completely empty directory: so empty that we need to run <code>composer init</code>
+to bootstrap a <code>composer.json</code> file:</p>
+<pre><code class="language-bash"><div class="line">composer init</div></code></pre>
+<p>Fill in the name - none of this matters too much in a private project. Ok, dependencies.
+We only need one: <code>symfony/symfony</code>. But I also want one more library:
+<code>sensio/framework-extra-bundle</code> - this is for annotation routing. If you don't want
+that, you only need <code>symfony/symfony</code>.</p>
+<p>Our blank project now has 1 file - <code>composer.json</code> - with just 2 dependencies:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a1b9631172">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-14" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            14 lines <span class="meta-divider"></span> <span title="composer.json">composer.json</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code">{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code">    <span class="hljs-attr">"name"</span>: <span class="hljs-string">"knpuniversity/micro-symfony"</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code">    <span class="hljs-attr">"require"</span>: {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">        <span class="hljs-attr">"symfony/symfony"</span>: <span class="hljs-string">"^2.7"</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">        <span class="hljs-attr">"sensio/framework-extra-bundle"</span>: <span class="hljs-string">"^3.0"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">    },</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Go back to run <code>composer install</code>:</p>
+<pre><code class="language-bash"><div class="line">composer install</div></code></pre>
+<p>Now our empty project has a <code>vendor/</code> directory.</p>
+<h2 id="bootstrapping-symfony">Bootstrapping Symfony <a class="headerlink" href="bootstrap#bootstrapping-symfony" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Now that we have Symfony how do we bootstrap the framework? We need two things: a 
+kernel class and a front controller script that boots and executes it.</p>
+<p>Start with the kernel: create a new <code>AppKernel.php</code> file at the root of your project.
+You can call this file anything, but I want to stay consistent with normal Symfony
+when possible. Make this extend Symfony's <code>Kernel</code> class. Since we're not in a namespaced
+class, PhpStorm auto-completes the namespaces inline. Ew! Add a <code>use</code> statement instead:
+let's keep things somewhat organized people:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="77a76cbb05">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="AppKernel.php">AppKernel.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">HttpKernel</span>\<span class="hljs-title">Kernel</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="4-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 4 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppKernel</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Kernel</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p><code>Kernel</code> is an abstract class. Use cmd+n - or the menu option, Code-&gt;Generate - then 
+"Implement Methods". Select the two methods at the bottom:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="8b37173c93">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="AppKernel.php">AppKernel.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">HttpKernel</span>\<span class="hljs-title">Kernel</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">Config</span>\<span class="hljs-title">Loader</span>\<span class="hljs-title">LoaderInterface</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppKernel</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Kernel</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">registerBundles</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">registerContainerConfiguration</span><span class="hljs-params">(LoaderInterface $loader)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="21-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h3 id="registerbundles">registerBundles() <a class="headerlink" href="bootstrap#registerbundles" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Get rid of the comments. So first, let's instantiate all the bundles we need.
+In a normal, new, Symfony project, there are 8 or more bundles here by default. We
+just need 3: a new <code>FrameworkBundle</code>, <code>TwigBundle</code> - this is used to render error
+and exception pages, so you may want this, even if you're building an API. And since
+I'll use annotations for my routing, use <code>SensioFrameworkExtraBundle</code>. If you like
+YAML routing, you don't even need this last one. Return the <code>$bundles</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d022898e8f">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="AppKernel.php">AppKernel.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppKernel</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Kernel</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">registerBundles</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">        $bundles = <span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">            <span class="hljs-keyword">new</span> \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">            <span class="hljs-keyword">new</span> \Symfony\Bundle\TwigBundle\TwigBundle(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">            <span class="hljs-keyword">new</span> \Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">        );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> $bundles;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="18-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 18 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h3 id="registercontainerconfiguration">registerContainerConfiguration() <a class="headerlink" href="bootstrap#registercontainerconfiguration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>For the next method - move the inline namespace to be a <code>use</code> statement on top. When
+the kernel boots, it needs to configure each bundle - it needs things like the database
+password, where to log, etc. That's the purpose of <code>registerContainerConfiguration()</code>.</p>
+<p>Use <code>$loader-&gt;load()</code> and point this to a new <code>config/config.yml</code> file:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="299b7f2281">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="AppKernel.php">AppKernel.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppKernel</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Kernel</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-18" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 18
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">registerContainerConfiguration</span><span class="hljs-params">(LoaderInterface $loader)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        $loader-&gt;load(<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/config/config.yml'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And now create the <code>config</code> directory and that file so that it isn't pointing into
+outerspace. Leave it blank for now.</p>
+<h2 id="front-controller-index-php">Front Controller: index.php <a class="headerlink" href="bootstrap#front-controller-index-php" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>That's a functional kernel! We need a front controller that can instantiate and execute
+it. Create a <code>web/</code> directory with an <code>index.php</code> inside. Symfony has two front controllers:
+<code>app.php</code> and <code>app_dev.php</code>: we'll have just one because I want less less less. We're going
+for the micro of micro!</p>
+<p>In my browser, we're looking at the <a href="https://github.com/symfony/symfony-standard">symfony/symfony-standard</a>
+repository, because I want to steal some things. Open the <code>web/</code> directory and find
+<code>app_dev.php</code>. Copy its contents into <code>index.php</code>. Now we're going to slim this
+down a bit:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3f6c778ed1">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            31 lines <span class="meta-divider"></span> <span title="web/index.php">web/index.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-meta">&lt;?php</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">HttpFoundation</span>\<span class="hljs-title">Request</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">Debug</span>\<span class="hljs-title">Debug</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-comment">// If you don't want to setup permissions the proper way, just uncomment the following PHP line</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-comment">// read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-comment">//umask(0000);</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"><span class="hljs-comment">// This check prevents access to debug front controllers that are deployed by accident to production servers.</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-comment">// Feel free to remove this, extend it, or make something more sophisticated.</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-keyword">if</span> (<span class="hljs-keyword">isset</span>($_SERVER[<span class="hljs-string">'HTTP_CLIENT_IP'</span>])</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    || <span class="hljs-keyword">isset</span>($_SERVER[<span class="hljs-string">'HTTP_X_FORWARDED_FOR'</span>])</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    || !(in_array(@$_SERVER[<span class="hljs-string">'REMOTE_ADDR'</span>], <span class="hljs-keyword">array</span>(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-string">'fe80::1'</span>, <span class="hljs-string">'::1'</span>)) || php_sapi_name() === <span class="hljs-string">'cli-server'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    header(<span class="hljs-string">'HTTP/1.0 403 Forbidden'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    <span class="hljs-keyword">exit</span>(<span class="hljs-string">'You are not allowed to access this file. Check '</span>.basename(<span class="hljs-keyword">__FILE__</span>).<span class="hljs-string">' for more information.'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">}</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">$loader = <span class="hljs-keyword">require_once</span> <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/../app/bootstrap.php.cache'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">Debug::enable();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code"><span class="hljs-keyword">require_once</span> <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/../app/AppKernel.php'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">$kernel = <span class="hljs-keyword">new</span> AppKernel(<span class="hljs-string">'dev'</span>, <span class="hljs-keyword">true</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">$kernel-&gt;loadClassCache();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">$request = Request::createFromGlobals();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">$response = $kernel-&gt;handle($request);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">$response-&gt;send();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">$kernel-&gt;terminate($request, $response);</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Delete the IP-checking stuff and uncomment out the <code>umask</code> - that makes dealing
+with permissions easier. For the loader, require Composer's standard autoloader
+in <code>vendor/autoload.php</code>. And <code>AppKernel</code> is <em>not</em> in an <code>app/</code> directory - so update
+the path:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ac6cdf83a5">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="web/index.php">web/index.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">umask(<span class="hljs-number">0000</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">$loader = <span class="hljs-keyword">require_once</span> <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/../vendor/autoload.php'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-keyword">require_once</span> <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/../AppKernel.php'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-24" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 24
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When you create the kernel, you pass it an environment and whether or not we're in
+<code>debug</code> mode: that controls whether errors are shown. We'll tackle these properly
+soon, but right now, hardcode two new variables <code>$env = 'dev'</code> and <code>$debug = true</code>.
+Pass these into <code>AppKernel</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d1741b9b0b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="web/index.php">web/index.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">$env = <span class="hljs-string">'dev'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">$debug = <span class="hljs-keyword">true</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-17" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 17
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">$kernel = <span class="hljs-keyword">new</span> AppKernel($env, $debug);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-24" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 19 - 24
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Oh, and put an <code>if</code> statement around the <code>Debug::enable()</code> line so it only runs in
+debug mode. This wraps PHP's error handler and gives us better errors:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fa6dd1cf96">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="web/index.php">web/index.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"><span class="hljs-keyword">if</span> ($debug) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    Debug::enable();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">}</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-24" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 24
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And in the spirit of making everything as small as possible, remove the <code>loadClassCache()</code>
+line: this adds a small performance boost. If you're feeling less micro, you can keep it.</p>
+<h2 id="testing-it-out">Testing it out <a class="headerlink" href="bootstrap#testing-it-out" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>That's it for the front controller! Time to try things. Open up a new terminal tab,
+move into the web directory, then start the built-in web server on port 8000:</p>
+<pre><code class="language-bash"><div class="line">cd web/</div><div class="line">php -S localhost:8000</div></code></pre>
+<p>Let's try it - we're hoping to see a working Symfony 404 page, because we don't have
+any routes yet. Okay, not working yet - but this isn't so bad: it's a Symfony error,
+we're missing some <code>kernel.secret</code> parameter.</p>
+<h2 id="adding-the-base-config">Adding the Base Config <a class="headerlink" href="bootstrap#adding-the-base-config" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The reason is that we do need a <em>little</em> bit of configuration in <code>config.yml</code>. Add
+a <code>framework</code> key with a <code>secret</code> under it that's set to anything:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="be4c01c71e">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-7" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            7 lines <span class="meta-divider"></span> <span title="config/config.yml">config/config.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">framework:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    secret:</span> ABC123</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="3-7" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 3 - 7
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When we refresh now, it's a different error: something about a Twig template that's
+not defined. These weird errors are due to some missing configuration. Here's the
+minimum you need. Add a <code>router</code> key with a <code>resource</code> sub-key that points to a routing
+file. Use <code>%kernel.root_dir%/config/routing.yml</code>. <code>%kernel.root_dir%</code> points to
+wherever your kernel lives, which is the <code>app/</code> directory in normal Symfony, but
+the root folder for us minimalists.</p>
+<p>You also need a <code>templating</code> key with an <code>engines</code> sub-key set to <code>twig</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="47251ea6dc">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            7 lines <span class="meta-divider"></span> <span title="config/config.yml">config/config.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">framework:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    secret:</span> ABC123</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">    router:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">        resource:</span> <span class="hljs-string">'%kernel.root_dir%/config/routing.yml'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-attr">    templating:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">        engines:</span> [twig]</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That's all you need to get things working. Oh, and don't forget to create
+a <code>config/routing.yml</code> file - it can be blank for now:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a0f3be9a83">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            1 lines <span class="meta-divider"></span> <span title="config/routing.yml">config/routing.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+            
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Refresh! It lives! "No route found for GET /" - that's our working 404 page. We'll fix 
+that missing CSS in a bit, but this <em>is</em> a functional Symfony project: it just doesn't
+have any routes yet.</p>
+<h2 id="the-symfony-plugin">The Symfony Plugin <a class="headerlink" href="bootstrap#the-symfony-plugin" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>One of the coolest things about using Symfony is the PhpStorm plugin for it, which we
+cover in the <a href="https://knpuniversity.com/screencast/phpstorm">Lean and Mean dev with PHP Storm tutorial</a>. </p>
+<p>If you have it installed, search "symfony" in your settings to find it. Check "Enable" and
+remove <code>app/</code> from all the configurable paths. Our project is smaller than normal:
+instead of <code>app/cache</code> and <code>app/logs</code>, you just have <code>cache</code> and <code>logs</code> at the root.
+Init a new <code>git</code> repository and add these to your <code>.gitignore</code> file along with <code>vendor/</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="b7f2c54bcd">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            4 lines <span class="meta-divider"></span> <span title=".gitignore">.gitignore</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code">/vendor/</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code">/cache/</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code">/logs/</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Count the files: other than composer stuff, we have 1, 2, 3, 4 files, and a functioning
+Symfony framework project. #micro</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2549424733" id="dsq-comment-2549424733">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2549424733">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-03</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2549424733" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2549424733" class="dsq-comment-text">
+	                                <p>It depends. It's great for quickly bootstrapping smaller projects - like a small API - the types of things you might consider also for Silex. But of course, it can also easily grow into a larger project. The trick with using this for smaller projects is that you need to have a "micro skeleton" that's available to avoid all the setup. The best one I've seen - that uses the new MicroKernelTrait we introduced in Symfony 2.8 - is <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FCawaKharkov%2Fsymfony-micro%3AdWYqNWAbQGtb5WAEudwLVyQaTFQ&amp;cuid=1175718" rel="nofollow noopener">https://github.com/CawaKharkov...</a>.</p><p>Let me know your thoughts :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2545009754" id="dsq-comment-2545009754">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_SZDJHjndI4/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/19783/217/avatar92.jpg?1456822557">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2545009754">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-01</span>
+	                            <span class="dsq-commenter-name">Paulius</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2545009754" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2545009754" class="dsq-comment-text">
+	                                <p>What kind of projects should use this micro framework?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2461837248" id="dsq-comment-2461837248">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2461837248">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-01-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2461837248" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2461837248" class="dsq-comment-text">
+	                                <p>Great tip! It's also safe (but not required) to add this setting in 2.8 - so that you won't hit this error when you upgrade.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2457188597" id="dsq-comment-2457188597">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2sH42PRrRo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/19205/8846/avatar92.jpg?1452778926">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2457188597">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-01-14</span>
+	                            <span class="dsq-commenter-name">Sargath</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2457188597" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2457188597" class="dsq-comment-text">
+	                                <p>Hi Guys!</p><p>Gr8 tut as always &lt;3</p><p>There is small issue during working with this, using latest symfony dependencies, I've mean</p><p>Twig_Error_Syntax: Unknown "asset" function in "@Twig/Exception/exception_full.html.twig" at line 4.</p><p>Newest dependencies</p><p>"require": {<br>    "symfony/symfony": "^3.0",<br>    "sensio/framework-extra-bundle": "^3.0"<br>}</p><p>So inside config.yml there should be added "assets:" key</p><p>Best regards!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2235406683" id="dsq-comment-2235406683">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bicpi/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/2101/8341/avatar92.jpg?1456084904">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2235406683">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-04</span>
+	                            <span class="dsq-commenter-name">Philipp Rieber</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2235406683" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2235406683" class="dsq-comment-text">
+	                                <p>It was only this "/logs" line :-)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2234638378" id="dsq-comment-2234638378">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2234638378">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-03</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2234638378" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2234638378" class="dsq-comment-text">
+	                                <p>Thanks Philipp! I think I've got it fixed now - check out the last code block. Was it just that missing /logs line in .gitignore of the last code block, or was there something else wrong too? I wasn't totally sure - but let me know!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2229632821" id="dsq-comment-2229632821">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bicpi/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/2101/8341/avatar92.jpg?1456084904">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2229632821">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-01</span>
+	                            <span class="dsq-commenter-name">Philipp Rieber</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2229632821" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2229632821" class="dsq-comment-text">
+	                                <p>Great tutorial, thanks!<br>2 small things in the script: "/logs" path is missing the last listing of ".gitignore" file and the code listings sum up the line with one additional line (e.g. 3 lines for the .gitignore file instead of 2).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2213355766" id="dsq-comment-2213355766">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/florianklein/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/5198/2760/avatar92.jpg?1369380381">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2213355766">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-08-25</span>
+	                            <span class="dsq-commenter-name">Florian Klein</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2213355766" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2213355766" class="dsq-comment-text">
+	                                <p>That's awesome. I like to bootstrap my projects like that, it makes so much more sense!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2197118238" id="dsq-comment-2197118238">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/sergeylunev/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/2549/8142/avatar92.jpg?1439745298">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2197118238">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-08-16</span>
+	                            <span class="dsq-commenter-name">sergeylunev</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2197118238" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2197118238" class="dsq-comment-text">
+	                                <p>Whoh! Its so awesome. Thx for great work!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_bootstrap';var disqus_url = 'https://knpuniversity.com/screencast/micro-symfony/bootstrap';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="app-bundle-annotations#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/micro-symfony/bootstrap" addthis:title="The Symfony Micro-Framework">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"micro-symfony","courseIsOwned":false,"chapter":"Bootstrapping Micro-Symfony","chapterNumber":1,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'The Symfony Micro-Framework';
+        Core.courseId = 67
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'micro-symfony';
+                    Core.chapterTitle = 'Bootstrapping Micro-Symfony';
+            Core.chapterNumber = 1;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'bootstrap';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

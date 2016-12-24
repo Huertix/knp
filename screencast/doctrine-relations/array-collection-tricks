@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Tricks with ArrayCollection > Mastering Doctrine Relationships in Symfony | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 34759
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Querying\x20on\x20a\x20Relationship <i class="fa fa-play"></i>',
+            'url': '/screencast/doctrine-relations/relation-query#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures.
+
+But, we left out *one* big piece: database relations. Once you&#039;ve mastered these,
+you&#039;ll be unstoppable. Unfortunately, a lot of information out there make Doctrine
+relations look over-complicated. Actually, they&#039;re simple and beautiful. Sure,
+they have some pitfalls - but they&#039;ll also help you build a complex data structure
+in no time.
+
+* ManyToOne relationships (associations)
+* The OneToMany side of a relation
+* The downfall of owning versus inverse sides of a relation
+* Doing magic with the ArrayCollection
+* Querying with Joins
+
+... and more - like some magic with the &quot;Param Conversion&quot;.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Tricks with ArrayCollection">
+<meta property="og:description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures">
+<meta property="og:url" content="http://knpuniversity.com/screencast/doctrine-relations/array-collection-tricks">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/doctrine-relations:00a4bff155bef69e3d39bd9c91a18e6e37c3bbac/doctrine-relationships.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="array-collection-tricks#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        8.
+                            Tricks with ArrayCollection
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Mastering Doctrine Relationships in Symfony</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="create-genus-note" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Create Genus Note
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-one-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The King of Relations: ManyToOne
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Saving a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="join-column-relation-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        JoinColumn &amp; Relations in Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="param-conversion" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Controller Magic: Param Conversion
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        OneToMany: Inverse Side of the Relation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many-order-by" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Order By with a OneToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="array-collection-tricks" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Tricks with ArrayCollection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="relation-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Querying on a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="query-with-join" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Query across a JOIN (and Love it)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/doctrine-relations" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Tricks with ArrayCollection</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Mastering Doctrine Relationships in Symfony Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="relation-query#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="array-collection-tricks#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="array-collection-tricks#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (7)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep3b-doctrine-relations/array-collection-tricks.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Oh man, the project manager just came to me with a new challenge. Showing all the
+notes below is great, but they want a new section on top to easily see how many notes
+have been posted during the past 3 months.</p>
+<p>Hmm. In <code>showAction()</code>, we need to somehow count all the recent notes for this <code>Genus</code>.
+We <em>could</em> start with <code>$recentNotes = $genus-&gt;getNotes()</code>... but that's <em>everything</em>. Do
+we need to finally stop being lazy and make a custom query? Not necessarily.</p>
+<p>Remember: <code>getNotes()</code> returns an <code>ArrayCollection</code> object and it has some tricks
+on it - like a method for filtering! Chain a call to the <code>filter()</code> method and pass
+this an anonymous function with a <code>GenusNote</code> argument. The <code>ArrayCollection</code> will
+call this function for <em>each</em> item. If we return true, it stays. If we return false,
+it disappears.</p>
+<p>Easy enough! Return <code>$note-&gt;getCreatedAt() &gt; new \DateTime('-3 months');</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6fbb440225">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-122" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            122 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-57" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 57
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="58"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showAction</span><span class="hljs-params">($genusName)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="60-85" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 60 - 85
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="86"></td>
+            <td class="blob-code">        $recentNotes = $genus-&gt;getNotes()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="87"></td>
+            <td class="blob-code">            -&gt;filter(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(GenusNote $note)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="88"></td>
+            <td class="blob-code">                <span class="hljs-keyword">return</span> $note-&gt;getCreatedAt() &gt; <span class="hljs-keyword">new</span> \DateTime(<span class="hljs-string">'-3 months'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="89"></td>
+            <td class="blob-code">            });</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="90-94" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 90 - 94
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="95"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="96-120" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 96 - 120
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="121"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, pass a new <code>recentNoteCount</code> variable into twig that's set to <code>count($recentNotes)</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="de8236b8bd">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-122" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            122 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-57" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 57
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="58"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showAction</span><span class="hljs-params">($genusName)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="60-90" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 60 - 90
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="91"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;render(<span class="hljs-string">'genus/show.html.twig'</span>, <span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="92"></td>
+            <td class="blob-code">            <span class="hljs-string">'genus'</span> =&gt; $genus,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="93"></td>
+            <td class="blob-code">            <span class="hljs-string">'recentNoteCount'</span> =&gt; count($recentNotes)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="94"></td>
+            <td class="blob-code">        ));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="95"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="96-120" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 96 - 120
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="121"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>In the template, add a new <code>dt</code> for <code>Recent Notes</code> and a <code>dd</code> with <code>{{ recentNoteCount }}</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="e6b4560097">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-42" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            42 lines <span class="meta-divider"></span> <span title="app/Resources/views/genus/show.html.twig">app/Resources/views/genus/show.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">h2</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-name"</span>&gt;</span></span><span class="hljs-template-variable">{{ genus.name }}</span><span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"sea-creature-container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-photo"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">dl</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"genus-details-list"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="12-17" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 12 - 17
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">dt</span>&gt;</span>Recent Notes<span class="hljs-tag">&lt;/<span class="hljs-name">dt</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">dd</span>&gt;</span></span><span class="hljs-template-variable">{{ recentNoteCount }}</span><span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">dd</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">dl</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"js-notes-wrapper"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-42" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 42
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>All right - give it a try! Refresh. Six notes - perfect: we clearly have a lot more
+than six in total.</p>
+<p>The <code>ArrayCollection</code> has lots of fun methods on it like this, including <code>contains()</code>,
+<code>containsKey()</code>, <code>forAll()</code>, <code>map()</code> and other goodies.</p>
+<h2 id="don-t-abuse-arraycollection">Don't Abuse ArrayCollection <a class="headerlink" href="array-collection-tricks#don-t-abuse-arraycollection" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Do you see any downsides to this? There's one big one: this queries for <em>all</em> of
+the notes, even though we don't need them all. If you know you'll only ever have
+a few notes, no big deal. But if you may have <em>many</em> notes: don't do this - you
+<em>will</em> feel the performance impact of loading up hundreds of extra objects.</p>
+<p>So what's the <em>right</em> way? Finally making a custom query that only returns the
+<code>GenusNote</code> objects we need. Let's do that next.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922962247" id="dsq-comment-2922962247">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922962247">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922962247" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922962247" class="dsq-comment-text">
+	                                <p>Well, some Symfony-related courses imply basic Symfony background.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922928439" id="dsq-comment-2922928439">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922928439">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922928439" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922928439" class="dsq-comment-text">
+	                                <p>I just wonder how it has appeared miraculously between the chapters...</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922921932" id="dsq-comment-2922921932">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922921932">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922921932" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922921932" class="dsq-comment-text">
+	                                <p>Yo Maksym,</p><p>`$this-&gt;get('logger')` or `$this-&gt;container-&gt;get('logger')`, which is the same, is a service call. Service container returns a Logger object which you can use in order to make some logs in your app. Actually, this course is the 4th in the Symfony 3 track. Please, check the <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony%2Fservices-useful-objects%3A0bSvuzPvhqn-M3XSlLn9rGLaItw&amp;cuid=1175718" rel="nofollow noopener">previous one</a> out where we explain some basic things about Service Container and Dependency Injection.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922870926" id="dsq-comment-2922870926">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922870926">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922870926" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922870926" class="dsq-comment-text">
+	                                <p>What is this get('logger') line about? There wasn't any in the previous chapter.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2694875526" id="dsq-comment-2694875526">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/raphael_schubert/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13465/8269/avatar92.jpg?1479961291">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2694875526">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-25</span>
+	                            <span class="dsq-commenter-name">Raphael Schubert</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2694875526" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2694875526" class="dsq-comment-text">
+	                                <p>Yeah.. its really ugly... but it worked... !!! cheers!!!</p><p>i`ll try the second way later... it seems to be good!!</p><p>Thank you for answering me daily!!! i asked around 10 questions... you`re rock!!!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2694870926" id="dsq-comment-2694870926">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2694870926">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2694870926" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2694870926" class="dsq-comment-text">
+	                                <p>Hey Raphael!</p><p>This is the big disadvantage of using Doctrine's array type (array or json_array). You can't *really* query on this - it's ultimately just a string in the database. However, you *can* technically query a "fuzzy" query - but it's a little ugly:</p><p></p><pre><code><br>$this-&gt;createQueryBuilder('u')<br>    -&gt;andWhere('u.roles LIKE :roleSearch')<br>    -&gt;setParameter('roleSearch', '%ROLE_USER%')<br>    -&gt;getQuery()<br>    -&gt;execute();<br></code></pre><p></p><p>If all you need are simple queries - this works in practice. However, if you need to do more complex query, then you'll may need another solution. In this case, I would create a Role entity (it would basically just have a string "role" property) and make a ManyToMany relationship from User to Role. Your User class would look something like this:</p><p></p><pre><code><br>    /**<br>     * @ORM\ManyToMany(targetEntity="Role")<br>     */<br>    private $roleObjects;<br><br>    // initialize roleObjects to an ArrayCollection in __construct()<br><br>    public function getRoles()<br>    {<br>        $roles = [];<br>        foreach ($this-&gt;roleObjects as $roleObject) {<br>            $roles[] = $roleObject-&gt;getRole();<br>        }<br><br>        return $roles;<br>    }<br><br>    // add setter and getter for roleObjects like normal<br></code></pre><p></p><p>As you can see, you create a normal ManyToMany relationship, then simply loop over that relationship to return the array of string roles in getRoles() (which is what Symfony's security system wants). Then, you can properly query for exact matches.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2693957292" id="dsq-comment-2693957292">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/raphael_schubert/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13465/8269/avatar92.jpg?1479961291">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2693957292">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-25</span>
+	                            <span class="dsq-commenter-name">Raphael Schubert</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2693957292" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2693957292" class="dsq-comment-text">
+	                                <p>Hello!!</p><p>I have a problem... i`m trying select from a field where is stored as array...<br>sample.. i Have the [ roles ]  field in database.</p><p>Now i need select all users where roles = "ROLE_USER"<br>But some of they has: "ROLE_USER", "ROLE_VENDOR", "ROLE_FINANCIAL"</p><p>how can i query for all where contains ROLE_USER?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_array-collection-tricks';var disqus_url = 'https://knpuniversity.com/screencast/doctrine-relations/array-collection-tricks';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="relation-query#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/doctrine-relations/array-collection-tricks" addthis:title="Mastering Doctrine Relationships in Symfony">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"doctrine-relations","courseIsOwned":false,"chapter":"Tricks with ArrayCollection","chapterNumber":8,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Mastering Doctrine Relationships in Symfony';
+        Core.courseId = 81
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'doctrine-relations';
+                    Core.chapterTitle = 'Tricks with ArrayCollection';
+            Core.chapterNumber = 8;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'array-collection-tricks';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

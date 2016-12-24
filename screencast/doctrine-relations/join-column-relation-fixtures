@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JoinColumn &amp; Relations in Fixtures > Mastering Doctrine Relationships in Symfony | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 34755
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Controller\x20Magic\x3A\x20Param\x20Conversion <i class="fa fa-play"></i>',
+            'url': '/screencast/doctrine-relations/param-conversion#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures.
+
+But, we left out *one* big piece: database relations. Once you&#039;ve mastered these,
+you&#039;ll be unstoppable. Unfortunately, a lot of information out there make Doctrine
+relations look over-complicated. Actually, they&#039;re simple and beautiful. Sure,
+they have some pitfalls - but they&#039;ll also help you build a complex data structure
+in no time.
+
+* ManyToOne relationships (associations)
+* The OneToMany side of a relation
+* The downfall of owning versus inverse sides of a relation
+* Doing magic with the ArrayCollection
+* Querying with Joins
+
+... and more - like some magic with the &quot;Param Conversion&quot;.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="JoinColumn &amp; Relations in Fixtures">
+<meta property="og:description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures">
+<meta property="og:url" content="http://knpuniversity.com/screencast/doctrine-relations/join-column-relation-fixtures">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/doctrine-relations:00a4bff155bef69e3d39bd9c91a18e6e37c3bbac/doctrine-relationships.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="join-column-relation-fixtures#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        4.
+                            JoinColumn &amp; Relations in Fixtur...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Mastering Doctrine Relationships in Symfony</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="create-genus-note" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Create Genus Note
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-one-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The King of Relations: ManyToOne
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Saving a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="join-column-relation-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        JoinColumn &amp; Relations in Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="param-conversion" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Controller Magic: Param Conversion
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        OneToMany: Inverse Side of the Relation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many-order-by" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Order By with a OneToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="array-collection-tricks" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Tricks with ArrayCollection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="relation-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Querying on a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="query-with-join" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Query across a JOIN (and Love it)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/doctrine-relations" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">JoinColumn &amp; Relations in Fixtures</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Mastering Doctrine Relationships in Symfony Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="param-conversion#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="join-column-relation-fixtures#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="join-column-relation-fixtures#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep3b-doctrine-relations/join-column-relation-fixtures.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Is the relationship <em>required</em> in the database? I mean, could I save a <code>GenusNote</code>
+<em>without</em> setting a <code>Genus</code> on it? Actually, I could! Unlike a normal column, relationship
+columns - for whatever reason - are <em>optional</em> by default. But does it make sense
+to allow a <code>GenusNote</code> without a <code>Genus</code>? No! That's crazy talk! Let's prevent it.</p>
+<p>Find the <code>ManyToOne</code> annotation and add a <em>new</em> annotation below it: <code>JoinColumn</code>.
+Inside, set <code>nullable=false</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="bb984a579e">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-96" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            96 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusNote.php">src/AppBundle/Entity/GenusNote.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusNote</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-39" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 39
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\ManyToOne(targetEntity="Genus")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\JoinColumn(nullable=false)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $genus;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="45-94" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 45 - 94
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="95"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The <code>JoinColumn</code> annotation controls how the foreign key looks in the database.
+And obviously, it's optional. Another option is <code>onDelete</code>: that literally
+changes the <code>ON DELETE</code> behavior in your database - the default is <code>RESTRICT</code>,
+but you can also use <code>CASCADE</code> or <code>SET NULL</code>.</p>
+<p>Anyways, we just made a schema change - so time to generate a migration!</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:diff</div></code></pre>
+<p>This time, I'll be lazy and trust that it's correct. Run it!</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:migrate</div></code></pre>
+<h2 id="when-migrations-go-wrong">When Migrations Go Wrong <a class="headerlink" href="join-column-relation-fixtures#when-migrations-go-wrong" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Ah, it explodes! Null value not allowed? Why? Think about what's happening: we have
+a bunch of <em>existing</em> <code>GenusNote</code> rows in the database, and each still has a <code>null</code>
+<code>genus_id</code>. We can't set that column to <code>NOT NULL</code> because of the data that's already
+in the database.</p>
+<p>If the app were already deployed to production, we would need to fix the migration:
+maybe UPDATE each existing <code>genus_note</code> and set the <code>genus_id</code> to the first <code>genus</code>
+in the table.</p>
+<p>But, alas! We haven't deployed to production yet: so there isn't any existing production
+database that we'll need to migrate. Instead, just start from scratch: drop the
+database completely, re-create it, and re-migrate from the beginning:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:database:drop --force</div></code></pre>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:database:create</div></code></pre>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:migrate</div></code></pre>
+<p>Phew! Now it works great.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>If you <em>still</em> get an error while running the migration, it's because
+of a MySQL change! Find the details here: <a href="http://bit.ly/migrations-tweak">http://bit.ly/migrations-tweak</a></p>
+</div><h2 id="relations-in-fixtures">Relations in Fixtures <a class="headerlink" href="join-column-relation-fixtures#relations-in-fixtures" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Last step! Our fixtures are broken: we need to associate each <code>GenusNote</code> with a
+<code>Genus</code>. We know how to set normal properties, like <code>username</code> and <code>userAvatarFilename</code>.
+But how can we set relations? As usual with Alice: it's <em>so</em> nice. Use <code>genus: @</code>
+then the internal name of one of the 10 genuses - like <code>genus_1</code>. That's it!</p>
+<p>But, you know what? That's not awesome enough. I <em>really</em> want this to be a <em>random</em>
+Genus. Ok: change that <code>genus_1</code> to <code>genus_*</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="452aacf257">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-16" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            16 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">AppBundle\Entity\GenusNote:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    genus.note_{1..100}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        genus:</span> <span class="hljs-string">'@genus_*'</span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Alice will now look at the 10 Genus objects matching this pattern and select
+a random one each time.</p>
+<p>Reload the fixtures:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:fixtures:load</div></code></pre>
+<p>It's alive! Check out the results again with <code>doctrine:query:sql</code>:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:query:sql 'SELECT * FROM genus_note'</div></code></pre>
+<p>Every single one has a random genus. Do you love it? I love it.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3049100550" id="dsq-comment-3049100550">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3049100550">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-12</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3049100550" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3049100550" class="dsq-comment-text">
+	                                <p>Ah, thanks Teodor! It makes sense then - there is a bug in *how* the migration generator for 5.6.7, so you generated the same "bug" that I did :). Nothing to worry about</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3048034938" id="dsq-comment-3048034938">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/teodoriancu/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20672/975/avatar92.jpg?1482509204">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3048034938">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-12</span>
+	                            <span class="dsq-commenter-name">Teodor Iancu</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3048034938" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3048034938" class="dsq-comment-text">
+	                                <p>Hy Ryan!<br>my version is not from download, I made step by step with you from begining :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3046093757" id="dsq-comment-3046093757">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3046093757">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-10</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3046093757" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3046093757" class="dsq-comment-text">
+	                                <p>Hey Teodor!</p><p>Glad you got it working :). I'm curious, did you download the "start" code for the project and have problems with the migration? We pushed a fix for the migration for MySQL 5.6.7 - so I *thought* we had that issue tackled. I'm interested in what you saw!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3045757285" id="dsq-comment-3045757285">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/teodoriancu/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20672/975/avatar92.jpg?1482509204">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3045757285">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-10</span>
+	                            <span class="dsq-commenter-name">Teodor Iancu</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3045757285" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3045757285" class="dsq-comment-text">
+	                                <p>that's work for me:</p><p> Delete all files inside DoctrineMigrations folder</p><p>/bin/console doctrine:database:drop --force</p><p>Restart MySQL server</p><p>./bin/console doctrine:database:create<br>./bin/console doctrine:migrations:diff<br>./bin/console doctrine:migrations:migrate</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977347435" id="dsq-comment-2977347435">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977347435">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977347435" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977347435" class="dsq-comment-text">
+	                                <p>No, it doesn't autocomplete for me, at least not right now (I feel like this *might* have worked in the past, but I'm not sure). So, you're not alone! It's all up to the Symfony plugin to provide this intelligence, which is AMAZING, but isn't 100% perfect (but it gets a pass for kicking butt otherwise).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977069678" id="dsq-comment-2977069678">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/TerryCaliendo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3040/380/avatar92.jpg?1359392966">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977069678">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Terry Caliendo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977069678" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977069678" class="dsq-comment-text">
+	                                <p>Thanks... when you say PhpStorm *should* do a better job... are you saying this typically does work and maybe my code is somehow goofed up?</p><p>Or are you saying that this typically doesn't work and the PhpStorm programmers *should* do a better job of programming in future versions?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2975961474" id="dsq-comment-2975961474">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2975961474">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-30</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2975961474" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2975961474" class="dsq-comment-text">
+	                                <p>Yo Terry!</p><p>PhpStorm should really do a better job in this one case - it should know (via the Symfony plugin) that since findAll() is being called on your Flow_Chart repository, that it is returning an array of Flow_Chart objects (and thus, if you loop over them, each has the methods of a Flow_Chart object).</p><p>The fix is to help PhpStorm with some inline phpdoc:</p><p><code><pre>/** @var Flow_Chart[] $FlowCharts */<br>$FlowCharts = $em-&gt;getRepository('...')-&gt;findAll();<br></pre></code></p><p>(make sure you auto-complete the Flow_Chart in the phpdoc, so you get that use statement in this class). This is manual, but the nice thing is that when you type <code>/**</code> and then press space, it'll fill in all of the details except for the class. And of course, when you're writing custom methods (e.g. custom repository methods), you'll want to include this type of thing as your method's <code>@return</code> to get autocompletion when you call those.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2974225194" id="dsq-comment-2974225194">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/TerryCaliendo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3040/380/avatar92.jpg?1359392966">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2974225194">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-29</span>
+	                            <span class="dsq-commenter-name">Terry Caliendo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2974225194" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2974225194" class="dsq-comment-text">
+	                                <p>This code works just fine, but PHP Storm doesn't seem to be able to figure out that getFlowObjects is a valid method.  Any thoughts on a fix?  See image here: <a href="https://disq.us/url?url=https%3A%2F%2Fdrive.google.com%2Fopen%3Fid%3D0B_EYFKRZzTIGeXZCWDY0dHdlTGs%3AnGRSsnqtmjoO2lqoaaPlOaluKoE&amp;cuid=1175718" rel="nofollow noopener">https://drive.google.com/open?...</a></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2917700216" id="dsq-comment-2917700216">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2917700216">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2917700216" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2917700216" class="dsq-comment-text">
+	                                <p>Yo Peter!</p><p>As long as you haven't already deployed your app to production, this is totally valid! This would create one big migration file with *all* of the migrations needed for your app up until now (but delete all the other files, if you have them).</p><p>Also, if you download the code and open our migration file, we've updated it to drop the F-key and re-add it... for people that are having the MySQL 5.6.7+ problem.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2916293186" id="dsq-comment-2916293186">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_w9FHMQqFEH/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2916293186">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-24</span>
+	                            <span class="dsq-commenter-name">Peter Stephens</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2916293186" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2916293186" class="dsq-comment-text">
+	                                <p>I think I cheated, but hey - Whatever keeps us going,</p><p>./bin/console doctrine:database:drop --force<br>./bin/console doctrine:database:create</p><p>THEN do,</p><p>./bin/console doctrine:migrations:diff<br>./bin/console doctrine:migrations:migrate</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2899213543" id="dsq-comment-2899213543">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2899213543">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2899213543" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2899213543" class="dsq-comment-text">
+	                                <p>Hey!</p><p>Thanks for the link - which finally explains this weird behavior! We've already fixed the finish code download (dropping the FKey in the migration) so that it works for everyone. I'm adding a note to the script and video now :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2893631047" id="dsq-comment-2893631047">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="join-column-relation-fixtures">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2893631047">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-14</span>
+	                            <span class="dsq-commenter-name">Krzysztof</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2893631047" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2893631047" class="dsq-comment-text">
+	                                <p>I had the same problem like the other readers (the last migration is not working).</p><p>I found this:</p><p><a href="http://disq.us/url?url=http%3A%2F%2Fstackoverflow.com%2Fquestions%2F17015844%2Fmysql-5-6-foreign-key-constraint-error-didnt-occur-in-5-5%3AXgKII_e-CaxzBUndgREuyaDOCXc&amp;cuid=1175718" rel="nofollow noopener">http://stackoverflow.com/quest...</a></p><p>So you must change your migration to drop the foreign key and the create it again.</p><p>Maybe it is worth to mention it in this video script?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2866029121" id="dsq-comment-2866029121">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2866029121">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2866029121" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2866029121" class="dsq-comment-text">
+	                                <p>Hi Yang!</p><p>Hmm, I think you deleted your original comment, but I saw it and I think I can help :). You just need to put the JoinColumn onto the same 1 line, like this:</p><p><code><pre>/**<br> * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")<br> */<br></pre></code></p><p>And then that should do it :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2865167618" id="dsq-comment-2865167618">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_fSkgMG99ER/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21577/5300/avatar92.jpg?1475849830">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2865167618">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-29</span>
+	                            <span class="dsq-commenter-name">Yang Liu</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2865167618" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2865167618" class="dsq-comment-text">
+	                                <p>I fixed problem 1, is was actually a syntax error... but problem 2 still remains</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2826499591" id="dsq-comment-2826499591">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_q1Cr8uzVst/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2826499591">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-08</span>
+	                            <span class="dsq-commenter-name">Mark</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2826499591" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2826499591" class="dsq-comment-text">
+	                                <p>Hi Andrea,<br>I got the same problem as you and i actually found the answer.</p><p>1. Delete the old files from the DoctrineMigrations folder<br>2. Drop the database in the cmd/terminal<br>3. Recreate it in the cmd/terminal<br>4. Delete genus variable with it's getter and setter from GenusNote entity.<br>5. Migrate the the two table in cmd<br>6. Now you've got your tables without relationship<br>7. Next insert genus var again to the GenusNote entity, generate getter and setter and<br>insert the comment part above it but both ORM\ManyToOne and ORM\Joincolumn<br>8. Migrate again and it should work fine.</p><p>The problem was that if you set the column to be a foreign key you cannot modify it to be not null even if you dont have any data in it. So after you added the genus_id column you have to tell the database to set it not null and then it can be foreign key.</p><p>I hope it helps.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2732427093" id="dsq-comment-2732427093">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2732427093">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-15</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2732427093" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2732427093" class="dsq-comment-text">
+	                                <p>how about attempting a newer version of symfony? who knows.<br>I always go about doing<br>composer install, then composer update<br>in the end had to get rid of the migration point that was giving the error (the file) and got it to work.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2732331396" id="dsq-comment-2732331396">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2732331396">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-15</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2732331396" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2732331396" class="dsq-comment-text">
+	                                <p>Yea, this is a bit of a mystery. There is clearly some issue here (as other users are getting the same migration error), but I haven't been able to repeat it yet locally :/</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2731110101" id="dsq-comment-2731110101">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2731110101">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2731110101" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2731110101" class="dsq-comment-text">
+	                                <p>ok, I went back again not to the previous git commit, but to the first commit of this screencast series (1.1) and redid the whole thing, it worked now.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730897098" id="dsq-comment-2730897098">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730897098">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730897098" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730897098" class="dsq-comment-text">
+	                                <p>hmmm, im getting nowhere here. im getting a whole different world of errors than what you have. and read all the comments, the drop --force;create;migrate just doesnt work, keeps erroring the same error.</p><p>and here goes the wall of text.</p><p>....<br>lies.</p><p>check the whole output here</p><p><a href="http://disq.us/url?url=http%3A%2F%2Fpastie.org%2Fprivate%2Fwmf2drrmscs4oilfeaeuaa%3Aamki9GC6VuubbNu2Ydrm7HGN7sY&amp;cuid=1175718" rel="nofollow noopener">http://pastie.org/private/wmf2...</a></p><p>I have even gone back to the previous commit in git (local git repo), and restarted the process, still get the same issue.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2689678269" id="dsq-comment-2689678269">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2689678269">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-22</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2689678269" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2689678269" class="dsq-comment-text">
+	                                <p>Hmm, this one has me stumped! My impression is that you *should* be able to modify this constraint, as long as there are no null values already in the table for this (and in this case, the tables are empty!). Technically, you could fix this by modifying your migration to drop the foreign key and the re-create it afterwards, but I'm not sure what the cause of the problem is :/</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2683814970" id="dsq-comment-2683814970">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_V0LlqoLvE7/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2683814970">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-19</span>
+	                            <span class="dsq-commenter-name">Andrea</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2683814970" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2683814970" class="dsq-comment-text">
+	                                <p>Yes i do.<br>I tried to use even yours files but nothing has changed.</p><p>Mysql version, i'm using is: 5.6.15</p><p>Thanks for your reply.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2683141041" id="dsq-comment-2683141041">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2683141041">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-19</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2683141041" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2683141041" class="dsq-comment-text">
+	                                <p>Thanks for the details!</p><p>So, I definitely don't get the same error :/. Do you get the error if you download the code for this tutorial and try the same procedures using the "finished" code? I'm also wondering if this is caused by some MySQL version difference - do you know what version you're using?</p><p>Thanks for the help!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2682058636" id="dsq-comment-2682058636">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_V0LlqoLvE7/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2682058636">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-18</span>
+	                            <span class="dsq-commenter-name">Andrea</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2682058636" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2682058636" class="dsq-comment-text">
+	                                <p>Hi ryan,<br>thanks for yout replay.<br>Yes i do, i used:<br>./bin/console doctrine:database:drop --force<br>./bin/console doctrine:database:create<br>and everything gone ok.</p><p>Then<br>./bin/console doctrine:migrations:migrate<br>and i've got the error.</p><p>If i look in my db, after the migrate command, i see 3 tables:<br>- genus (empty)<br>- genus_note (empty)<br>- migration_versions (5 rows with migration code inside column "version").</p><p>Hope this help</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2681238742" id="dsq-comment-2681238742">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2681238742">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2681238742" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2681238742" class="dsq-comment-text">
+	                                <p>Hi Andrea!</p><p>Hmm, this definitely makes me think that here might be an issue here - several people have problems. When you say "I dropped and created" - did you drop the entire database or just the tables? I mean, did you run:</p><p><code><pre>bin/console doctrine:database:drop --force<br>bin/console doctrine:database:create<br></pre></code></p><p>Also, when you get the error, if you look in your database manually, do you see a GenusNote table? And if so, are there any records in this table?</p><p>Thanks! I'm very happy to help debug this - I just need some help from someone who can see the issue :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2675092468" id="dsq-comment-2675092468">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_V0LlqoLvE7/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2675092468">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-14</span>
+	                            <span class="dsq-commenter-name">Andrea</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2675092468" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2675092468" class="dsq-comment-text">
+	                                <p>Hi, i've got the same problem of others users.<br>I read about the link passed in weaverryan's response but.... i dropped and created and then migrated and i still have the same error:<br>SQLSTATE[HY000]: General error: 1832 Cannot change column 'genus_id': used in a foreign key constraint 'FK_6478FCEC85C4074C'</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2595716069" id="dsq-comment-2595716069">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/valdass87/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2595716069">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-29</span>
+	                            <span class="dsq-commenter-name">Valdass87</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2595716069" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2595716069" class="dsq-comment-text">
+	                                <p>Hi,</p><p>Now second command works with double quotes around the query.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2595273379" id="dsq-comment-2595273379">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2595273379">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2595273379" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2595273379" class="dsq-comment-text">
+	                                <p>Hi there!</p><p>You *should* get the first failure :). I got it too - I talk about it here: <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fdoctrine-relations%2Fjoin-column-relation-fixtures%23when-migrations-go-wrong%3AyaUnR3PssM45ysE_gT7K3BqXhtk&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a>.</p><p>The second command, however, should *not* fail. When I copy that, it works. Is it possible you forgot the single quotes around the query when you originally tried it? The error is because the doctrine:query:sql command thinks that you're passing *more* than 1 argument to it. One way that could happen is if you didn't have the quotes around your query (then it would look like 4 arguments).</p><p>I hope that helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2595269663" id="dsq-comment-2595269663">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2595269663">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2595269663" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2595269663" class="dsq-comment-text">
+	                                <p>Yes, you *should* get an error - I got one too :). I talk about it here: <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fdoctrine-relations%2Fjoin-column-relation-fixtures%23when-migrations-go-wrong%3AyaUnR3PssM45ysE_gT7K3BqXhtk&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2591065816" id="dsq-comment-2591065816">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/valdass87/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2591065816">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-27</span>
+	                            <span class="dsq-commenter-name">Valdass87</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2591065816" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2591065816" class="dsq-comment-text">
+	                                <p>I got two exceptions:</p><p>1. After bin/console doctrine:migrations:migrate</p><p>     -&gt; ALTER TABLE genus_note CHANGE genus_id genus_id INT NOT NULL<br>Migration 20160327014231 failed during Execution. Error An exception occurred while executing 'ALTER TABLE genus_note CHANGE genus_id genus_id INT NOT NULL':<br>SQLSTATE[HY000]: General error: 1832 Cannot change column 'genus_id': used in a foreign key constraint 'FK_6478FCEC85C4074C'</p><p>2. After bin/console doctrine:query:sql 'SELECT * FROM genus_note'</p><p>[Symfony\Component\Console\Exception\RuntimeException]<br>Too many arguments.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2586622925" id="dsq-comment-2586622925">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/andrewgrudin/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2586622925">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-24</span>
+	                            <span class="dsq-commenter-name">Andrew Grudin</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2586622925" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2586622925" class="dsq-comment-text">
+	                                <p>After <br>( bin/console doctrine:migrations:migrate )<br> I got exception about *foreign key* !</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_join-column-relation-fixtures';var disqus_url = 'https://knpuniversity.com/screencast/doctrine-relations/join-column-relation-fixtures';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="param-conversion#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/doctrine-relations/join-column-relation-fixtures" addthis:title="Mastering Doctrine Relationships in Symfony">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"doctrine-relations","courseIsOwned":false,"chapter":"JoinColumn & Relations in Fixtures","chapterNumber":4,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Mastering Doctrine Relationships in Symfony';
+        Core.courseId = 81
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'doctrine-relations';
+                    Core.chapterTitle = 'JoinColumn &amp; Relations in Fixtures';
+            Core.chapterNumber = 4;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'join-column-relation-fixtures';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>FOSUserBundle > KnpUGuard: Symfony Authentication with a Smile | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 5308
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: How\x20can\x20I\x20Manually\x20Authenticate\x20a\x20User\x3F <i class="fa fa-play"></i>',
+            'url': '/screencast/guard/manually-authenticating#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Symfony&#039;s authentication is definitely powerful, but if you
+need to do something complex, you might pull your hair out.
+
+Introducing KnpUGuard authentication, which puts all the complexities of any
+authentication scheme right at your finger-tips. The code you right will be
+easy to understand and customizing things to any whim will be simple:
+
+* Authentication via an API token
+* &quot;Social login&quot; / OAuth authentication
+* Creating a traditional login form
+* Customizing success/failure behavior
+* Customizing error messages
+* Loading users in complex ways
+* ... probably anything else
+
+If all goes well, Guard will become a core part of Symfony. If you like it, let
+people know it worked for you at [symfony/symfony#14673](https://github.com/symfony/symfony/pull/14673).
+And if it doesn&#039;t cover a use-case, [open an issue](https://github.com/knpuniversity/KnpUGuard)
+and let me know!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="FOSUserBundle">
+<meta property="og:description" content="Symfony&amp;#039;s authentication is definitely powerful, but if you
+need to do something complex, you might pull your hair out.
+
+Introducing KnpUGuard authentication, which puts all the complexities of any
+authentication scheme right at your finger-tips">
+<meta property="og:url" content="http://knpuniversity.com/screencast/guard/fos-user-bundle">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/guard:a326b83b22fcc1c6da3b2fdda75ead60b37c0c4f/guard-auth.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="fos-user-bundle#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        12.
+                            FOSUserBundle
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="../guard.1">KnpUGuard: Symfony Authentication with a Smile</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="install" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Installation
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="login-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        How to Create a Login Form
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="api-token" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        How to Authenticate via an API Token
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fos-user-bundle#" class="js-no-follow-link">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Social Login with Facebook
+                                                    <small><em>(coming soon)</em></small>
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="login-form-customize-user" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        How to Login with a username *or* email (or crazier)
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="error-messages" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Customizing Authentication Failure Messages
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="failure-handling" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Customizing Failure Handling
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="success-handling" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Customizing Success Handling
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fos-user-bundle#" class="js-no-follow-link">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Login Form: Adding a CSRF Token
+                                                    <small><em>(coming soon)</em></small>
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fos-user-bundle#" class="js-no-follow-link">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        How can I use Multiple Authenticators?
+                                                    <small><em>(coming soon)</em></small>
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fos-user-bundle#" class="js-no-follow-link">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        How can I use this in Silex?
+                                                    <small><em>(coming soon)</em></small>
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="fos-user-bundle#" class="js-no-follow-link">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        FOSUserBundle
+                                                    <small><em>(coming soon)</em></small>
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fos-user-bundle#" class="js-no-follow-link">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        How can I Manually Authenticate a User?
+                                                    <small><em>(coming soon)</em></small>
+                                            </div>
+
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <div class="dropdown download-buy-buttons">
+              <button class="btn btn-success dropdown-toggle" type="button" id="downloadDropdown" data-toggle="dropdown" aria-expanded="true">
+                  <span><i class="fa fa-download"></i></span>
+                  <span class="hidden-xs">Download</span>
+                  <span class="caret"></span>
+              </button>
+              <ul class="list-unstyled dropdown-menu pull-right" role="menu" aria-labelledby="downloadDropdown">
+                  
+                  <li><a href="../get/guard/code/a326b83b22fcc1c6da3b2fdda75ead60b37c0c4f" class="js-analytics-download" data-download-type="code"><i class="fa fa-code"></i> Course Code</a></li>
+
+                                        <li><a href="../get/guard/script/a326b83b22fcc1c6da3b2fdda75ead60b37c0c4f" class="js-analytics-download" data-download-type="script"><i class="fa fa-book"></i> Course Script</a></li>              </ul>
+          </div>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">FOSUserBundle</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="../guard.1"><em>KnpUGuard: Symfony Authentication with a Smile Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="manually-authenticating#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="fos-user-bundle#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="fos-user-bundle#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/guard-tutorial/edit/master/knpu/fos-user-bundle.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Todo - come back later!</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2930726445" id="dsq-comment-2930726445">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2930726445">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-03</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2930726445" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2930726445" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="ciudadano82:disqus" href="https://disq.us/url?url=https%3A%2F%2Fdisqus.com%2Fby%2Fciudadano82%2F%3ApH9Ox4YVZZarmt-6A6Jtm8RLWWc&amp;cuid=1175718" rel="nofollow noopener">ciudadano82</a> ,</p><p>Actually, these cases covered with the new <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fsecurity%2Fguard_authentication.html%3AK_EKewck86uGznjLUGT0GsvUwu8&amp;cuid=1175718" rel="nofollow noopener">Guard component</a>. Check out the onAuthenticationSuccess() and onAuthenticationFailure() methods there.</p><p>Also we have a course about Guard: <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fguard%3A0wxihcBbEDdRP1ng-NRTsjkFHe8&amp;cuid=1175718" rel="nofollow noopener">KnpUGuard: Symfony Authentication with a Smile</a>. You also can check out <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony-security%3AoNQQwRwhxh3aP0QSGyBcgQ-bS5E&amp;cuid=1175718" rel="nofollow noopener">Symfony Security: Beautiful Authentication, Powerful Authorization</a> Symfony course based on Guard component.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2928191506" id="dsq-comment-2928191506">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ciudadano82/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/25/5887/avatar92.jpg?1475334073">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2928191506">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-01</span>
+	                            <span class="dsq-commenter-name">ciudadano82</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2928191506" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2928191506" class="dsq-comment-text">
+	                                <p>Hi Victor! Is there any documentation / tutorials related to those handlers (DefaultAuthenticationSuccessHandler and DefaultAuthenticationFailureHandler)?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2746887783" id="dsq-comment-2746887783">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2746887783">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-23</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2746887783" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2746887783" class="dsq-comment-text">
+	                                <p>No, it should be still "/login_check"! Actually, it should be a value of "check_path" config key in security.yml (<a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Freference%2Fconfiguration%2Fsecurity.html%23check-path%3ArGH2OWtVYo4orzAtVim6rYpFvs8&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a> ).</p><p>You can place these handlers whenever you want. But you need to declare them as a service. Actually, "your_custom_auth_failure_handler" and "your_custom_auth_success_handler" names in my previous comment are the services names.  For example, place your classes under "AppBundle\Security\Http\Authentication" namespace to be consistent with "DefaultAuthenticationSuccessHandler" class which you extend. Here's an example of service declaration:<br></p><pre><code><br>    your_custom_auth_failure_handler:<br>        class: AppBundle\Security\Http\Authentication\CustomAuthenticationFailureHandler<br>        arguments:<br>            - "@http_kernel"<br>            - "@security.http_utils"<br><br>    your_custom_auth_success_handler:<br>        class: AppBundle\Security\Http\Authentication\CustomAuthenticationSuccessHandler<br>        arguments:<br>            - "@security.http_utils"<br></code></pre><p></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2746174807" id="dsq-comment-2746174807">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/sudhir600/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/8230/5376/avatar92.jpg?1481801737">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2746174807">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-23</span>
+	                            <span class="dsq-commenter-name">Sudhir</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2746174807" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2746174807" class="dsq-comment-text">
+	                                <p>thank you <a data-dsq-mention="bocharsky25:disqus" href="https://disqus.com/by/bocharsky25/" rel="nofollow noopener">Victor Bocharsky</a></p><p>but pls help me with file name and location that where i  have to write <b>class CustomAuthenticationSuccessHandler</b><br>and in ajax i have to change  landing path or it will be same as '<b>login_check</b>'</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2746162873" id="dsq-comment-2746162873">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2746162873">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-23</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2746162873" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2746162873" class="dsq-comment-text">
+	                                <p>Hey, Sudhir!</p><p>Ah, yes, I know exactly what you mean! It's already an expert level. :)</p><p>You need to create your custom failure and success handlers which will return a JsonResponse on each Ajax auth request. They should be declare in the `security.yml` as:</p><p></p><pre><code>security:<br>    firewalls:<br>        main:<br>            form_login:<br>                failure_handler: your_custom_auth_failure_handler<br>                success_handler: your_custom_auth_success_handler<br></code></pre><p></p><p>For example, in you custom success auth handle you need to return a JsonResponse if you see an XmlHttpRequest:</p><p></p><pre><code>class CustomAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler<br>{<br>    public function onAuthenticationSuccess(Request $request, TokenInterface $token)<br>    {<br>        if ($request-&gt;isXmlHttpRequest()) {<br>            return new JsonResponse([<br>                'authenticated' =&gt; true,<br>                'id' =&gt; $token-&gt;getUser()-&gt;getId(),<br>            ]);<br>        }<br><br>        return parent::onAuthenticationSuccess($request, $token);<br>    }<br>}<br></code></pre><p></p><p>And similar changes for failure auth handle, but this time you need to extend "DefaultAuthenticationFailureHandler" class, where you just return JsonResponse if you got a XmlHttpRequest.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2746060384" id="dsq-comment-2746060384">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/sudhir600/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/8230/5376/avatar92.jpg?1481801737">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2746060384">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-23</span>
+	                            <span class="dsq-commenter-name">Sudhir</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2746060384" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2746060384" class="dsq-comment-text">
+	                                <p>hi <a data-dsq-mention="weaverryan:disqus" href="https://disqus.com/by/weaverryan/" rel="nofollow noopener">weaverryan</a>  ,<br>in FOSUserbundle, i want to change the way of login. instead of traditional login (hit submit and page redirect)  i want to use ajax login.<br>so in order to achieve this, i make a JavaScript. my code is handling request perfectly but problem is that i am not able to fetch the details that credentials (login true or false).</p><p>Here i am getting all HTML code of redirected page. (in my case, its redirecting /admin page and i am getting view sources in console.)<br>as per my UI, i want to show that like  "user validated..you will redirect in a moment "</p><p>So, may u help me that how i can achieve this target.</p><p>Here is my js code.<br></p><pre><code><br>var resp ="";<br>$(document).ready(function(){<br>    $('#_submit').click(function(e){<br><br>        e.preventDefault();<br>        resp = ajaxLogin($(this).attr('path'));<br>        /* add ajax code here to check validation */<br>        if(resp==1) {<br>            setTimeout(function () {<br>                $(that).addClass("success");<br>                setTimeout(function () {<br>                    $app.show();<br>                    $app.css("top");<br>                    $app.addClass("active");<br>                }, submitPhase2 - 70);<br>                setTimeout(function () {<br>                    $login.hide();<br>                    $login.addClass("inactive");<br>                    animating = false;<br>                    $(that).removeClass("success processing");<br>                }, submitPhase2);<br>            }, submitPhase1);<br>        }<br>        else{<br>            alert(resp);<br>            console.log(resp);<br>        }<br><br>    });<br>});<br><br></code><br></pre>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2635244752" id="dsq-comment-2635244752">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2635244752">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-21</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2635244752" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2635244752" class="dsq-comment-text">
+	                                <p>Hey Jon!</p><p>I just checked, I don't have any handy right now :/. But, what problem are you running into?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2634788481" id="dsq-comment-2634788481">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_untniric2F/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/7006/8983/avatar92.jpg?1377626017">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2634788481">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-21</span>
+	                            <span class="dsq-commenter-name">Jon Chapman</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2634788481" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2634788481" class="dsq-comment-text">
+	                                <p>Ryan,</p><p>Any chance of maybe some source code that you could point to that uses Guard along with FOS_UserBundle? I feel like I am so close to making this work, but am missing something. :-(</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2562377529" id="dsq-comment-2562377529">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2562377529">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-10</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2562377529" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2562377529" class="dsq-comment-text">
+	                                <p>Hi Niel!</p><p>I *really* want to - but I can't until FOSUserBundle finally tags their 2.0 release (otherwise we risk making a tutorial and then having them change a lot of stuff before that stable version). As soon as that happens, we'll be on it!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2558609160" id="dsq-comment-2558609160">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nielshine/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2558609160">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-08</span>
+	                            <span class="dsq-commenter-name">Niel Shine</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2558609160" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2558609160" class="dsq-comment-text">
+	                                <p>HI</p><p>Can you update this tutorial please ?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2248112870" id="dsq-comment-2248112870">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2248112870">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-11</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2248112870" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2248112870" class="dsq-comment-text">
+	                                <p>I think it's a fine solution - I also don't see any other hook there that use in this case :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2246334197" id="dsq-comment-2246334197">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2246334197">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-10</span>
+	                            <span class="dsq-commenter-name">Symfony Enthusiast</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2246334197" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2246334197" class="dsq-comment-text">
+	                                <p>Hello weaverryan!</p><p>Thank you for the reply.</p><p>I ended up overriding the ResettingController of the FOSUserBundle to make it work for me.</p><p>I wanted my app to send a password resetting request email to the user even if the password had already been requested.</p><p>Use Case: You request a password reset but it either got lost in your email or went to spam (or something happened while the email was getting to you) and you need to request another reset. Currently you cannot do that, you have to wait until token_ttl expires.   So I overrode sendEmailAction() in this controller <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FFriendsOfSymfony%2FFOSUserBundle%2Fblob%2Fmaster%2FController%2FResettingController.php%3AyD1xbAEA1GZb14pAIwLKnJ2_yUQ&amp;cuid=1175718" rel="nofollow noopener">https://github.com/FriendsOfSy...</a> . It didn't seem to have any events to hook into.</p><p>Does this sound like a sound solution?</p><p>Thank you!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2234648525" id="dsq-comment-2234648525">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2234648525">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-03</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2234648525" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2234648525" class="dsq-comment-text">
+	                                <p>Hey there!</p><p>1) I believe you can only request a password reset once per token - the token is cleared after resetting.</p><p>2) The time the reset link is active can be controller in 2 different ways: by setting the resetting.token_ttl in config.yml (<a href="https://disq.us/url?url=https%3A%2F%2Fsymfony.com%2Fdoc%2Fmaster%2Fbundles%2FFOSUserBundle%2Fconfiguration_reference.html%29%3AVj15atIhSCx6_Ubr0906hiQSG4M&amp;cuid=1175718" rel="nofollow noopener">https://symfony.com/doc/master...</a> or by overriding User::isPasswordRequestNonExpired().</p><p>Overall, you can completely control the password request process by adding an event listener that is executed right when the user tries to request a password reset. For example, even the core functionality of FOSUserBundle uses a listener: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FFriendsOfSymfony%2FFOSUserBundle%2Fblob%2Fmaster%2FEventListener%2FResettingListener.php%3AhEd4hy9FiCS5TOAZysiUmjdECl8&amp;cuid=1175718" rel="nofollow noopener">https://github.com/FriendsOfSy...</a>. You could create a listener like this, give it a priority of 10 (so that it runs before this listener), and if the user should not be able to request a password reset, call $event-&gt;setResponse() and pass it a RedirectResponse to a page that explains this to the user.</p><p>This is a bit more advanced, but the point is this: with listeners, you can really control anything, which is awesome!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2230325666" id="dsq-comment-2230325666">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2230325666">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-01</span>
+	                            <span class="dsq-commenter-name">Symfony Enthusiast</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2230325666" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2230325666" class="dsq-comment-text">
+	                                <p>Is there a way to independently control the time that the reset link is active and the number of times you can request a password reset to the same token_ttl?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2112278273" id="dsq-comment-2112278273">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2112278273">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-02</span>
+	                            <span class="dsq-commenter-name">Mel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2112278273" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2112278273" class="dsq-comment-text">
+	                                <p>I see, I will try and implement this feature manually.</p><p>Thanks for the reply.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2110533341" id="dsq-comment-2110533341">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2110533341">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-01</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2110533341" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2110533341" class="dsq-comment-text">
+	                                <p>Hi Mel!</p><p>Hmm, so for your 2 issues:</p><p>1) I'm not sure why the form would show as non-submitted. My advice would be to *not* try to re-use the ProfileController for FOSUserBundle for this - that's really meant for a user to edit their *own* profile. If you have a screen where you're editing other people's profiles, just create a new route/controller for this and setup it up manually - that will be much more naturla.</p><p>2) About the "is not callable" error, this tells me that somewhere, you have a route setup for /profile/. You should be able to see this if you run "php app/console router:match /profile/". The error means that the _controller value is not pointing to a valid function. Usually, this means that it finds your controller class, but does *not* find the method inside that class. So, reading directly from your error, it means that it doesn't find a 'showAction' inside of that ProfileController class.</p><p>Good luck!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2108520064" id="dsq-comment-2108520064">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2108520064">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-30</span>
+	                            <span class="dsq-commenter-name">mel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2108520064" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2108520064" class="dsq-comment-text">
+	                                <p>Hi weaverryan,</p><p>Nice tuts btw, I was hoping you could lead me to the right direction as I am having issues with overriding the ProfileController, in particular the editAction. This is what I want to achieve, an admin can update the profile of any user.</p><p>What I have done so far.</p><p>1. Created a list of users with an edit link (mydomain/admin/user/5/edit).<br>2. Created my own bundle and defined FOSUserBundle as its parent.<br>3. Copied the ProfileController in my controller folder and removed everything except for the use statements and editAction.</p><p>Issues:</p><p>Scenario: I'm logged-in as admin</p><p>1. When updating other user - not saving $form-&gt;isValid() returns false and $form-&gt;submitted is false<br>2. When updating my own profile - It saves but throwing error<br>Controller "mypath\COntroller\ProfileController::showACtion" for URI /profile/ is not callable</p><p>Please see my code below. Thanks in advance!</p><p>/**<br>* Edit the user<br>*/</p><p>  public function editAction(Request $request)<br>{</p><p>    // Get current user.<br>$user = $this-&gt;container-&gt;get('security.context')-&gt;getToken()-&gt;getUser();</p><p>    // Get target user.<br>$target_user_post = $request-&gt;request-&gt;get('smd_user_profile');<br>$user_manager = $this-&gt;container-&gt;get('fos_user.user_manager');<br>$target_user = $user_manager-&gt;findUserByEmail($target_user_post['email']);</p><p>    if($target_user) // detect if the edit_users form sent the request rather than self-updating<br>{<br>$target_user-&gt;setName($target_user_post['name']);<br>} else {<br>$target_user = $user;<br>}</p><p>    if (!is_object($target_user) || !$target_user instanceof UserInterface) {</p><p>      throw new AccessDeniedException('This user does not have access to this section.');</p><p>    }</p><p>    /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */</p><p>    $dispatcher = $this-&gt;get('event_dispatcher');</p><p>    $event = new GetResponseUserEvent($target_user, $request);</p><p>    $dispatcher-&gt;dispatch(FOSUserEvents::PROFILE_EDIT_INITIALIZE, $event);</p><p>    if (null !== $event-&gt;getResponse()) {</p><p>      return $event-&gt;getResponse();</p><p>    }</p><p>    /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */</p><p>    $formFactory = $this-&gt;get('fos_user.profile.form.factory');</p><p>    $form = $formFactory-&gt;createForm();</p><p>    $form-&gt;setData($target_user);</p><p>    $form-&gt;handleRequest($request);</p><p>    if ($form-&gt;isValid()) {</p><p>      /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */</p><p>      $userManager = $this-&gt;get('fos_user.user_manager');</p><p>      $event = new FormEvent($form, $request);</p><p>      $dispatcher-&gt;dispatch(FOSUserEvents::PROFILE_EDIT_SUCCESS, $event);</p><p>      $userManager-&gt;updateUser($target_user);</p><p>      if (null === $response = $event-&gt;getResponse()) {</p><p>        $url = $this-&gt;generateUrl('fos_user_profile_show');</p><p>        $response = new RedirectResponse($url);</p><p>      }</p><p>      $dispatcher-&gt;dispatch(FOSUserEvents::PROFILE_EDIT_COMPLETED, new FilterUserResponseEvent($target_user, $request, $response));</p><p>      return $response;</p><p>    }</p><p>    return $this-&gt;render('FOSUserBundle:Profile:edit.html.twig', array(</p><p>      'form' =&gt; $form-&gt;createView()</p><p>    ));<br>}<br>}</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1996002960" id="dsq-comment-1996002960">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_sBQqM2L8re/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/14876/2176/avatar92.jpg?1477149535">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1996002960">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-04-30</span>
+	                            <span class="dsq-commenter-name">Mojo Jojo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1996002960" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1996002960" class="dsq-comment-text">
+	                                <p>Leanna is such a wonderful and lucid instructor that it makes understanding of complex topics so much easier. I don't think I'd have grasped Symfony2 the way I had, had it not been for Leanna's instructional videos. Thumbs up for the effort.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1800419626" id="dsq-comment-1800419626">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1800419626">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-01-19</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1800419626" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1800419626" class="dsq-comment-text">
+	                                <p>I'm mixed. FOSUserBundle is much faster to start, and you get a lot of features out of the box. But eventually, you will need to override more and more, and you lose the initial benefit. The answer depends on the comfort-level of the developer to do what we did in Episode 2 and how big the project will be.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1798859332" id="dsq-comment-1798859332">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/MolloKhan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9429/4645/avatar92.jpg?1475260109">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1798859332">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-01-17</span>
+	                            <span class="dsq-commenter-name">Diego Aguiar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1798859332" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1798859332" class="dsq-comment-text">
+	                                <p>Hi, great tutorial!</p><p>I would like to know what's better to use for user's login/registration, using this bundle or the one we made in "Starting in Symfony2: Episode 2"</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1636632604" id="dsq-comment-1636632604">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_RwCdJU7sH5/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12520/6915/avatar92.jpg?1413367080">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1636632604">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-10-15</span>
+	                            <span class="dsq-commenter-name">Patrick</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1636632604" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1636632604" class="dsq-comment-text">
+	                                <p>Ok, thanks for checking that ryan :) !<br>At first, i did it like you mentioned in the Constructor, but always adding an empty address to a user whenever one is created did not seem legit for me :D.<br>Oh yeah Ryan before i forget to ask: Do you know something about the "remember_me" feature on localhost development with FosUserBundle , that it is broken ? Because when i logout, Chrome does not delete the Cookie but Firefox does. I thought, that it might be a problem on localhost development (xampp).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1632167315" id="dsq-comment-1632167315">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1632167315">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-10-12</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1632167315" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1632167315" class="dsq-comment-text">
+	                                <p>Hey Patrick!</p><p>Yes, overriding the RegistrationFormHandler seems just fine to me! There's not really a *best* way to do this - there are some options, and whichever works easiest is just fine. For example, you might (never tried on a collection) be able to use the empty_data option (<a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Freference%2Fforms%2Ftypes%2Fcollection.html%23empty-data%29%3AjK8dY2kcbm7_3ma5J3co0Adq89o&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a> on the `addresses` field when setting up your form to be an array with a single Address entity on it. You *could* also add 1 Address to each User in the User's __construct() function (though you'd then need to cascade persist and need to be ok with a potentially "empty" Address record being saved in the database.</p><p>So, as you can see, I like your solution just fine :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1629636044" id="dsq-comment-1629636044">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_RwCdJU7sH5/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12520/6915/avatar92.jpg?1413367080">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1629636044">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-10-10</span>
+	                            <span class="dsq-commenter-name">Patrick</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1629636044" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1629636044" class="dsq-comment-text">
+	                                <p>Hey guys, i got a problem with the FosUserBundle.</p><p>I know how to add new fields to the registration form (OneToOne relationed fields).</p><p>But when i try to add an Address form type to the registration formular by using the FOsUserBundle Registration Controller,</p><p>i don't know how to pass the "empty" Address Object to the User in the Registration Controller so that the fields are displayed and later map the address to the user. (User - Address = OneToMany relation)</p><p>Is overwriting the RegistrationFormHandler to the following the correct solution. It is working fine, but maybe there is another way:</p><p> public function process($confirmation = false)<br>    {<br>        $user = $this-&gt;createUser();<br>        $user-&gt;addAddress(new Address());</p><p>        $this-&gt;form-&gt;setData($user);</p><p>      // ...<br>    }<br>I hope you can help me, ur the best!<br>Regards.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1501913646" id="dsq-comment-1501913646">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1501913646">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-07-24</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1501913646" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1501913646" class="dsq-comment-text">
+	                                <p>Hey!</p><p>Nope, FOSUserBundle doesn't do anything special at all for the password field, and the password field doesn't work any differently than normal fields (except the repeated field, which wraps the password is a bit different).</p><p>I would expect this to work:</p><p>{{ form_row(form.plainPassword.first, { attr: {class: 'input-sm'}}) }}<br>{{ form_row(form.plainPassword.second, { attr: {class: 'input-sm'}}) }}</p><p>Render the two sub-fields individually - I'm not sure if you pass the attr into the "compound" field if that translates down to the two individual fields.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1499880436" id="dsq-comment-1499880436">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/dizzybryanhigh/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/6084/7805/avatar92.jpg?1481290691">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1499880436">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-07-23</span>
+	                            <span class="dsq-commenter-name">Dizzy Bryan High</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1499880436" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1499880436" class="dsq-comment-text">
+	                                <p>hi again, ive been hacking away at customising the register form to include bootstrap styles, i opted for braincraftedBootstrap as the docs seem to be more complete.</p><p>I cant seem to get the password fields to render with the class input-sm, the username and email fields are fine.</p><p>is there some internal customisation of the password widget in fosUserbundle?<br>{% trans_default_domain 'FOSUserBundle' %}</p><p>    {{ form_start(form, { 'style': 'horizontal', 'col_size': 'xs', 'label_col': 5, 'widget_col': 7, attr: {class: 'pull-left'}}) }}<br>    {{ form_row(form.username, { attr: {class: 'input-sm'}}) }}<br>    {{ form_row(<a href="http://disq.us/url?url=http%3A%2F%2Fform.email%3AvoKRpDCk_gw6yZiWIVr2ybhYUhc&amp;cuid=1175718" rel="nofollow noopener">form.email</a>, { attr: {class: 'input-sm'}}) }}<br>    {{ form_row(form.plainPassword, { attr: {class: 'input-sm'}}) }}<br>    {{ form_row(form.plainPassword.second, { attr: {class: 'input-sm'}}) }}<br>    &lt;div class="col-sm-5"&gt;&lt;/div&gt;<br>    &lt;div class="col-sm-7"&gt;<br>        &lt;input class="btn-primary btn-sm" type="submit" value="{{ 'registration.submit'|trans }}"/&gt;<br>    &lt;/div&gt;<br>    {{ form_rest(form) }}<br>    {{ form_end(form) }}</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1480173283" id="dsq-comment-1480173283">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/dizzybryanhigh/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/6084/7805/avatar92.jpg?1481290691">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1480173283">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-07-11</span>
+	                            <span class="dsq-commenter-name">Dizzy Bryan High</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1480173283" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1480173283" class="dsq-comment-text">
+	                                <p>Ahh found it, just a question of duplicating the other templates, how sweet :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1480166773" id="dsq-comment-1480166773">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/dizzybryanhigh/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/6084/7805/avatar92.jpg?1481290691">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1480166773">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-07-11</span>
+	                            <span class="dsq-commenter-name">Dizzy Bryan High</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1480166773" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1480166773" class="dsq-comment-text">
+	                                <p>Another question for you.<br>I've created a template with 2 columns, which renders the forms in the right column.<br>There does not seem to be any way to define which actual form is rendered as it just uses the `{{ block('fos_user_content') }}` to render all the forms. how can i differentiate what form is displayed and show different content in the left column depending on what form is rendered?<br>I would like to display different text content in the left column depending on whether the login/registration/profile etc forms are displayed, what's the easiest way to do this?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1474212424" id="dsq-comment-1474212424">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1474212424">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-07-08</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1474212424" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1474212424" class="dsq-comment-text">
+	                                <p>Hey!</p><p>So ultimately, it should be a little bit less effort to integrate Twitter bootstrap with the normal forms (those that use the form type classes) than with something like the login form. That's because what you'll need to do is customize your form theme (<a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fcookbook%2Fform%2Fform_customization.html%29%3ACgo5H-W215CDcF5Kyql97A_zXvo&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a> to render fields with all the markup you need for Bootstrap. Do that once, and *all* forms on your system will use it (assuming you enable it globally in config.yml).</p><p>So, FOSUserBundle is no different in that sense. If you're using a form theme for bootstrap globally, those forms will magically render in the Bootstrap markup. That being said, it's still very possible that you'll want to override the individual templates, because you may want to tweak how the page looks otherwise, or change the order in which the fields are rendered.</p><p>For actually creating a Bootstrap theme, I've traditionally done this myself, but used BraincraftedBootstrapBundle and Mopa as examples. That's mostly because I've found Mopa a bit heavy-handed (it's so good, it almost does *too* much stuff for me), but I think I've had more luck with Braincrafted, if you want to try that. If it gives you too much trouble, just use some ideas from them :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1474136745" id="dsq-comment-1474136745">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/dizzybryanhigh/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/6084/7805/avatar92.jpg?1481290691">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1474136745">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-07-08</span>
+	                            <span class="dsq-commenter-name">Dizzy Bryan High</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1474136745" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1474136745" class="dsq-comment-text">
+	                                <p>Great tutorial as always from you guys.<br>Could you point me in the right direction for integrating twitter bootstrap, with the fosUserBundle, I notice the login form has a template where the register form does not it just uses formTypes.<br>Would my best approach be to use a bundle such as BrainCrafted bootstrapBundle, or the mopaBootstrap bundle (which is best)? and then  override the forms by extending them? <br>I have googled extensivley and not found any tutorials on the subject specifically for bootstrapping FOSUSerBundle, any pointers would be greatly appreciated :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1275090129" id="dsq-comment-1275090129">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1275090129">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-03-07</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1275090129" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1275090129" class="dsq-comment-text">
+	                                <p>You rock @Noris! We're planning on updating this screencast sometime soon, but until then - thanks for adding these instructions! I'm happy the tutorial is useful :).</p><p>Thanks!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1275053528" id="dsq-comment-1275053528">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1275053528">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2014-03-07</span>
+	                            <span class="dsq-commenter-name">Noris</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1275053528" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1275053528" class="dsq-comment-text">
+	                                <p>Great tutorial!<br>For the installation in symfony2.1.6 plus the installation with composer (instead of with "deps document") is easy when you know it ;-). Here is the code:</p><p>1) Add the following line to the compser.json</p><p>Check latest version from packagist:</p><p><a href="https://disq.us/url?url=https%3A%2F%2Fpackagist.org%2Fpackages%2Ffriendsofsymfony%2Fuser-bundle%3AbtO_BB0_gSJGNsE5V91X9ZMf_S8&amp;cuid=1175718" rel="nofollow noopener">https://packagist.org/packages...</a></p><p>I used:</p><p>// composer.json</p><p>"require": {<br>           "friendsofsymfony/user-bundle": "2.0.*@dev"<br>}</p><p>2. Update with composer with the following line:<br>sudo php composer.phar update friendsofsymfony/user-bundle</p><p>As change in symfony2.1.6 plus: That was it!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1015814531" id="dsq-comment-1015814531">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1015814531">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-08-24</span>
+	                            <span class="dsq-commenter-name">Gemi</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1015814531" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1015814531" class="dsq-comment-text">
+	                                <p>At first <br>thank you very much Really you are very helpful</p><p>seconed</p><p>i<br> have install fosuserbundle on my project and it is working well but <br>when i acess the login form it redirect me to the symfony login form in <br>demobundle after i remove the demobundel it give me now<br>  The controller for URI "/login" is not callable. <br> although i configured the main firewall as fos provider but it does'nt work</p><p>any suggestion ?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="983849589" id="dsq-comment-983849589">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/hihihehecc/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/6524/845/avatar92.jpg?1375346959">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-983849589">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-08-01</span>
+	                            <span class="dsq-commenter-name">Hihi Hehe Ặc Ặc</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-983849589" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-983849589" class="dsq-comment-text">
+	                                <p>Nice tutorial series :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="918605283" id="dsq-comment-918605283">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-918605283">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-06-04</span>
+	                            <span class="dsq-commenter-name">Carrie</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-918605283" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-918605283" class="dsq-comment-text">
+	                                <p>i would love to see a more updated version of this. the video takes some of the intimidation out of the bundle :]</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="896388245" id="dsq-comment-896388245">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-896388245">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-05-13</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-896388245" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-896388245" class="dsq-comment-text">
+	                                <p>Yes, that's one of the areas where this video is out of date. Starting with Symfony 2.1, using the composer.json file. Follow along with the official docs to see what you'll need :).</p><p>Thanks!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="896387538" id="dsq-comment-896387538">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-896387538">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-05-13</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-896387538" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-896387538" class="dsq-comment-text">
+	                                <p>This entry is indeed a bit out of date - you can use it for big picture stuff, but as Robert says, watch the real docs! We'll hopefully update this at some point, just a matter of finding some time :).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="840979002" id="dsq-comment-840979002">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/robert_speer/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/35/8624/avatar92.jpg?1476905594">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-840979002">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-03-24</span>
+	                            <span class="dsq-commenter-name">Robert Speer</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-840979002" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-840979002" class="dsq-comment-text">
+	                                <p>Answer, pretty close but keep an eye on the github doc's</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="840892585" id="dsq-comment-840892585">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/robert_speer/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/35/8624/avatar92.jpg?1476905594">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-840892585">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-03-24</span>
+	                            <span class="dsq-commenter-name">Robert Speer</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-840892585" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-840892585" class="dsq-comment-text">
+	                                <p>How upto date is this video?  There appear to be some significant differences between what's in this tutorial and what's in the instructions on GitHub: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FFriendsOfSymfony%2FFOSUserBundle%2Fblob%2Fmaster%2FResources%2Fdoc%2Findex.md%3AzrPYW7Ykmz6lWwAwqwI8EazBJeg&amp;cuid=1175718" rel="nofollow noopener">https://github.com/FriendsOfSy...</a></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="763532016" id="dsq-comment-763532016">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-763532016">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2013-01-11</span>
+	                            <span class="dsq-commenter-name">radovan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-763532016" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-763532016" class="dsq-comment-text">
+	                                <p>I have not the deps document in symfony2.1.6</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="736039101" id="dsq-comment-736039101">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/google-f33bf37c44e53d2b5a4746518701e8fd/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-736039101">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-12-14</span>
+	                            <span class="dsq-commenter-name">Никита Сапогов</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-736039101" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-736039101" class="dsq-comment-text">
+	                                <p>Thanks for tutorial<br></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="725379060" id="dsq-comment-725379060">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-725379060">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-12-02</span>
+	                            <span class="dsq-commenter-name">Zorg-iris</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-725379060" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-725379060" class="dsq-comment-text">
+	                                <p>thank look and work great, but i have question is the resetting work ?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="703867415" id="dsq-comment-703867415">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/facebook-1500679376/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3606/681/avatar92.jpg?1352367819">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-703867415">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-11-08</span>
+	                            <span class="dsq-commenter-name">Mohammed Ezz El-Din Eisa</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-703867415" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-703867415" class="dsq-comment-text">
+	                                <p>Thanks . Life is cool with FOS !!<br></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="601652162" id="dsq-comment-601652162">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bbmatt1/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/336/6547/avatar92.jpg?1372227144">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-601652162">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-07-29</span>
+	                            <span class="dsq-commenter-name">bbmatt1</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-601652162" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-601652162" class="dsq-comment-text">
+	                                <p>Great tutorial - just one thing, the encoders entry is removed in the tutorial, but the default FOS from the documentation one isn't added, so when you use the console to add a user, it throws up an encoding error.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="600494151" id="dsq-comment-600494151">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-600494151">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-07-28</span>
+	                            <span class="dsq-commenter-name">Richa Kalangutker</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-600494151" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-600494151" class="dsq-comment-text">
+	                                <p>hi... i need some help in adding new fields to FOSUserBundle.. I followed the tutorial on <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FFriendsOfSymfony%2FFOSUserBundle%2Fblob%2Fmaster%2FResources%2Fdoc%2Foverriding_forms.md%3AC6i4Impp7l3KR3ipW4yKAYJ-AHI&amp;cuid=1175718" rel="nofollow noopener">https://github.com/FriendsOfSy...</a> but i get an error saying Neither element "fname" nor method "setFname()" exists in class "Acme\UserBundle\Entity\User" where Fname is my new field...<br> Please help me!!!!</p><p>Thanks</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="543264431" id="dsq-comment-543264431">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-543264431">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-05-31</span>
+	                            <span class="dsq-commenter-name">webornot</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-543264431" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-543264431" class="dsq-comment-text">
+	                                <p>Nice job !</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="534625985" id="dsq-comment-534625985">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/sergeyzherevchuk/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20350/4572/avatar92.jpg?1460046542">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-534625985">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-05-21</span>
+	                            <span class="dsq-commenter-name">Sergey Zherevchuk</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-534625985" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-534625985" class="dsq-comment-text">
+	                                <p>It was awesome! Thx!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="485697516" id="dsq-comment-485697516">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/matteopoile/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/16290/9010/avatar92.jpg?1435177343">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-485697516">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-04-04</span>
+	                            <span class="dsq-commenter-name">Matteo Poile</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-485697516" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-485697516" class="dsq-comment-text">
+	                                <p>Thank you very much!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="476682247" id="dsq-comment-476682247">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/hugohamon/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/5164/466/avatar92.jpg?1369269270">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-476682247">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-03-26</span>
+	                            <span class="dsq-commenter-name">Hugo Hamon</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-476682247" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-476682247" class="dsq-comment-text">
+	                                <p>Nice tutorial! UserBundle looks easier to use.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="471997940" id="dsq-comment-471997940">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-471997940">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-03-21</span>
+	                            <span class="dsq-commenter-name"> Aman Varshney</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-471997940" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-471997940" class="dsq-comment-text">
+	                                <p>Awesum tutorial....big thanks for this tutorial..</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="462889704" id="dsq-comment-462889704">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-462889704">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-03-11</span>
+	                            <span class="dsq-commenter-name">bassemreda</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-462889704" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-462889704" class="dsq-comment-text">
+	                                <p>Thanks so much for this tutorial. </p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="447733026" id="dsq-comment-447733026">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/google-db9faf6b7e93cb5333421b9a3b8d5388/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/1316/3635/avatar92.jpg?1330078049">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-447733026">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-02-24</span>
+	                            <span class="dsq-commenter-name">We Burn It TV</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-447733026" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-447733026" class="dsq-comment-text">
+	                                <p>Big thanks Leanna!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="443874517" id="dsq-comment-443874517">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="fos-user-bundle">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-443874517">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-02-20</span>
+	                            <span class="dsq-commenter-name">anton</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-443874517" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-443874517" class="dsq-comment-text">
+	                                <p>Thanks for clear tutorial!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="437402800" id="dsq-comment-437402800">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_Y7BjTx8kd0/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/4738/9067/avatar92.jpg?1476818924">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-437402800">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-02-13</span>
+	                            <span class="dsq-commenter-name">Paca-vaca</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-437402800" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-437402800" class="dsq-comment-text">
+	                                <p>Really good work. Thank you.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="436871142" id="dsq-comment-436871142">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/zenstruck/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/473/181/avatar92.jpg?1472135120">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-436871142">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2012-02-12</span>
+	                            <span class="dsq-commenter-name">Kevin Bond</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-436871142" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-436871142" class="dsq-comment-text">
+	                                <p>Nice work guys,  this is great!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_fos-user-bundle';var disqus_url = 'https://knpuniversity.com/screencast/fosuserbundle-ftw/fos-user-bundle';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="manually-authenticating#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/guard/fos-user-bundle" addthis:title="KnpUGuard: Symfony Authentication with a Smile">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"guard","courseIsOwned":true,"chapter":"FOSUserBundle","chapterNumber":12,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'KnpUGuard: Symfony Authentication with a Smile';
+        Core.courseId = 65
+        Core.courseIsOwned = true;
+        Core.courseSlug = 'guard';
+                    Core.chapterTitle = 'FOSUserBundle';
+            Core.chapterNumber = 12;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'fos-user-bundle';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

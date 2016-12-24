@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Pagination Links > Symfony RESTful API: Basics++ (Course 3) | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 42370
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Reusable\x20Pagination\x20System <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-rest3/reusable-pagination-system#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="The [basics](http://knpuniversity.com/screencast/symfony-rest), check!
+[Errors](http://knpuniversity.com/screencast/symfony-rest), double check!
+Now let&#039;s get back to some *core* API concepts and take things up a level.
+
+* REST Pagination
+* Including next/prev pagination links
+* Filtering collections
+* Advanced serialization customization (serializer subscriber)
+* Including links via custom annotations
+* Evaluating expressions
+* Making embedded resources configurable/conditional
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Pagination Links">
+<meta property="og:description" content="The [basics](http://knpuniversity.com/screencast/symfony-rest), check!
+[Errors](http://knpuniversity">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-rest3/pagination-links">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-rest3:e0d65b609e02b36d300aaa84fb8e0124038c2420/rest-sf-3.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="pagination-links#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        3.
+                            Pagination Links
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony RESTful API: Basics++ (Course 3)</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="pagination-test" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Pagination Design and Test
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:20</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="pagerfanta-pagination" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Pagerfanta Pagination
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="pagination-links" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Pagination Links
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="reusable-pagination-system" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Reusable Pagination System
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="filtering" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Filtering / Searching
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="serialization-event-subscriber" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Serialization Event Subscriber
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:20</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="custom-serialization-field" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Super Custom Serialization Fields
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:01</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="links-via-annotations" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Adding Links via Annotations
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="evaluating-expression" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Evaluating the Link Expression
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:23</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="conditionally-embedding-relations" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Conditionally Serializing Fields with Groups
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:11</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-rest3" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Pagination Links</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony RESTful API: Basics++ (Course 3) Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $10.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="reusable-pagination-system#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="pagination-links#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="pagination-links#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony2-rest/edit/master/knpu/episode3/pagination-links.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>The response <em>is</em> returning a paginated list, and it even has extra <code>count</code> and <code>total</code>
+fields. Now we need to add those <code>next</code>, <code>previous</code>, <code>first</code> and <code>last</code> links. And
+since the response is entirely created via this <code>PaginatedCollection</code> class, this
+is simple: just add a new <code>private $_links = array();</code> property:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="5e2d0de822">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-27" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            27 lines <span class="meta-divider"></span> <span title="src/AppBundle/Pagination/PaginatedCollection.php">src/AppBundle/Pagination/PaginatedCollection.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PaginatedCollection</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $_links = <span class="hljs-keyword">array</span>();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h2 id="creating-and-setting-the-links">Creating and Setting the Links <a class="headerlink" href="pagination-links#creating-and-setting-the-links" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>To actually add links, create a new function called <code>public function addLink()</code>
+that has two arguments: the <code>$ref</code> - that's the <em>name</em> of the link, like
+<code>first</code> or <code>last</code> - and the <code>$url</code>. Add the link with <code>$this-&gt;_links[$ref] = $url;</code>.
+Great - now head back to the controller:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="68ebad4fdd">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-27" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            27 lines <span class="meta-divider"></span> <span title="src/AppBundle/Pagination/PaginatedCollection.php">src/AppBundle/Pagination/PaginatedCollection.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PaginatedCollection</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addLink</span><span class="hljs-params">($ref, $url)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;_links[$ref] = $url;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Every link will point to the same route, but with a different <code>page</code> query parameter.
+The route to this controller doesn't have a name yet, so give it one:
+<code>api_programmers_collection</code>. Copy that name and set it to a <code>$route</code> variable:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fda133f52c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-222" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            222 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/Api/ProgrammerController.php">src/AppBundle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProgrammerController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">BaseController</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-75" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 75
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="76"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="77"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@Route</span>("/api/programmers", name="api_programmers_collection")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="78"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@Method</span>("GET")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="80"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">listAction</span><span class="hljs-params">(Request $request)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="81"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="82-98" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 82 - 98
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="99"></td>
+            <td class="blob-code">        $route = <span class="hljs-string">'api_programmers_collection'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="100-120" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 100 - 120
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="121"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="122-220" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 122 - 220
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="221"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, create <code>$routeParams</code>: this will hold any wildcards that need to be passed
+to the route - meaning the curly brace parts in its path. This route doesn't have
+any, so set leave it empty. We're already setting things up to be reusable for other
+paginated responses.</p>
+<p>Since we need to generate <em>four</em> links, create an anonymous function to help out
+with this: <code>$createLinkUrl = function()</code>. Give it one argument <code>$targetPage</code>. Also,
+add <code>use</code> for <code>$route</code> and <code>$routeParams</code> so we can access those inside. To generate
+the URL, use the normal <code>return $this-&gt;generateURL()</code> passing it the <code>$route</code> and an
+<code>array_merge()</code> of any <code>routeParams</code> with a new <code>page</code> key:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="4e7127ef6e">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-222" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            222 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/Api/ProgrammerController.php">src/AppBundle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-98" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 98
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="99"></td>
+            <td class="blob-code">        $route = <span class="hljs-string">'api_programmers_collection'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="100"></td>
+            <td class="blob-code">        $routeParams = <span class="hljs-keyword">array</span>();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="101"></td>
+            <td class="blob-code">        $createLinkUrl = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($targetPage)</span> <span class="hljs-title">use</span> <span class="hljs-params">($route, $routeParams)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="102"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;generateUrl($route, array_merge(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="103"></td>
+            <td class="blob-code">                $routeParams,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="104"></td>
+            <td class="blob-code">                <span class="hljs-keyword">array</span>(<span class="hljs-string">'page'</span> =&gt; $targetPage)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="105"></td>
+            <td class="blob-code">            ));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="106"></td>
+            <td class="blob-code">        };</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="107-222" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 107 - 222
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Since there's no <code>{page}</code> routing wildcard, the router will add a <code>?page=</code> query
+parameter to the end, exactly how we want it to.</p>
+<p>Sweet! Add the first link with <code>$paginatedCollection-&gt;addLink()</code>. Call this link <code>self</code>
+and use <code>$page</code> to point to the <em>current</em> page. It might seem silly to link to <em>this</em>
+page, but it's a pretty standard thing to do:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="af196f0b07">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-222" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            222 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/Api/ProgrammerController.php">src/AppBundle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-107" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 107
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="108"></td>
+            <td class="blob-code">        $paginatedCollection-&gt;addLink(<span class="hljs-string">'self'</span>, $createLinkUrl($page));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="109-222" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 109 - 222
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Copy this line and paste it twice. Name the second link <code>first</code> instead of <code>self</code>
+and point this to page 1. Name the third link <code>last</code> and have it generate a URL to
+the last page: <code>$pagerfanta-&gt;getNbPages()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="27504aff61">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-222" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            222 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/Api/ProgrammerController.php">src/AppBundle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-108" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 108
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="109"></td>
+            <td class="blob-code">        $paginatedCollection-&gt;addLink(<span class="hljs-string">'first'</span>, $createLinkUrl(<span class="hljs-number">1</span>));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="110"></td>
+            <td class="blob-code">        $paginatedCollection-&gt;addLink(<span class="hljs-string">'last'</span>, $createLinkUrl($pagerfanta-&gt;getNbPages()));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="111-222" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 111 - 222
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The last two links are <code>next</code> and <code>previous</code>... but wait! We don't <em>always</em> have
+a next or previous page: these should be conditional. Add: <code>if($pagerfanta-&gt;hasNextPage())</code>,
+well, then, of course we want to generate a link to <code>$pagerfanta-&gt;getNextPage()</code>
+that's called <code>next</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="f73d09bc2b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-222" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            222 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/Api/ProgrammerController.php">src/AppBundle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-110" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 110
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="111"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> ($pagerfanta-&gt;hasNextPage()) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="112"></td>
+            <td class="blob-code">            $paginatedCollection-&gt;addLink(<span class="hljs-string">'next'</span>, $createLinkUrl($pagerfanta-&gt;getNextPage()));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="113"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="114-222" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 114 - 222
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Do this same thing for the <code>previous</code> page. <code>if($pagerfanta-&gt;hasPreviousPage())</code>,
+then <code>getPreviousPage()</code> and call that link <code>prev</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="56e1a14437">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-222" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            222 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/Api/ProgrammerController.php">src/AppBundle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-113" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 113
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="114"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> ($pagerfanta-&gt;hasPreviousPage()) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="115"></td>
+            <td class="blob-code">            $paginatedCollection-&gt;addLink(<span class="hljs-string">'prev'</span>, $createLinkUrl($pagerfanta-&gt;getPreviousPage()));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="116"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="117-222" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 117 - 222
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Phew!</p>
+<p>With some luck, the test should pass:</p>
+<pre><code class="language-bash"><div class="line">./bin/phpunit -c app --filter testGETProgrammersCollectionPaginated</div></code></pre>
+<p>Rerun it aaaannnddd perfect! This is pretty cool: the tests actually <em>follow</em> those links:
+walking from page 1 to page 2 to page 3 and asserting things along the way.</p>
+<h2 id="link-rels-self-first-etc">Link rels (self, first, etc) <a class="headerlink" href="pagination-links#link-rels-self-first-etc" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The link keys - <code>self</code>, <code>first</code>, <code>last</code>, <code>next</code> and <code>prev</code> are actually called link
+<code>rels</code>, or relations. They have a very important purpose: to explain the <em>meaning</em>
+of the link. On the web, the link's text tells us what that link points to. In an
+API, the "rel" does that job.</p>
+<p>In other words, as long as our API client understands <code>first</code> means the first page
+of results and <code>next</code> means the next page of results, you can communicate the significance
+of what those links are. </p>
+<p>And you know what else? I <em>didn't</em> just invent these link rels. They're super-official
+IANA rels - an organization that tries to standardize some of this stuff. Why is
+that cool? Because if everyone used these same links for pagination, understanding
+API's would be easier and more consistent.</p>
+<p>We <em>are</em> going to talk about links a lot more in a future episode - including all
+those buzzwords like hypermedia and HATEOAS. So sit tight.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2767198850" id="dsq-comment-2767198850">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2767198850">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-05</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2767198850" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2767198850" class="dsq-comment-text">
+	                                <p>Wow, very clean. I really appreciate you posting your complete solutions inside here - it will definitely help others :)</p><p>Thanks!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2767011346" id="dsq-comment-2767011346">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_kdXXgr89l9/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2767011346">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-05</span>
+	                            <span class="dsq-commenter-name">Vlad</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2767011346" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2767011346" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>I was also able to accomplish this by using a custom ORM adapter that implements <strong>AdapterInterface</strong> and the 2 interface methods. Its constructor has two parameters: a query to get the collection of items and a query to get the total number of items.</p><p>Here is the code:</p><p></p><pre><code><br>use Doctrine\ORM\QueryBuilder;<br>use Pagerfanta\Adapter\AdapterInterface;<br><br>/**<br> * Class CustomORMAdapter<br> * @package AppBundle\Pagination<br> */<br>class CustomORMAdapter implements AdapterInterface<br>{<br>    /**<br>     * @var QueryBuilder<br>     */<br>    private $queryBuilder;<br><br>    /**<br>     * @var QueryBuilder<br>     */<br>    private $countQueryBuilder;<br><br>    /**<br>     * Custom ORM Adapter constructor.<br>     *<br>     * @param QueryBuilder $queryBuilder Query builder for the query that returns the collection of items<br>     * @param QueryBuilder $countQueryBuilder Query builder for the query that returns total number of items<br>     */<br>    public function __construct(QueryBuilder $queryBuilder, QueryBuilder $countQueryBuilder)<br>    {<br>        $this-&gt;queryBuilder = $queryBuilder;<br>        $this-&gt;countQueryBuilder = $countQueryBuilder;<br>    }<br><br>    /**<br>     * Returns the number of results.<br>     *<br>     * @return integer The number of results.<br>     * @throws \Doctrine\ORM\NonUniqueResultException<br>     * @throws \Doctrine\ORM\NoResultException<br>     */<br>    public function getNbResults()<br>    {<br>        return $this-&gt;countQueryBuilder<br>            -&gt;setMaxResults(1)<br>            -&gt;getQuery()<br>            -&gt;getSingleScalarResult();<br>    }<br><br>    /**<br>     * Returns an slice of the results.<br>     *<br>     * @param integer $offset The offset.<br>     * @param integer $length The length.<br>     *<br>     * @return array|\Traversable The slice.<br>     */<br>    public function getSlice($offset, $length)<br>    {<br>        return $this-&gt;queryBuilder<br>            -&gt;setMaxResults($length)<br>            -&gt;setFirstResult($offset)<br>            -&gt;getQuery()<br>            -&gt;getResult();<br>    }<br>}<br></code><br></pre>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2757317037" id="dsq-comment-2757317037">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_kdXXgr89l9/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2757317037">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-29</span>
+	                            <span class="dsq-commenter-name">Vlad</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2757317037" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2757317037" class="dsq-comment-text">
+	                                <p>Thank you, Ryan!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2756684540" id="dsq-comment-2756684540">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2756684540">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2756684540" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2756684540" class="dsq-comment-text">
+	                                <p>Wow, nice work!</p><p>So, output walkers are really advanced. An output walker - which is a less common thing to worry about, there are also tree walkers, which modify the AST - is responsible for turning the "DQL" (represented by an abstract syntax tree - AST) into the actual SQL. In essence, this the actual code that turns the AST into the actual query string. Here's the default walker: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fdoctrine%2Fdoctrine2%2Fblob%2Fmaster%2Flib%2FDoctrine%2FORM%2FQuery%2FSqlWalker.php%3AgqsvTMgSKcInOVRXmmr6CwHcRtk&amp;cuid=1175718" rel="nofollow noopener">https://github.com/doctrine/do...</a></p><p>In the pagination library, they use a sub-class of this walker: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fdoctrine%2Fdoctrine2%2Fblob%2Fmaster%2Flib%2FDoctrine%2FORM%2FTools%2FPagination%2FCountOutputWalker.php%3A80EVi5Iqf8F1njUDvta984tkL-Q&amp;cuid=1175718" rel="nofollow noopener">https://github.com/doctrine/do...</a> - which helps to "count" the query result, used for pagination. That's what you turned off. I'm honestly not sure what the result of that is - but if it works, do it :). Pagination is quite "magical" - since Doctrine needs to take your query and dynamically change it so that it can first get a COUNT of those potential results (without actually fetching all of them). The only thing I'd double-check is that the pagination library is not now querying for ALL the rows, just to get a count of them. Double-check that in the profiler.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2755550032" id="dsq-comment-2755550032">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_kdXXgr89l9/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2755550032">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Vlad</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2755550032" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2755550032" class="dsq-comment-text">
+	                                <p>Hi Ryan,<br>I just got it to work! Turns out I had to disable output walkers.</p><p>I changed the following line in PaginationFactory::createCollection()<br></p><pre><code>new DoctrineORMAdapter($queryBuilder);</code></pre><p><br>to<br></p><pre><code>new DoctrineORMAdapter($queryBuilder, true, false);</code></pre><p><br>thus setting the <strong>$useOutputWalkers</strong> parameter to <strong>false</strong>.</p><p>My query is a DTO query with the <strong>NEW</strong> operator, with 5 joins.</p><p>What are output walkers anyway, and in which cases are they needed?<br>Thank you for your hints.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754883328" id="dsq-comment-2754883328">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754883328">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754883328" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754883328" class="dsq-comment-text">
+	                                <p>Hey Vlad!</p><p>Hmm, interesting! I don't have experience doing this, but in theory, I would be surprised if it's not supported. The error specifically is coming from Doctrine (not the paginator library itself), so changing libraries (probably) won't help.</p><p>Could you post your query? By looking at the code in Doctrine near where that error is thrown, it looks like it might be complaining that there is no "root alias" in the query, which means it may just be the query itself that's causing the problems. If you haven't tried it yet, try including the primary key (e.g. <a href="http://disq.us/url?url=http%3A%2F%2Falias.id%3ALgKQ_PfSGp_-AXusRXs2sHGvuXY&amp;cuid=1175718" rel="nofollow noopener">alias.id</a>) in the results.</p><p>Btw - link to the code in Doctrine fwiw - it's complex, but might help :) <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fdoctrine%2Fdoctrine2%2Fblob%2Fmaster%2Flib%2FDoctrine%2FORM%2FTools%2FPagination%2FLimitSubqueryOutputWalker.php%23L541%3AlxS0PNud13jUcPGCGj61NmNPqjw&amp;cuid=1175718" rel="nofollow noopener">https://github.com/doctrine/do...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754840081" id="dsq-comment-2754840081">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_kdXXgr89l9/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754840081">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Vlad</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754840081" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754840081" class="dsq-comment-text">
+	                                <p>Hi,<br>When I pass a query (e.g. <code>$em-&gt;createQuery</code>), instead of a query builder to this paginator, I get an error: <strong>​"The Paginator does not support Queries which only yield ScalarResults."</strong>. <br>Is there a paginator I can use with a query that returns scalar results?<br>Thank you!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2718341887" id="dsq-comment-2718341887">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_0Ksag17Pj1/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2718341887">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-08</span>
+	                            <span class="dsq-commenter-name">Chuck Norris</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2718341887" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2718341887" class="dsq-comment-text">
+	                                <p>Hi,</p><p>thanks for the quick answer.<br>I just saw that when I take a quick look to the rest of the course.</p><p>Any way, great job.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2718296442" id="dsq-comment-2718296442">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2718296442">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-08</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2718296442" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2718296442" class="dsq-comment-text">
+	                                <p>Hey Chuck!</p><p>Thank you!</p><p>Great question! HATEOS bundle is really cool! But we don't want to show this topic in basics and kept it for the next episode (Symfony REST 5) which was already released a few weeks ago. You can check it <a href="http://disq.us/url?url=http%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony-rest5%2Fhateoas-hypermedia-buzzwords%3A4ZS_TEvgvQtLZB3xGskD0yhwPW4&amp;cuid=1175718" rel="nofollow noopener">http://knpuniversity.com/scree...</a> .</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2716364533" id="dsq-comment-2716364533">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_0Ksag17Pj1/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2716364533">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-07</span>
+	                            <span class="dsq-commenter-name">Chuck Norris</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2716364533" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2716364533" class="dsq-comment-text">
+	                                <p>Hi,</p><p>Great tutorial,</p><p>But why not using HATEOS bundle to generate links like you do in silex rest tutorial ?</p><p>Thanks.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_pagination-links';var disqus_url = 'https://knpuniversity.com/screencast/symfony-rest3/pagination-links';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="reusable-pagination-system#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-rest3/pagination-links" addthis:title="Symfony RESTful API: Basics++ (Course 3)">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-rest3","courseIsOwned":false,"chapter":"Pagination Links","chapterNumber":3,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony RESTful API: Basics++ (Course 3)';
+        Core.courseId = 61
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-rest3';
+                    Core.chapterTitle = 'Pagination Links';
+            Core.chapterNumber = 3;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'pagination-links';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

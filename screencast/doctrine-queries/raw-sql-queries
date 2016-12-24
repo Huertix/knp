@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Raw SQL Queries > Go Pro with Doctrine Queries | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 40306
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Reusing\x20Queries\x20with\x20the\x20Query\x20Builder <i class="fa fa-play"></i>',
+            'url': '/screencast/doctrine-queries/reusing-queries-query-builder#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="
+You already know how to query with SQL, so learning how to do complex
+queries with Doctrine should *not* give you a headache. In this series,
+we&#039;ll learn the language Doctrine speaks (DQL), as well as the query
+builder object, how to use complex query features and even how to run
+good ol&#039; fashioned raw SQL queries with Doctrine. Because hey, sometimes
+simplicity rules :).
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Raw SQL Queries">
+<meta property="og:description" content="
+You already know how to query with SQL, so learning how to do complex
+queries with Doctrine should *not* give you a headache. In this series,
+we&amp;#039;ll learn the language Doctrine speaks (DQL), as well as the query
+builder object, how to use complex query features and even how to run
+good ol&amp;#039; fashioned raw SQL queries with Doctrine">
+<meta property="og:url" content="http://knpuniversity.com/screencast/doctrine-queries/raw-sql-queries">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/doctrine-queries:c4c30be78317e26076b8797261ff71d9c4e99033/doctrine-queries.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="raw-sql-queries#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        8.
+                            Raw SQL Queries
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Go Pro with Doctrine Queries</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dql" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Doctrine DQL
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:58</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="query-builder" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The QueryBuilder
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:02</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="and-where-or-where" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        And WHERE Or WHERE
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="joins" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        JOINs!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="joins-reduce-queries" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Joins and addSelect Reduce Queries
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="select-sum" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        SELECT the SUM (or COUNT)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:51</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="select-specific-fields" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Selecting Specific Fields
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="raw-sql-queries" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Raw SQL Queries
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="reusing-queries-query-builder" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Reusing Queries with the Query Builder
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="filters" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Filters
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 10:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/doctrine-queries" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Raw SQL Queries</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Go Pro with Doctrine Queries Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $6.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="reusing-queries-query-builder#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="raw-sql-queries#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="raw-sql-queries#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (5)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/doctrine-queries/edit/master/knpu/raw-sql-queries.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>All this Doctrine entity object stuff and DQL queries are really great.
+But if you ever feel overwhelmed with all of this or need write a <em>really</em>
+complex query, you can always fall back to using raw SQL. Seriously, this
+is <em>huge</em>. When Doctrine scares you, you are <em>totally</em> free to run away and
+use plain SQL. I won't judge you - just get that feature finished and launch
+it already. If a tool isn't helping you, don't use it.</p>
+<p>Put on your DBA hat and let's write some SQL!</p>
+<p>Open up <code>FortuneCookieRepository</code>. This is where we built a query that selected
+a sum, an average and the category name.</p>
+<h2 id="the-dbal-connection">The DBAL Connection <a class="headerlink" href="raw-sql-queries#the-dbal-connection" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The most important object in Doctrine is.... the entity manager! But that's
+just a puppet for the <em>real</em> guy in charge: the connection! Grab it by getting
+the entity manager and calling <code>getConnection()</code>. Let's <code>var_dump()</code> this:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="862a15b226">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-32" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            32 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/FortuneCookieRepository.php">src/AppBundle/Entity/FortuneCookieRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">countNumberPrintedForCategory</span><span class="hljs-params">(Category $category)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">        $conn = <span class="hljs-keyword">$this</span>-&gt;getEntityManager()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;getConnection();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        var_dump($conn);<span class="hljs-keyword">die</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="21-28" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 21 - 28
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-32" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 30 - 32
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Head to the browser and click into one of the category pages. There's our
+beautiful <code>var_dump()</code>. Hey! Look at the class name:</p>
+<pre><code>Doctrine\DBAL\Connection</code></pre>
+<p>Fun fact! The Doctrine library is actually <em>multiple</em> libraries put together.
+The two parts we care about are the ORM and the DBAL. The ORM is what does
+all the magic mapping of data onto objects. The DBAL - or database abstraction
+layer - can be used <em>completely</em> independent of the ORM. It's basically a
+wrapper around PDO. Said in a less boring way, it's a library for executing
+database queries.</p>
+<p>So this DBAL Connection objects is <em>our</em> key to running raw database queries.
+Google for "Doctrine DBAL Query" so we can follow its docs. Find the
+<a href="http://doctrine-dbal.readthedocs.org/en/latest/reference/data-retrieval-and-manipulation.html">Data Retrieval And Manipulaton</a>
+section. Scroll down a little to a good example:</p>
+<pre><code class="language-php">$sql = "SELECT * FROM articles WHERE id = ?";
+$stmt = $conn-&gt;prepare($sql);
+$stmt-&gt;bindValue(1, $id);
+$stmt-&gt;execute();</code></pre>
+<p>This DBAL library is a really light wrapper around PHP's PDO. So if you've
+used that before, you'll like this. But if not, it's like 3 steps, so stick
+with me.</p>
+<h2 id="making-a-raw-sql-query">Making a Raw SQL Query <a class="headerlink" href="raw-sql-queries#making-a-raw-sql-query" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Back in <code>FortuneCookieRepository</code>, let's write some simple SQL to test with:</p>
+<pre><code>SELECT * FROM fortune_cookie;</code></pre>
+<p>When you use the DBAL, there are <em>no</em> entities and it doesn't know about
+any of our Doctrine annotations. Yep, we're talking to the raw tables and
+columns. So I used <code>fortune_cookies</code> because that's the name of the actual
+table in the database.</p>
+<p>Next, we'll use the SQL to get a statement. So:</p>
+<pre><code>$stmt = $conn-&gt;prepare($sql);</code></pre>
+<p>And then we can <code>execute()</code> that, which runs the query but doesn't give you
+the result. To get <em>that</em>, call <code>$stmt-&gt;fetchAll()</code> and <code>var_dump()</code> that:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="0466f61d88">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/FortuneCookieRepository.php">src/AppBundle/Entity/FortuneCookieRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">countNumberPrintedForCategory</span><span class="hljs-params">(Category $category)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">        $conn = <span class="hljs-keyword">$this</span>-&gt;getEntityManager()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;getConnection();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $sql = <span class="hljs-string">'SELECT * FROM fortune_cookie'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        $stmt = $conn-&gt;prepare($sql);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        $stmt-&gt;execute();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        var_dump($stmt-&gt;fetchAll());<span class="hljs-keyword">die</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-31" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 31
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="33-35" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 33 - 35
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Try it! And there it is: exactly what you'd expect with no effort at all.
+It's literally the results - in array format - from the raw SQL query. Doctrine
+isn't trying to hide this feature from you - just grab the Connection object
+and you're dangerous.</p>
+<h2 id="prepared-statements">Prepared Statements <a class="headerlink" href="raw-sql-queries#prepared-statements" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The query we made with the query builder is a bit more complex. Could we
+replacle that with raw SQL? Sure! Well there's not really a good reason to
+do this, since it's built and working. But let's prove we can do it!</p>
+<p>Let's grab the "select" part of the query and stick that in our query. I
+hate long lines, so let's use multiple. Piece by piece, add the other query
+parts. The FROM is <code>fortune_cookie fc</code>. Add the <code>INNER JOIN</code> to <code>category</code>
+<code>ON cat.id = fc.category_id</code>. And since we're in DBAL land, we don't have
+any of our annotation mapping configuration, so we have to tell it exactly
+how to join - it's just raw SQL. And for the same reason, we're using the
+<em>real</em> column names, like <code>category_id</code>.</p>
+<p>Add a single <code>WHERE</code> of <code>fc.category_id = :category</code>. That's some good-old-fashioned
+boring SQL. I love it! The only thing we <em>still</em> need to do is fill in the
+<code>:category</code> placeholder. Even though we're using the DBAL, we still don't
+concatenate strings in our queries, unless you love SQL attacks or prefer
+to live dangerously. Are you feeling lucky, punk?</p>
+<p>Ahem. To give <code>:category</code> a value, just pass an array to <code>execute()</code> and
+pass it a <code>category</code> key assigned to the id. Ok, done! Let's dump this!</p>
+<p><div class="code-block-wrapper" data-code-block-guid="b8589f71f1">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-40" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            40 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/FortuneCookieRepository.php">src/AppBundle/Entity/FortuneCookieRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">countNumberPrintedForCategory</span><span class="hljs-params">(Category $category)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">        $conn = <span class="hljs-keyword">$this</span>-&gt;getEntityManager()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;getConnection();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $sql = <span class="hljs-string">'</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">            SELECT SUM(fc.numberPrinted) as fortunesPrinted, AVG(fc.numberPrinted) as fortunesAverage, cat.name</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">            FROM fortune_cookie fc</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">            INNER JOIN category cat ON cat.id = fc.category_id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">            WHERE fc.category_id = :category</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">            '</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        $stmt = $conn-&gt;prepare($sql);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">        $stmt-&gt;execute(<span class="hljs-keyword">array</span>(<span class="hljs-string">'category'</span> =&gt; $category-&gt;getId()));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">        var_dump($stmt-&gt;fetchAll());<span class="hljs-keyword">die</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="29-36" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 29 - 36
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="38-40" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 38 - 40
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Boom! That's <em>exactly</em> what I was hoping for.</p>
+<h2 id="using-fetch-to-get-back-the-first-row">Using fetch() to get back the First Row <a class="headerlink" href="raw-sql-queries#using-fetch-to-get-back-the-first-row" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Since our SQL gives us just <em>one</em> row, it'd be awesome to get just <em>its</em>
+columns, instead of an array with one result. Just use <code>fetch()</code>!</p>
+<p><div class="code-block-wrapper" data-code-block-guid="b44ae643b4">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-40" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            40 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/FortuneCookieRepository.php">src/AppBundle/Entity/FortuneCookieRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">countNumberPrintedForCategory</span><span class="hljs-params">(Category $category)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">        $conn = <span class="hljs-keyword">$this</span>-&gt;getEntityManager()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;getConnection();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $sql = <span class="hljs-string">'</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">            SELECT SUM(fc.numberPrinted) as fortunesPrinted, AVG(fc.numberPrinted) as fortunesAverage, cat.name</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">            FROM fortune_cookie fc</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">            INNER JOIN category cat ON cat.id = fc.category_id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">            WHERE fc.category_id = :category</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">            '</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        $stmt = $conn-&gt;prepare($sql);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">        $stmt-&gt;execute(<span class="hljs-keyword">array</span>(<span class="hljs-string">'category'</span> =&gt; $category-&gt;getId()));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">        var_dump($stmt-&gt;fetch());<span class="hljs-keyword">die</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="29-36" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 29 - 36
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="38-40" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 38 - 40
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And now, this is exactly what our query builder gave us before. So get rid
+of the <code>die()</code> statement and return the <code>fetch()</code> line:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="92d0b99b00">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-41" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            41 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/FortuneCookieRepository.php">src/AppBundle/Entity/FortuneCookieRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">countNumberPrintedForCategory</span><span class="hljs-params">(Category $category)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">        $conn = <span class="hljs-keyword">$this</span>-&gt;getEntityManager()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;getConnection();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $sql = <span class="hljs-string">'</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">            SELECT SUM(fc.numberPrinted) as fortunesPrinted, AVG(fc.numberPrinted) as fortunesAverage, cat.name</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">            FROM fortune_cookie fc</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">            INNER JOIN category cat ON cat.id = fc.category_id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">            WHERE fc.category_id = :category</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">            '</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        $stmt = $conn-&gt;prepare($sql);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">        $stmt-&gt;execute(<span class="hljs-keyword">array</span>(<span class="hljs-string">'category'</span> =&gt; $category-&gt;getId()));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> $stmt-&gt;fetch();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-37" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 30 - 37
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="39-41" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 39 - 41
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Just let the old code sit down there. Refresh! And we're prefectly back to
+normal. Man, that was kinda easy. So if Doctrine ever looks hard or you're
+still learning it, totally use SQL. It's no big deal.</p>
+<h2 id="native-queries">Native Queries? <a class="headerlink" href="raw-sql-queries#native-queries" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>One slightly confusing thing is that if you google for "doctrine raw sql",
+you'll find a different solution - something called <a href="http://doctrine-orm.readthedocs.org/en/latest/reference/native-sql.html">NativeQuery</a>.
+It sort of looks the same, just with some different function names. But there's
+this <code>ResultSetMapping</code> thing. Huh. This <code>NativeQuery</code> thing allows you to
+run a raw SQL query and then map that <em>back</em> to an object. That's pretty neat
+I guess. But for me, if I'm writing some custom SQL, I'm fine just getting
+back an array of data. I can deal with that. The <code>ResultSetMapping</code> confuses
+me, and probably isn't worth the effort. But it's there if you want to geek
+out on it.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2308819017" id="dsq-comment-2308819017">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_XvTOyGsPIs/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12512/3183/avatar92.jpg?1455500375">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2308819017">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-15</span>
+	                            <span class="dsq-commenter-name">Daniel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2308819017" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2308819017" class="dsq-comment-text">
+	                                <p>Wrote you from my business mail (daniel@timemanagerweb.co).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2307967143" id="dsq-comment-2307967143">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2307967143">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-15</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2307967143" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2307967143" class="dsq-comment-text">
+	                                <p>We do them in the US too, both in site and publicly from time to time (I give the US trainings). Send me a message - ryan@knplabs.com if you're interested :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2307960230" id="dsq-comment-2307960230">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_XvTOyGsPIs/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12512/3183/avatar92.jpg?1455500375">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2307960230">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-15</span>
+	                            <span class="dsq-commenter-name">Daniel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2307960230" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2307960230" class="dsq-comment-text">
+	                                <p>Thanks Ryan. I am seriously interested on taking the on premise training. Is it in the US or only in France?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2306046375" id="dsq-comment-2306046375">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2306046375">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-14</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2306046375" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2306046375" class="dsq-comment-text">
+	                                <p>Hey Daniel!</p><p>So very nice of you to day - I'm thrilled you're coming from raw php to Symfony - these are skill that you will not regret :).</p><p>I am not a Postgres expert (actually, I completely think it's superior to MySQL, but still have not used it extensively), but my guess is that yes, this is probably do to a difference in the databases themselves. In the case of the query builder, usually Doctrine abstracts things away and makes queries that work on all database systems. But, as you can see, it *is* generating valid PgSQL code, but yes, it looks like you must need a GROUP BY in order to do the sum and/or average.</p><p>So, I wouldn't worry about it too much - I think you came to the right conclusion and are understanding things correctly.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2305880480" id="dsq-comment-2305880480">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_XvTOyGsPIs/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12512/3183/avatar92.jpg?1455500375">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2305880480">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-13</span>
+	                            <span class="dsq-commenter-name">Daniel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2305880480" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2305880480" class="dsq-comment-text">
+	                                <p>Hi Ryan! Me again. Really this site for me has become an absolutely essential tool for migrating from raw php to symfony, I've been devouring all tutorials! Not long ago I decided to move to Postgres, I fall in love with the jsonb data type and many other advanced things that I miss in MySql, so, I'm following this tutorial using Postgres 9.4. In this screen cast and in a previous one I ran into an PDO error, here goes as:</p><p>An exception occurred while executing '<br>            SELECT SUM(fc.numberPrinted) as fortunesPrinted, AVG(fc.numberPrinted) as fortunesAverage, <a href="http://disq.us/url?url=http%3A%2F%2Fcat.name%3Anwy950t2WDYRtbTZzX82qoH5D80&amp;cuid=1175718" rel="nofollow noopener">cat.name</a><br>            FROM fortune_cookie fc<br>            INNER JOIN category cat ON <a href="http://disq.us/url?url=http%3A%2F%2Fcat.id%3AWaHEA0_5-uVvdq-rWhL98oCqzR4&amp;cuid=1175718" rel="nofollow noopener">cat.id</a> = fc.category_id<br>            WHERE fc.category_id = :category<br>        ' with params [3]:</p><p>But, if I do something like this (I did as the error suggested), the error goes away:</p><p>SELECT SUM(fc.numberPrinted) as fortunesPrinted, AVG(fc.numberPrinted) as fortunesAverage, <a href="http://disq.us/url?url=http%3A%2F%2Fcat.name%3Anwy950t2WDYRtbTZzX82qoH5D80&amp;cuid=1175718" rel="nofollow noopener">cat.name</a><br>            FROM fortune_cookie fc<br>            INNER JOIN category cat ON <a href="http://disq.us/url?url=http%3A%2F%2Fcat.id%3AWaHEA0_5-uVvdq-rWhL98oCqzR4&amp;cuid=1175718" rel="nofollow noopener">cat.id</a> = fc.category_id<br>            WHERE fc.category_id = 3<br>            group by <a href="http://disq.us/url?url=http%3A%2F%2Fcat.name%3Anwy950t2WDYRtbTZzX82qoH5D80&amp;cuid=1175718" rel="nofollow noopener">cat.name</a></p><p>May it be a difference with DB engine or something on Doctrine. I got something very similar on the screen cast before this one, so I changed it to:</p><p>return $this-&gt;createQueryBuilder('fc')<br>    -&gt;andWhere('fc.category = :category')<br>    -&gt;setParameter('category', $category)<br>    -&gt;innerJoin('fc.category', 'cat')<br>    -&gt;select('SUM(fc.numberPrinted) as fortunesPrinted, AVG(fc.numberPrinted) as fortunesAverage, <a href="http://disq.us/url?url=http%3A%2F%2Fcat.name%3Anwy950t2WDYRtbTZzX82qoH5D80&amp;cuid=1175718" rel="nofollow noopener">cat.name</a>')<br>    -&gt;addGroupBy('<a href="http://disq.us/url?url=http%3A%2F%2Fcat.name%3Anwy950t2WDYRtbTZzX82qoH5D80&amp;cuid=1175718" rel="nofollow noopener">cat.name</a>')<br>    -&gt;getQuery()<br>    -&gt;getOneOrNullResult();</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_raw-sql-queries';var disqus_url = 'https://knpuniversity.com/screencast/doctrine-queries/raw-sql-queries';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="reusing-queries-query-builder#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/doctrine-queries/raw-sql-queries" addthis:title="Go Pro with Doctrine Queries">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"doctrine-queries","courseIsOwned":false,"chapter":"Raw SQL Queries","chapterNumber":8,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Go Pro with Doctrine Queries';
+        Core.courseId = 56
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'doctrine-queries';
+                    Core.chapterTitle = 'Raw SQL Queries';
+            Core.chapterNumber = 8;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'raw-sql-queries';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

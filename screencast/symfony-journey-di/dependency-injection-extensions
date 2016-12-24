@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Dependency Injection Extensions > Journey to the Center of Symfony: The Dependency Injection Container | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 20637
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Compiler\x20Passes <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-journey-di/compiler-passes#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Let&#039;s not just *use* Symfony, let&#039;s conquer it! In this series, we&#039;re
+going to rip open the code that builds and boots Symfony&#039;s Container
+to see how it really works. Yes, this is geeky, and yes it&#039;s sweet!
+
+Besides the occassional [dinosaur](http://upload.wikimedia.org/wikipedia/commons/a/a0/Amazing_Stories_June_1926.jpg),
+expect to do the following on our adventure:
+
+* Build a container from scratch
+* Master the **ContainerBuilder** and **Definition** objects: the backbones to the container
+* See how Definitions are built with YAML
+* Dump the container to PHP code and use it
+* See how Symfony *builds* the container (woh)
+* Learn how DependencyInjection Extension classes work (i.e. the guys who process all that `config.yml` stuff)
+* Discover existing compiler passes and create your own
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Dependency Injection Extensions">
+<meta property="og:description" content="Let&amp;#039;s not just *use* Symfony, let&amp;#039;s conquer it! In this series, we&amp;#039;re
+going to rip open the code that builds and boots Symfony&amp;#039;s Container
+to see how it really works. Yes, this is geeky, and yes it&amp;#039;s sweet!
+
+Besides the occassional [dinosaur](http://upload">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-journey-di/dependency-injection-extensions">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-journey-di:2069840da60f17835afd095e72296700f2d9b670/sf2-journey-container.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="dependency-injection-extensions#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        8.
+                            Dependency Injection Extensions
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Journey to the Center of Symfony: The Dependency Injection Container</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="container-in-the-wild" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Creating a Container in the Wild
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:44</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="definition" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Definitions: Teach the Container
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="definition-unlocked" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Definition Unlocked
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="yaml" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Yaml for Service Definitions
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:01</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="parameters" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Parameters
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dumper" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        The Container Dumper
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="symfony-builds-the-container" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        How Symfony Builds the Container
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="dependency-injection-extensions" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Dependency Injection Extensions
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="compiler-passes" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Compiler Passes
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:34</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-journey-di" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Dependency Injection Extensions</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Journey to the Center of Symfony: The Dependency Injection Container Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $10.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="compiler-passes#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="dependency-injection-extensions#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="dependency-injection-extensions#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony-journey/edit/master/knpu/container/dependency-injection-extensions.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>These Yaml files <em>should</em> only have keys for <code>services</code>, <code>parameters</code> and
+<code>imports</code>. What if I just make something up, like <code>journey</code> and put a
+<code>dino_count</code> of 10 under it:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="de2e78ce46">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-77" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            77 lines <span class="meta-divider"></span> <span title="app/config/config.yml">app/config/config.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">journey:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">    dino_count:</span> <span class="hljs-number">10</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-77" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 77
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When we refresh, we get a <em>huge</em> error!</p>
+<pre><code>There is no extension able to load the configuration for "journey".</code></pre>
+<p>And it says it found valid namespaces for <code>framework</code>, <code>security</code>, <code>twig</code>,
+<code>monolog</code>, blah blah blah. Hey, <em>those</em> are the root keys that we have in
+our config files. So what makes <code>journey</code> invalid but <code>framework</code> valid?
+And what does <code>framework</code> do anyways?</p>
+<p>Take out that <code>journey</code> code.</p>
+<h2 id="registering-of-extension-classes">Registering of Extension Classes <a class="headerlink" href="dependency-injection-extensions#registering-of-extension-classes" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The answer lives in the bundle classes. Open up <code>AppBundle</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6485adf997">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-10" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            10 lines <span class="meta-divider"></span> <span title="src/AppBundle/AppBundle.php">src/AppBundle/AppBundle.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">HttpKernel</span>\<span class="hljs-title">Bundle</span>\<span class="hljs-title">Bundle</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppBundle</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Bundle</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">} </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This is empty, but it extends Symfony's base <code>Bundle</code> class. The key method
+is <code>getContainerExtension()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c9c0aecf95">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-212" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            212 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Bundle/Bundle.php">vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Bundle/Bundle.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-28" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 28
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code"><span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Bundle</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ContainerAware</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">BundleInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="31-71" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 31 - 71
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="72"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getContainerExtension</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="73"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="74"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">null</span> === <span class="hljs-keyword">$this</span>-&gt;extension) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="75"></td>
+            <td class="blob-code">            $class = <span class="hljs-keyword">$this</span>-&gt;getContainerExtensionClass();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="76"></td>
+            <td class="blob-code">            <span class="hljs-keyword">if</span> (class_exists($class)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="77"></td>
+            <td class="blob-code">                $extension = <span class="hljs-keyword">new</span> $class();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="78-88" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 78 - 88
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="89"></td>
+            <td class="blob-code">                <span class="hljs-keyword">$this</span>-&gt;extension = $extension;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="90"></td>
+            <td class="blob-code">            } <span class="hljs-keyword">else</span> {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="91"></td>
+            <td class="blob-code">                <span class="hljs-keyword">$this</span>-&gt;extension = <span class="hljs-keyword">false</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="92"></td>
+            <td class="blob-code">            }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="93"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="94"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="95"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">$this</span>-&gt;extension) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="96"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;extension;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="97"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="98"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="99-212" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 99 - 212
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When Symfony boots, it calls this method on each bundle looking for something
+called an Extension. This calls <code>getContainerExtensionClass()</code> and checks
+to see if that class exists. Move down to that method:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="38584037b0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-212" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            212 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Bundle/Bundle.php">vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Bundle/Bundle.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-204" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 204
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="205"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getContainerExtensionClass</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="206"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="207"></td>
+            <td class="blob-code">        $basename = preg_replace(<span class="hljs-string">'/Bundle$/'</span>, <span class="hljs-string">''</span>, <span class="hljs-keyword">$this</span>-&gt;getName());</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="208"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="209"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;getNamespace().<span class="hljs-string">'\\DependencyInjection\\'</span>.$basename.<span class="hljs-string">'Extension'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="210"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="211-212" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 211 - 212
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ah, and <em>here's</em> the magic. To find this "extension" class, it looks for
+a <code>DependencyInjection</code> directory and a class with the same name as the bundle,
+except replacing <code>Bundle</code> with <code>Extension</code>. For example, for AppBundle, it's
+looking for a <code>DependencyInjection\AppExtension</code> class. We don't have that.</p>
+<p>Open up the TwigBundle class and double-click the directory tree at the top
+to move PhpStorm here. TwigBundle <em>does</em> have a <code>DependencyInjection</code>
+directory and a <code>TwigExtension</code> inside:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="0f2b0b5267">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-157" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            157 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TwigExtension</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Extension</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="28-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 28 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(array $configs, ContainerBuilder $container)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-130" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 130
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="131"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="132-155" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 132 - 155
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="156"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So because this is here, it's automatically registered with the container.
+We may not know what an extension does yet, but we know how it's all setup.</p>
+<h2 id="registering-twig-globals">Registering Twig Globals <a class="headerlink" href="dependency-injection-extensions#registering-twig-globals" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Forget about extensions for a second and let me tell you about a totally
+unrelated feature. If you want to add a global variable to Twig, one way
+to do that is under the <code>twig</code> config. Just add <code>globals</code>, then set something
+up. I'll say <code>twitter_username: weaverryan</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="e2eca6fa75">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-76" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            76 lines <span class="meta-divider"></span> <span title="app/config/config.yml">app/config/config.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-28" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 28
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code"><span class="hljs-attr">twig:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code"><span class="hljs-attr">    debug:</span>            <span class="hljs-string">"%kernel.debug%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code"><span class="hljs-attr">    strict_variables:</span> <span class="hljs-string">"%kernel.debug%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code"><span class="hljs-attr">    globals:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code"><span class="hljs-attr">        twitter_username:</span> weaverryan</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="34-76" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 34 - 76
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And just by doing that, we could open up any Twig template and have access
+to a <code>twitter_username</code> variable. My question is: how does that work?</p>
+<h2 id="the-extension-load-method">The Extension load() Method <a class="headerlink" href="dependency-injection-extensions#the-extension-load-method" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>To answer that, look back at <code>TwigExtension</code>. The first secret is that when
+we call <code>compile()</code> on the container, this <code>load()</code> method is called. In
+fact the <code>load()</code> method is called on <em>every</em> extension that's registered
+with Symfony: so every class that follows the DependencyInjection\Extension
+naming-convention.</p>
+<p>Let's dump the <code>$configs</code> variable, because I don't know what that is yet:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="70c46e0a7f">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-158" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            158 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(array $configs, ContainerBuilder $container)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">        var_dump($configs);<span class="hljs-keyword">die</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="37-131" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 37 - 131
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="133-158" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 133 - 158
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Go back and refresh! Ok: it dumps an array with the <code>twig</code> configuration.
+Whatever we have in <code>config.yml</code> under <code>twig</code> is getting passed to <code>TwigExtension</code>:</p>
+<p>In fact, <em>that's</em> the rule. The fact that we have a key called <code>framework</code>
+means that this config will be passed to a class called <code>FrameworkExtension</code>.
+If you want to see how this config is used, look there. With the <code>assetic</code>
+key, that's passed to <code>AsseticExtension</code>. These extension classes have a
+<code>getAlias()</code> method in them, and that returns a lower-cased version of
+the class name without the word <code>Extension</code>.</p>
+<h2 id="extensions-load-services">Extensions Load Services <a class="headerlink" href="dependency-injection-extensions#extensions-load-services" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>These extensions have two jobs. First, they add service definitions to the
+container. Because after all, the main reason for adding a bundle is to add
+services to your container.</p>
+<p>The way it does this is just like our <code>roar.php</code> file, except it loads an
+XML file instead of Yaml:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="25f3cb7db0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-158" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            158 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(array $configs, ContainerBuilder $container)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-36" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 36
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">        $loader = <span class="hljs-keyword">new</span> XmlFileLoader($container, <span class="hljs-keyword">new</span> FileLocator(<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/../Resources/config'</span>));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">        $loader-&gt;load(<span class="hljs-string">'twig.xml'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="39-131" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 39 - 131
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="133-158" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 133 - 158
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's open up that <code>Resources/config/twig.xml</code> file:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9f08615ef2">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-144" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            144 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/Resources/config/twig.xml">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/Resources/config/twig.xml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="php"><span class="hljs-meta">&lt;?</span>xml version=<span class="hljs-string">"1.0"</span> <span class="hljs-meta">?&gt;</span></span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-tag">&lt;<span class="hljs-name">container</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://symfony.com/schema/dic/services"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">    <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">"http://www.w3.org/2001/XMLSchema-instance"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">    <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">parameters</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">parameter</span> <span class="hljs-attr">key</span>=<span class="hljs-string">"twig.class"</span>&gt;</span>Twig_Environment<span class="hljs-tag">&lt;/<span class="hljs-name">parameter</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="9-28" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 9 - 28
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">parameters</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">services</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">service</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"twig"</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"%twig.class%"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">argument</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"service"</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"twig.loader"</span> /&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">argument</span>&gt;</span>%twig.options%<span class="hljs-tag">&lt;/<span class="hljs-name">argument</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">call</span> <span class="hljs-attr">method</span>=<span class="hljs-string">"addGlobal"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">argument</span>&gt;</span>app<span class="hljs-tag">&lt;/<span class="hljs-name">argument</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">argument</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"service"</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"templating.globals"</span> /&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">call</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">service</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">service</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"twig.cache_warmer"</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"%twig.cache_warmer.class%"</span> <span class="hljs-attr">public</span>=<span class="hljs-string">"false"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">tag</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"kernel.cache_warmer"</span> /&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">argument</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"service"</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"service_container"</span> /&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">argument</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"service"</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"templating.finder"</span> /&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">service</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="46-141" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 46 - 141
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="142"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">services</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="143"></td>
+            <td class="blob-code"><span class="hljs-tag">&lt;/<span class="hljs-name">container</span>&gt;</span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>If you ever wondered where the <code>twig</code> service comes from, it's right here!
+You can see it in <code>container:debug</code>:</p>
+<pre><code class="language-bash"><div class="line">php app/console container:debug twig</div></code></pre>
+<p>So the first job of an extension class is to add services, which it always
+does by loading one or more XML files.</p>
+<h2 id="extensions-configuration">Extensions Configuration <a class="headerlink" href="dependency-injection-extensions#extensions-configuration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The second job is to read our configuration array and use that information
+to mutate the service definitions. We'll see code that does this shortly.</p>
+<p>Most extensions will have two lines near the top that call <code>getConfiguration()</code>
+and <code>processConfiguration</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d71114ee28">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-158" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            158 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(array $configs, ContainerBuilder $container)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-52" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 52
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code">        $configuration = <span class="hljs-keyword">$this</span>-&gt;getConfiguration($configs, $container);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="55"></td>
+            <td class="blob-code">        $config = <span class="hljs-keyword">$this</span>-&gt;processConfiguration($configuration, $configs);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="56-131" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 56 - 131
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="133-158" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 133 - 158
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next to every extension class, you'll find a class called <code>Configuration</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="486404aa56">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-201" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            201 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/Configuration.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/Configuration.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Configuration</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ConfigurationInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-199" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 199
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="200"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Watch out, a meteor! Oh, never mind, it's just the awesome fact that if I
+mess up some configuration - like <code>globals</code> as <code>globalsss</code> in Yaml, we'll
+get a really nice error. That doesn't happen by accident, that system <em>evolved</em>
+these <code>Configuration</code> classes to make that happen.</p>
+<p>This is probably one of the more bizarre classes you'll see: it builds a
+tree of valid configuration that can be used under this key. It adds a <code>globals</code>
+section, which says that the children are an array. It even has some stuff
+to validate and normalize what we put here:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="424062792d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-201" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            201 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/Configuration.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/Configuration.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-104" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 104
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="105"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addGlobalsSection</span><span class="hljs-params">(ArrayNodeDefinition $rootNode)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="106"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="107"></td>
+            <td class="blob-code">        $rootNode</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="108"></td>
+            <td class="blob-code">            -&gt;fixXmlConfig(<span class="hljs-string">'global'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="109"></td>
+            <td class="blob-code">            -&gt;children()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="110"></td>
+            <td class="blob-code">                -&gt;arrayNode(<span class="hljs-string">'globals'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="111"></td>
+            <td class="blob-code">                    -&gt;normalizeKeys(<span class="hljs-keyword">false</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="112"></td>
+            <td class="blob-code">                    -&gt;useAttributeAsKey(<span class="hljs-string">'key'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="113"></td>
+            <td class="blob-code">                    -&gt;example(<span class="hljs-keyword">array</span>(<span class="hljs-string">'foo'</span> =&gt; <span class="hljs-string">'"@bar"'</span>, <span class="hljs-string">'pi'</span> =&gt; <span class="hljs-number">3.14</span>))</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="114"></td>
+            <td class="blob-code">                    -&gt;prototype(<span class="hljs-string">'array'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="115-124" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 115 - 124
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="125"></td>
+            <td class="blob-code">                        -&gt;beforeNormalization()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="126"></td>
+            <td class="blob-code">                            -&gt;ifTrue(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($v)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="127"></td>
+            <td class="blob-code">                                <span class="hljs-keyword">if</span> (is_array($v)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="128"></td>
+            <td class="blob-code">                                    $keys = array_keys($v);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="129"></td>
+            <td class="blob-code">                                    sort($keys);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="130"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="131"></td>
+            <td class="blob-code">                                    <span class="hljs-keyword">return</span> $keys !== <span class="hljs-keyword">array</span>(<span class="hljs-string">'id'</span>, <span class="hljs-string">'type'</span>) &amp;&amp; $keys !== <span class="hljs-keyword">array</span>(<span class="hljs-string">'value'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">                                }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="133"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="134"></td>
+            <td class="blob-code">                                <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="135"></td>
+            <td class="blob-code">                            })</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="136"></td>
+            <td class="blob-code">                            -&gt;then(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($v)</span> </span>{ <span class="hljs-keyword">return</span> <span class="hljs-keyword">array</span>(<span class="hljs-string">'value'</span> =&gt; $v); })</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="137"></td>
+            <td class="blob-code">                        -&gt;end()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="138-147" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 138 - 147
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="148"></td>
+            <td class="blob-code">                    -&gt;end()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="149"></td>
+            <td class="blob-code">                -&gt;end()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="150"></td>
+            <td class="blob-code">            -&gt;end()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="151"></td>
+            <td class="blob-code">        ;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="152"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="153-201" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 153 - 201
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>These <code>Configuration</code> classes are tough to write, but pretty easy to read.
+And if you can't get something to configure correctly, opening up the right
+<code>Configuration</code> class might give you a hint.</p>
+<p>Back in <code>TwigExtension</code>, let's dump <code>$config</code> after calling <code>processConfiguration()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="60d86c6d43">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-158" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            158 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(array $configs, ContainerBuilder $container)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-51" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 51
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">        $configuration = <span class="hljs-keyword">$this</span>-&gt;getConfiguration($configs, $container);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code">        $config = <span class="hljs-keyword">$this</span>-&gt;processConfiguration($configuration, $configs);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="55"></td>
+            <td class="blob-code">        var_dump($config);<span class="hljs-keyword">die</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="56-131" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 56 - 131
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="132"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="133-158" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 133 - 158
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This dumps out a nice, normalized and validated version of our config, including
+keys we didn't have, with their default values. </p>
+<h2 id="extensions-mutate-definitions">Extensions Mutate Definitions <a class="headerlink" href="dependency-injection-extensions#extensions-mutate-definitions" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>So finally, how is the <code>globals</code> key used? Scroll down to around line 90:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="7938578492">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-157" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            157 lines <span class="meta-divider"></span> <span title="vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php">vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">(array $configs, ContainerBuilder $container)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-86" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 86
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="87"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">empty</span>($config[<span class="hljs-string">'globals'</span>])) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="88"></td>
+            <td class="blob-code">            $def = $container-&gt;getDefinition(<span class="hljs-string">'twig'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="89"></td>
+            <td class="blob-code">            <span class="hljs-keyword">foreach</span> ($config[<span class="hljs-string">'globals'</span>] <span class="hljs-keyword">as</span> $key =&gt; $global) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="90-92" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 90 - 92
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="93"></td>
+            <td class="blob-code">                    $def-&gt;addMethodCall(<span class="hljs-string">'addGlobal'</span>, <span class="hljs-keyword">array</span>($key, $global[<span class="hljs-string">'value'</span>]));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="94-94" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 94
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="95"></td>
+            <td class="blob-code">            }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="96"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="97-130" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 97 - 130
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="131"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="132-157" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 132 - 157
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>For most people, this code will look weird. But not us! If there are globals,
+it gets the <code>twig</code> Definition back <em>out</em> of the <code>ContainerBuilder</code>. This
+definition was added when it loaded <code>twig.xml</code>, and now we're going to tweak
+it. Just focus on the second part of the <code>if</code>: it calls <code>$def-&gt;addMethodCall()</code>
+and passes it <code>addGlobal</code> and two arguments: our key from the config, and
+the value - <code>weaverryan</code> in this case.</p>
+<p>If you read the Twig documentation, it tells you that if you want to add
+a global variable, you can call <code>addGlobal</code> on the <code>Twig_Environment</code> object.
+And that's exactly what this does. This type of stuff is <em>super</em> typical
+for extensions.</p>
+<p>If you refresh without any debug code, we'll get a working page again. Now
+open up the cached container - <code>app/cache/dev/appDevDebugProjectContainer.php</code>
+and find the method that creates the <code>twig</code> service - <code>getTwigService()</code>.
+Make sure you spell that correctly:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a951703eb6">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-4244" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            4244 lines <span class="meta-divider"></span> <span title="app/cache/dev/appDevDebugProjectContainer.php">app/cache/dev/appDevDebugProjectContainer.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-3703" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 3703
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3704"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getTwigService</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3705"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3706"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;services[<span class="hljs-string">'twig'</span>] = $instance = <span class="hljs-keyword">new</span> \Twig_Environment(<span class="hljs-keyword">$this</span>-&gt;get(<span class="hljs-string">'twig.loader'</span>), <span class="hljs-keyword">array</span>(<span class="hljs-string">'debug'</span> =&gt; <span class="hljs-keyword">true</span>, <span class="hljs-string">'strict_variables'</span> =&gt; <span class="hljs-keyword">true</span>, <span class="hljs-string">'exception_controller'</span> =&gt; <span class="hljs-string">'twig.controller.exception:showAction'</span>, <span class="hljs-string">'form_themes'</span> =&gt; <span class="hljs-keyword">array</span>(<span class="hljs-number">0</span> =&gt; <span class="hljs-string">'form_div_layout.html.twig'</span>), <span class="hljs-string">'autoescape_service'</span> =&gt; <span class="hljs-keyword">NULL</span>, <span class="hljs-string">'autoescape_service_method'</span> =&gt; <span class="hljs-keyword">NULL</span>, <span class="hljs-string">'cache'</span> =&gt; <span class="hljs-string">'/Users/weaverryan/Sites/knp/knpu-repos/symfony-journey-to-center/app/cache/dev/twig'</span>, <span class="hljs-string">'charset'</span> =&gt; <span class="hljs-string">'UTF-8'</span>, <span class="hljs-string">'paths'</span> =&gt; <span class="hljs-keyword">array</span>()));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="3707-3725" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 3707 - 3725
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3726"></td>
+            <td class="blob-code">        $instance-&gt;addGlobal(<span class="hljs-string">'twitter_username'</span>, <span class="hljs-string">'weaverryan'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3727"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3728"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> $instance;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3729"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="3730-4244" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 3730 - 4244
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Near the bottom, we see it: <code>$instance-&gt;addGlobal('twitter_username', 'weaverryan')</code>.
+We passed in simple configuration, <code>TwigExtension</code> used that to mutate the
+<code>twig</code> Definition, and ultimately the dumped container is updated. </p>
+<p>That's the power of the dependency injection extensions, and if it makes
+even a bit of sense, you're awesome.</p>
+<h2 id="our-configuration-wins">Our Configuration Wins <a class="headerlink" href="dependency-injection-extensions#our-configuration-wins" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Oh, and one more cool note. If I added a <code>twig</code> service to <code>config.yml</code>,
+would it override the one from <code>TwigBundle</code>? Actually yes: even though the
+extensions are called after loading these files, any parameters or services
+we add here win.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_dependency-injection-extensions';var disqus_url = 'https://knpuniversity.com/screencast/symfony-journey-di/dependency-injection-extensions';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="compiler-passes#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-journey-di/dependency-injection-extensions" addthis:title="Journey to the Center of Symfony: The Dependency Injection Container">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-journey-di","courseIsOwned":false,"chapter":"Dependency Injection Extensions","chapterNumber":8,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Journey to the Center of Symfony: The Dependency Injection Container';
+        Core.courseId = 59
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-journey-di';
+                    Core.chapterTitle = 'Dependency Injection Extensions';
+            Core.chapterNumber = 8;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'dependency-injection-extensions';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

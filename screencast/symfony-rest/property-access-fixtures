@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Test Fixtures and the PropertyAccess Component > Symfony RESTful API: Course 1 | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 41848
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: The\x20ResponseAsserter\x21 <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-rest/response-asserter#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="In this series, we get to work: by building the same API in the
+[REST series](http://knpuniversity.com/screencast/rest), but leveraging
+all the amazing tools and libraries of the Symfony framework. If terminology
+like representations, resources, and hypermedia are new to you, start
+with the [REST series](http://knpuniversity.com/screencast/rest) and
+then come back. And get ready to get your (API) mind blown.
+
+In Course 1, we&#039;ll start quick with:
+
+* Build your first functional POST endpoint
+* Decoding the Request body
+* Using forms to handle incoming data
+* Writing tests for your API
+* Handling data &quot;seeding&quot; for your tests
+* GET, PUT, DELETE and PATCH endpoints
+* Using the JMS Serializer
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Test Fixtures and the PropertyAccess Component">
+<meta property="og:description" content="In this series, we get to work: by building the same API in the
+[REST series](http://knpuniversity.com/screencast/rest), but leveraging
+all the amazing tools and libraries of the Symfony framework">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-rest/property-access-fixtures">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-rest:a5dc486f568b17f2957f648b5f78a465396f48e4/rest-sf.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="property-access-fixtures#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        11.
+                            Test Fixtures and the PropertyAc...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony RESTful API: Course 1</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="post" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        POST To Create
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="post-json-body" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Finish POST with a Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="form-post" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Handling data with a Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="get-one" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        GET one Programmer
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:20</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="tightening-up-response" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Tightening up the Response
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:51</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="get-collection" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        GET a Collection of Programmers
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="first-test" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Add a Test!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:00</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="test-code-reuse" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Test Code Reuse
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:31</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="tests-clear-data" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Tests with the Container
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:23</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="mad-test-debugging" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Mad Test Debugging
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="property-access-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Test Fixtures and the PropertyAccess Component
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="response-asserter" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        The ResponseAsserter!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:21</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="test-database" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Using a Test Database
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:52</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="put-programmer" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        PUT is for Updating
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="readonly-fields" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Read-Only Fields
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:26</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="delete-programmer" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        DELETE is for Saying Goodbye
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:59</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="patch-programmer" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        PATCH is (also) for Updating (basically)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="serializer-basics" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Using a Serializer
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="centralizing-response" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Centralize that Response!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="serializer-control" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        Taking Control of the Serializer
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:21</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-rest" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Test Fixtures and the PropertyAccess Component</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony RESTful API: Course 1 Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $10.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="response-asserter#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="property-access-fixtures#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="property-access-fixtures#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (10)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony2-rest/edit/master/knpu/episode1/property-access-fixtures.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Howdy big error! Now that I can see you, I can fix you! Remember, back in
+<code>ProgrammerController</code>, we're <em>always</em> assuming there's a <code>weaverryan</code> user
+in the database:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="5f63164302">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-98" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            98 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/Api/ProgrammerController.php">src/AppBundle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">newAction</span><span class="hljs-params">(Request $request)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="22-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 22 - 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        $form-&gt;submit($data);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">        $programmer-&gt;setUser(<span class="hljs-keyword">$this</span>-&gt;findUserByUsername(<span class="hljs-string">'weaverryan'</span>));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">        $em = <span class="hljs-keyword">$this</span>-&gt;getDoctrine()-&gt;getManager();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">        $em-&gt;persist($programmer);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">        $em-&gt;flush();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="33-42" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 33 - 42
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="44-98" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 44 - 98
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>We'll fix this later with some proper authentication, but for now, when we run
+our tests, we need to make sure that user is cozy and snug in the database.</p>
+<h2 id="creating-a-test-user">Creating a test User <a class="headerlink" href="property-access-fixtures#creating-a-test-user" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Create a new <code>protected function</code> called <code>createUser()</code> with a required <code>username</code>
+argument and one for <code>plainPassword</code>. Make that one optional: in this case,
+we don't care what the user's password will be:</p>
+<p>I'll paste in some code for this: it's pretty easy stuff. I'll trigger autocomplete
+on the <code>User</code> class to get PhpStorm to add that <code>use</code> statement for me. This
+creates the <code>User</code> and gives it the required data. The <code>getService()</code> function
+we created lets us fetch the password encoder out so we can use it, what a wonderfully
+trained function:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="80e75a4546">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-259" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            259 lines <span class="meta-divider"></span> <span title="src/AppBundle/Test/ApiTestCase.php">src/AppBundle/Test/ApiTestCase.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-212" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 212
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="213"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createUser</span><span class="hljs-params">($username, $plainPassword = <span class="hljs-string">'foo'</span>)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="214"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="215"></td>
+            <td class="blob-code">        $user = <span class="hljs-keyword">new</span> User();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="216"></td>
+            <td class="blob-code">        $user-&gt;setUsername($username);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="217"></td>
+            <td class="blob-code">        $user-&gt;setEmail($username.<span class="hljs-string">'@foo.com'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="218"></td>
+            <td class="blob-code">        $password = <span class="hljs-keyword">$this</span>-&gt;getService(<span class="hljs-string">'security.password_encoder'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="219"></td>
+            <td class="blob-code">            -&gt;encodePassword($user, $plainPassword);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="220"></td>
+            <td class="blob-code">        $user-&gt;setPassword($password);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="221-226" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 221 - 226
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="227"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="228-259" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 228 - 259
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's save this! Since we'll need the <code>EntityManager</code> a lot in this class,
+let's add a <code>protected function getEntityManager()</code>. Use <code>getService()</code> with
+<code>doctrine.orm.entity_manager</code>. And since I <em>love</em> autocomplete, give this
+PHPDoc:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="eda6c315fa">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-235" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            235 lines <span class="meta-divider"></span> <span title="src/AppBundle/Test/ApiTestCase.php">src/AppBundle/Test/ApiTestCase.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-226" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 226
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="227"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="228"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@return</span> EntityManager</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="229"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="230"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getEntityManager</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="231"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="232"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;getService(<span class="hljs-string">'doctrine.orm.entity_manager'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="233"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="234-235" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 234 - 235
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Now <code>$this-&gt;getEntityManager()-&gt;persist()</code> and <code>$this-&gt;getEntityManager()-&gt;flush()</code>.
+And just in case whoever calls this needs the <code>User</code>, let's return it.</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1b95aca2b3">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-235" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            235 lines <span class="meta-divider"></span> <span title="src/AppBundle/Test/ApiTestCase.php">src/AppBundle/Test/ApiTestCase.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-210" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 210
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="211"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createUser</span><span class="hljs-params">($username, $plainPassword = <span class="hljs-string">'foo'</span>)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="212"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="213-219" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 213 - 219
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="220"></td>
+            <td class="blob-code">        $em = <span class="hljs-keyword">$this</span>-&gt;getEntityManager();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="221"></td>
+            <td class="blob-code">        $em-&gt;persist($user);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="222"></td>
+            <td class="blob-code">        $em-&gt;flush();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="223"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="224"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> $user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="225"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="226-235" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 226 - 235
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>We could just go to the top of <code>testPOST</code> and call this there. But really,
+our entire system is kind of dependent on this user. So to truly fix this,
+let's put it in <code>setup()</code>. Don't forget to call <code>parent::setup()</code> - we've
+got some awesome code there. Then, <code>$this-&gt;createUser('weaverryan')</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="8be151db5a">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-36" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            36 lines <span class="meta-divider"></span> <span title="src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php">src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProgrammerControllerTest</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ApiTestCase</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setUp</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">        <span class="hljs-keyword">parent</span>::setUp();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;createUser(<span class="hljs-string">'weaverryan'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-34" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 34
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>I'd say we've earned a greener test - let's try it!</p>
+<pre><code class="language-bash"><div class="line">phpunit -c app src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php</div></code></pre>
+<p>Yay!</p>
+<h2 id="testing-get-one-programmer">Testing GET one Programmer <a class="headerlink" href="property-access-fixtures#testing-get-one-programmer" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Now, let's test the GET programmer endpoint:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d189eb9919">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-54" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            54 lines <span class="meta-divider"></span> <span title="src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php">src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProgrammerControllerTest</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ApiTestCase</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-35" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 35
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">testGETProgrammer</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="38-51" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 38 - 51
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Hmm, so we have another data problem: before we make a request to fetch a
+single programmer, we need to make sure there's one in the database.</p>
+<p>To do that, call out to an imaginary function <code>createProgrammer()</code> that we'll
+write in a second. This will let us pass in an array of whatever fields we
+want to set on that <code>Programmer</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="bd65c51e2b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-54" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            54 lines <span class="meta-divider"></span> <span title="src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php">src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-35" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 35
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">testGETProgrammer</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;createProgrammer(<span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">            <span class="hljs-string">'nickname'</span> =&gt; <span class="hljs-string">'UnitTester'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">            <span class="hljs-string">'avatarNumber'</span> =&gt; <span class="hljs-number">3</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">        ));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="42-51" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 42 - 51
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="53-54" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 53 - 54
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The <code>Programmer</code> class has a few other fields and the idea is that if we
+don't pass something here, <code>createProgrammer()</code> will invent some clever 
+default for us.</p>
+<p>Let's get to work in <code>ApiTestCase</code>: <code>protected function createProgrammer()</code>
+with an array of <code>$data</code> as the argument. And as promised, our first job
+is to use <code>array_merge()</code> to pass in some default values. One is the <code>powerLevel</code> -
+it's required - and if it's not set, give it a random value from 0 to 10.
+Next, create the <code>Programmer</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="663d8d282d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-258" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            258 lines <span class="meta-divider"></span> <span title="src/AppBundle/Test/ApiTestCase.php">src/AppBundle/Test/ApiTestCase.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-228" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 228
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="229"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createProgrammer</span><span class="hljs-params">(array $data)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="230"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="231"></td>
+            <td class="blob-code">        $data = array_merge(<span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="232"></td>
+            <td class="blob-code">            <span class="hljs-string">'powerLevel'</span> =&gt; rand(<span class="hljs-number">0</span>, <span class="hljs-number">10</span>),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="233-235" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 233 - 235
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="236"></td>
+            <td class="blob-code">        ), $data);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="237-238" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 237 - 238
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="239"></td>
+            <td class="blob-code">        $programmer = <span class="hljs-keyword">new</span> Programmer();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="240-247" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 240 - 247
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="248"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="249-258" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 249 - 258
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, maybe you're expecting me to iterate over the data, put the string <code>set</code>
+before each property name, and call that method. But no! There's a better way.</p>
+<h2 id="getting-down-with-propertyaccess">Getting down with PropertyAccess <a class="headerlink" href="property-access-fixtures#getting-down-with-propertyaccess" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Create an <code>$accessor</code> variable that's set to <code>ProperyAccess::createPropertyAccessor()</code>.
+Hello Symfony's PropertyAccess component! <em>Now</em> iterate over data. And instead
+of the "set" idea, call <code>$accessor-&gt;setValue()</code>, pass in <code>$programmer</code>,
+passing <code>$key</code> - which is the property name - and pass in the <code>$value</code> we
+want to set:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9cb42fec0c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-258" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            258 lines <span class="meta-divider"></span> <span title="src/AppBundle/Test/ApiTestCase.php">src/AppBundle/Test/ApiTestCase.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-228" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 228
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="229"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createProgrammer</span><span class="hljs-params">(array $data)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="230"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="231-237" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 231 - 237
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="238"></td>
+            <td class="blob-code">        $accessor = PropertyAccess::createPropertyAccessor();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="239"></td>
+            <td class="blob-code">        $programmer = <span class="hljs-keyword">new</span> Programmer();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="240"></td>
+            <td class="blob-code">        <span class="hljs-keyword">foreach</span> ($data <span class="hljs-keyword">as</span> $key =&gt; $value) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="241"></td>
+            <td class="blob-code">            $accessor-&gt;setValue($programmer, $key, $value);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="242"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="243-247" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 243 - 247
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="248"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="249-258" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 249 - 258
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The <code>PropertyAccess</code> component is what works behind the scenes with Symfony's
+Form component. So, it's great at calling getters and setters, but it also
+has some <em>really</em> cool superpowers that we'll need soon.</p>
+<p>The <code>Programmer</code> has all the data it needs, <em>except</em> for this <code>$user</code> relationship
+property. To set that, we can just add <code>user</code> to the defaults and query for
+one. I'll paste in a few lines here: I already setup our <code>UserRepository</code>
+to have a <code>findAny()</code> method on it:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="75b3e79f63">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-258" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            258 lines <span class="meta-divider"></span> <span title="src/AppBundle/Test/ApiTestCase.php">src/AppBundle/Test/ApiTestCase.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-228" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 228
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="229"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createProgrammer</span><span class="hljs-params">(array $data)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="230"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="231"></td>
+            <td class="blob-code">        $data = array_merge(<span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="232"></td>
+            <td class="blob-code">            <span class="hljs-string">'powerLevel'</span> =&gt; rand(<span class="hljs-number">0</span>, <span class="hljs-number">10</span>),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="233"></td>
+            <td class="blob-code">            <span class="hljs-string">'user'</span> =&gt; <span class="hljs-keyword">$this</span>-&gt;getEntityManager()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="234"></td>
+            <td class="blob-code">                -&gt;getRepository(<span class="hljs-string">'AppBundle:User'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="235"></td>
+            <td class="blob-code">                -&gt;findAny()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="236"></td>
+            <td class="blob-code">        ), $data);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="237-247" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 237 - 247
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="248"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="249-258" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 249 - 258
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And finally, the easy stuff! Persist and flush that <code>Programmer</code>. And return
+it too for good measure:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="434985a353">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-258" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            258 lines <span class="meta-divider"></span> <span title="src/AppBundle/Test/ApiTestCase.php">src/AppBundle/Test/ApiTestCase.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-228" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 228
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="229"></td>
+            <td class="blob-code">    <span class="hljs-keyword">protected</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createProgrammer</span><span class="hljs-params">(array $data)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="230"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="231-242" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 231 - 242
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="243"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="244"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;getEntityManager()-&gt;persist($programmer);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="245"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;getEntityManager()-&gt;flush();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="246"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="247"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> $programmer;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="248"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="249-258" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 249 - 258
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h2 id="finishing-the-get-test">Finishing the GET Test <a class="headerlink" href="property-access-fixtures#finishing-the-get-test" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Phew! With that work done, finishing the test is easy. Make a <code>GET</code> request
+to <code>/api/programmers/UnitTester</code>. And as always, we want to start by asserting
+the status code:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9e03262278">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-54" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            54 lines <span class="meta-divider"></span> <span title="src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php">src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-35" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 35
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">testGETProgrammer</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;createProgrammer(<span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">            <span class="hljs-string">'nickname'</span> =&gt; <span class="hljs-string">'UnitTester'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">            <span class="hljs-string">'avatarNumber'</span> =&gt; <span class="hljs-number">3</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">        ));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">        $response = <span class="hljs-keyword">$this</span>-&gt;client-&gt;get(<span class="hljs-string">'/api/programmers/UnitTester'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;assertEquals(<span class="hljs-number">200</span>, $response-&gt;getStatusCode());</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="45-51" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 45 - 51
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="53-54" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 53 - 54
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>I want to assert that we get the properties we expect. If you look
+in <code>ProgrammerController</code>, we're serializing 4 properties: <code>nickname</code>, <code>avatarNumber</code>,
+<code>powerLevel</code> and <code>tagLine</code>. To avoid humiliation let's assert that those actually exist.</p>
+<p>I'll use an <code>assertEquals()</code> and put those property names as the first argument
+in a moment. For the second argument - the <em>actual</em> value - we can use <code>array_keys()</code>
+on the json decoded response body - which I'll cleverly call <code>$data</code>. Guzzle can decode
+the JSON for us if we call <code>$response-&gt;json()</code>. This gives us the decoded
+JSON and <code>array_keys</code> gives us the field names in it. Back in the first argument
+to <code>assertEquals()</code>, we'll fill in the fields: <code>nickname</code>, <code>avatarNumber</code>,
+<code>powerLevel</code> and <code>tagLine</code> - even if it's empty:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="909b49caef">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-54" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            54 lines <span class="meta-divider"></span> <span title="src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php">src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-35" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 35
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">testGETProgrammer</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="38-42" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 38 - 42
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">        $response = <span class="hljs-keyword">$this</span>-&gt;client-&gt;get(<span class="hljs-string">'/api/programmers/UnitTester'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;assertEquals(<span class="hljs-number">200</span>, $response-&gt;getStatusCode());</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">        $data = $response-&gt;json();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;assertEquals(<span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">            <span class="hljs-string">'nickname'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">            <span class="hljs-string">'avatarNumber'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">            <span class="hljs-string">'powerLevel'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">            <span class="hljs-string">'tagLine'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code">        ), array_keys($data));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="53-54" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 53 - 54
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, time to test-drive this:</p>
+<pre><code class="language-bash"><div class="line">phpunit -c app src/AppBundle/Tests/Controller/Api/ProgrammerControllerTest.php</div></code></pre>
+<p>Great success! Now let's zero in and make our assertions a whole lot more
+...assertive :)</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2953552824" id="dsq-comment-2953552824">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_TpYLfmqdqZ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13756/7661/avatar92.jpg?1477237174">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2953552824">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-16</span>
+	                            <span class="dsq-commenter-name">Johan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2953552824" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2953552824" class="dsq-comment-text">
+	                                <p>I notice that there are so many different ways of tackling this haha</p><p>For now I just fixed it by adding the CASCADEs. The solution with the sqlite database sounds interesting though. I might try that whenever simple CASCADEs are not possible anymore and the purger breaks :)</p><p>Thank you for your time!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2953462250" id="dsq-comment-2953462250">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2953462250">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2953462250" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2953462250" class="dsq-comment-text">
+	                                <p>Hey Johan!</p><p>So I think I have had similar situations where I've hit the same problems and drawn the same conclusions as you! The purger actually calculates the correct delete order to avoid foreign key problems, but sometimes due to circular relationships, it's just not possible. In fact, I just hit the yesterday, and didn't bother debugging it - I just added the CASCADEs (it was a safe enough situation for me to do this). And yes, I've also done the foreign_key_checks thing too :p.</p><p>Btw, there is one other interesting solution for testing, which I know others have used, but I haven't ever quite tried: that is to prepare an sqlite database with a known data set (or perhaps, even empty), copy this to the correct location before the test to have it automatically used. Here are some details: <a href="http://disq.us/url?url=http%3A%2F%2Fstackoverflow.com%2Fquestions%2F23537549%2Fsymfony-doctrine-unittests-with-sqlite-memory-db%2323539791%3AUu8IzxnUmFv5ontgnB0PPPlXJrI&amp;cuid=1175718" rel="nofollow noopener">http://stackoverflow.com/quest...</a>. Don't use the "in memory" option - that only works if you're using Symfony's internal test client - whereas here we're making real HTTP requests in a different thread (this is my preferred way).</p><p>Cheers and good luck!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2952448156" id="dsq-comment-2952448156">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_TpYLfmqdqZ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13756/7661/avatar92.jpg?1477237174">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2952448156">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-15</span>
+	                            <span class="dsq-commenter-name">Johan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2952448156" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2952448156" class="dsq-comment-text">
+	                                <p>I was trying your suggestion using the purger, but this actually gave the error. I guess it tries to remove users before removing posts.</p><p>I think it would be painful to manually clear tables before starting your test because you need to know and specify the order in which you delete the tables.</p><p>In this case I think setting the onDelete to CASCADE would solve my problem, but only if all my FKs have this option, which probably won't be the case. I'm literally trying to clear the entire database.</p><p>I'm thinking of just writing a PHP script that temporarily turns off foreign key constraints ("SET foreign_key_checks = 0;"), iterate over all tables and DELETE all rows.</p><p>Thank you for your reply, very much appreciated!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2952104051" id="dsq-comment-2952104051">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2952104051">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-15</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2952104051" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2952104051" class="dsq-comment-text">
+	                                <p>Hey Johan!</p><p>Yea, this is a classic problem :). So, by default in Doctrine, when Doctrine setups of your relationship in the database, it doesn't add *any* "ON DELETE" behavior. This means that if you try to delete a row in a table, but there are other records that reference this as a foreign key, it'll fail. And this is a good default, because it's safe. So, you have 2 options to fix this:</p><p>1) You can fix it in your test. What I mean is, you can make sure that you empty the posts table *before* your test starts (so that it is able to delete a user later). Sometimes, I will literally - in my setup() method of my test - empty a few tables manually, with code like this:</p><p></p><pre><code><br>// get the entity manager, however you do in your test<br><br>$em<br>    -&gt;createQuery('DELETE FROM AppBundle:Post')<br>    -&gt;execute()<br>;<br></code></pre><p></p><p>OR, you could empty *every* table in your project. We actually do that in this tutorial. If you look in the ApiTestCase class that I setup for the tutorial, in the setup() method, we call a purgeDatabase() method, which does the following:</p><p></p><pre><code><br>// $em is the entity manager<br>$purger = new ORMPurger($em);<br>$purger-&gt;purge();<br></code></pre><p></p><p>2) When it makes sense, an even better solution is to fix this in your application. What I mean is, perhaps it *is* ok in your app that if a user were somehow ever deleted, that all of that user's posts are also deleted (or maybe not deleted, but their user/owner" set to null. If you feel comfortable doing this, then you'll update your Post.user property to add a JoinColumn:</p><p></p><pre><code><br>// Post.php<br><br>/**<br> * @ORM\ManyToOne(targetEntity="User")<br> * @ORM\JoinColumn(onDelete="CASCADE")<br> */<br>private $user;<br></code></pre><p></p><p>The other likely value instead of "CASCADE" would be "SET NULL". You'll need to generate a migration for this, since this is a change that affects your database.</p><p>Let me know if that helps! This is a really tough issue that I also struggle with - the correct answer depends on your app. I typically try to completely empty my database before each test, but eventually that can slow your tests down. I usually tackle that problem later when/if that becomes an issue.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2952045835" id="dsq-comment-2952045835">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_TpYLfmqdqZ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13756/7661/avatar92.jpg?1477237174">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2952045835">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-15</span>
+	                            <span class="dsq-commenter-name">Johan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2952045835" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2952045835" class="dsq-comment-text">
+	                                <p>Hmm, I'm getting an error. I have a situation similar to this: a user has many posts. When it is trying to remove the user, it crashes because of foreign key constraints, which makes sense of course. How do I work around this? :(</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2858583456" id="dsq-comment-2858583456">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/rakibahmedshovon/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13993/9225/avatar92.jpg?1473178884">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2858583456">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">Rakib Ahmed Shovon</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2858583456" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2858583456" class="dsq-comment-text">
+	                                <p>oh .. got it . done</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2857229648" id="dsq-comment-2857229648">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/rakibahmedshovon/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13993/9225/avatar92.jpg?1473178884">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2857229648">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-24</span>
+	                            <span class="dsq-commenter-name">Rakib Ahmed Shovon</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2857229648" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2857229648" class="dsq-comment-text">
+	                                <p>There was 1 failure:</p><p>1) AppBundle\Tests\Controller\Api\ProgrammerControllerTest::testGETProgrammer<br>Failed asserting that two arrays are equal.<br>--- Expected<br>+++ Actual<br>@@ @@<br> Array (<br>-    0 =&gt; 'nickname'<br>-    1 =&gt; 'avatarNumber'<br>-    2 =&gt; 'powerLevel'<br>-    3 =&gt; 'tagLine'<br>+    0 =&gt; 'id'<br>+    1 =&gt; 'nickname'<br>+    2 =&gt; 'avatar_number'<br>+    3 =&gt; 'power_level'<br>+    4 =&gt; 'user'<br> )</p><p>C:\Users\rakib\Site\symfony2-rest\src\AppBundle\Tests\Controller\Api\ProgrammerControllerTest.php:59</p><p>avatar_number become avatarNumber ...<br> in Windows</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2665518484" id="dsq-comment-2665518484">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_In5PITaduy/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2665518484">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-09</span>
+	                            <span class="dsq-commenter-name">Vincent Wong</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2665518484" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2665518484" class="dsq-comment-text">
+	                                <p>Inore my last comment I think I open the wrong ApiTestCase file, all good now. Thanks.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2664056831" id="dsq-comment-2664056831">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2664056831">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-07</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2664056831" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2664056831" class="dsq-comment-text">
+	                                <p>Hey Vincent!</p><p>Yep, this tutorial uses Guzzle version 5 - they're always releasing new versions on me! But, if you download the course code for course #4 (<a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony-rest4%29%3ATx2LPZHTG_jJJnGWuCjFDLjEkYY&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a> - you can check out the new version of the `ApiTestCase`. I upgraded to Symfony 3 and Guzzle 6 for that tutorial, and updated all that History stuff for the new version :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2661177479" id="dsq-comment-2661177479">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_In5PITaduy/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2661177479">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-06</span>
+	                            <span class="dsq-commenter-name">Vincent Wong</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2661177479" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2661177479" class="dsq-comment-text">
+	                                <p>Hi Ryan, which Guzzle version that you are using for this example? I tried using latest Guzzle version 6.2 and got some error in the History class. I notice that Guzzle make quite a bit of an update on the version 6.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_property-access-fixtures';var disqus_url = 'https://knpuniversity.com/screencast/symfony-rest/property-access-fixtures';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="response-asserter#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-rest/property-access-fixtures" addthis:title="Symfony RESTful API: Course 1">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-rest","courseIsOwned":false,"chapter":"Test Fixtures and the PropertyAccess Component","chapterNumber":11,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony RESTful API: Course 1';
+        Core.courseId = 58
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-rest';
+                    Core.chapterTitle = 'Test Fixtures and the PropertyAccess Component';
+            Core.chapterNumber = 11;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'property-access-fixtures';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

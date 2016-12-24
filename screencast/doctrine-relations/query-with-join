@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Query across a JOIN (and Love it) > Mastering Doctrine Relationships in Symfony | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 34761
+        };
+
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures.
+
+But, we left out *one* big piece: database relations. Once you&#039;ve mastered these,
+you&#039;ll be unstoppable. Unfortunately, a lot of information out there make Doctrine
+relations look over-complicated. Actually, they&#039;re simple and beautiful. Sure,
+they have some pitfalls - but they&#039;ll also help you build a complex data structure
+in no time.
+
+* ManyToOne relationships (associations)
+* The OneToMany side of a relation
+* The downfall of owning versus inverse sides of a relation
+* Doing magic with the ArrayCollection
+* Querying with Joins
+
+... and more - like some magic with the &quot;Param Conversion&quot;.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Query across a JOIN (and Love it)">
+<meta property="og:description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures">
+<meta property="og:url" content="http://knpuniversity.com/screencast/doctrine-relations/query-with-join">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/doctrine-relations:00a4bff155bef69e3d39bd9c91a18e6e37c3bbac/doctrine-relationships.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="query-with-join#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        10.
+                            Query across a JOIN (and Love it...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Mastering Doctrine Relationships in Symfony</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="create-genus-note" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Create Genus Note
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-one-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The King of Relations: ManyToOne
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Saving a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="join-column-relation-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        JoinColumn &amp; Relations in Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="param-conversion" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Controller Magic: Param Conversion
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        OneToMany: Inverse Side of the Relation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many-order-by" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Order By with a OneToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="array-collection-tricks" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Tricks with ArrayCollection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="relation-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Querying on a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="query-with-join" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Query across a JOIN (and Love it)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/doctrine-relations" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Query across a JOIN (and Love it)</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Mastering Doctrine Relationships in Symfony Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="resume">
+            Finish Course <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="query-with-join#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="query-with-join#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (12)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep3b-doctrine-relations/query-with-join.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>What about a JOIN query with Doctrine? Well, they're really cool.</p>
+<p>Here's our <em>last</em> challenge. Go to <code>/genus</code>. Right now, this list is ordered by the
+<code>speciesCount</code> property. Instead, I want to order by which genus has the most recent
+note - a column that lives on an entirely different table.</p>
+<p>In <code>GenusRepository</code>, the list page uses the query in <code>findAllPublishedOrderedBySize()</code>.
+Rename that to <code>findAllPublishedOrderedByRecentlyActive()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9902da22ec">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="src/AppBundle/Repository/GenusRepository.php">src/AppBundle/Repository/GenusRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EntityRepository</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">findAllPublishedOrderedByRecentlyActive</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Go change it in <code>GenusController</code> too:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="08846c3911">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-120" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            120 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-42" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 42
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">listAction</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="45-46" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 45 - 46
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">        $genuses = $em-&gt;getRepository(<span class="hljs-string">'AppBundle:Genus'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">            -&gt;findAllPublishedOrderedByRecentlyActive();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="49-52" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 49 - 52
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="54-118" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 54 - 118
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="119"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>PhpStorm has a great refactoring tool to rename everything automatically. Check out
+the <a href="../phpstorm/refactoring">Refactoring in PhpStorm</a> tutorial.</p>
+</div><h2 id="adding-the-join">Adding the Join <a class="headerlink" href="query-with-join#adding-the-join" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Let's go to work! Remove the <code>orderBy</code> line. We need to order by the <code>createdAt</code>
+field in the <code>genus_note</code> table. And we know from SQL that we can't do that unless
+we <em>join</em> over to that table. Do that with, <code>-&gt;leftJoin('genus')</code> - because that's
+the alias we set on line 15 - <code>genus.notes</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c066649201">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="src/AppBundle/Repository/GenusRepository.php">src/AppBundle/Repository/GenusRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EntityRepository</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">findAllPublishedOrderedByRecentlyActive</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;createQueryBuilder(<span class="hljs-string">'genus'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">            -&gt;andWhere(<span class="hljs-string">'genus.isPublished = :isPublished'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">            -&gt;setParameter(<span class="hljs-string">'isPublished'</span>, <span class="hljs-keyword">true</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;leftJoin(<span class="hljs-string">'genus.notes'</span>, <span class="hljs-string">'genus_note'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">            -&gt;getQuery()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">            -&gt;execute();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Why <code>notes</code>? This is the <em>property</em> name on <code>Genus</code> that references the relationship.
+And just by mentioning it, Doctrine has all the info it needs to generate the full JOIN SQL.</p>
+<h2 id="joins-and-the-inverse-relation">Joins and the Inverse Relation <a class="headerlink" href="query-with-join#joins-and-the-inverse-relation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Remember, this is the optional, <em>inverse</em> side of the relationship: we added this
+for the convenience of being able to say <code>$genus-&gt;getNotes()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3e7a65447d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-115" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            115 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-45" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 45
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\OneToMany(targetEntity="GenusNote", mappedBy="genus")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\OrderBy({"createdAt" = "DESC"})</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $notes;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="51-106" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 51 - 106
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="107"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="108"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@return</span> ArrayCollection|GenusNote[]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="109"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="110"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getNotes</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="111"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="112"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;notes;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="113"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="114"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And this is the <em>second</em> reason you might decide to map the inverse side of the relation:
+it's required if you're doing a JOIN in this direction.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>Actually, not true! As Stof suggested in the comments on this page, it <em>is</em> possible
+to query over this join <em>without</em> mapping this side of the relationship, it just
+takes a little bit more work:</p>
+<pre><code class="language-php">$this-&gt;createQueryBuilder('genus')
+    // ...
+    -&gt;leftJoin(
+        'AppBundle:GenusNote',
+        'genus_note',
+        \Doctrine\ORM\Query\Expr\Join::WITH,
+        'genus = genus_note.genus'
+    )
+    // ...</code></pre>
+</div><p>Back in <code>GenusRepository</code>, give <code>leftJoin()</code> a second argument: <code>genus_note</code> - this
+is the alias we can use during the rest of the query to reference fields on the joined
+<code>genus_note</code> table. This allows us to say <code>-&gt;orderBy('genus_note.createdAt', 'DESC')</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="b7609bb4d7">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="src/AppBundle/Repository/GenusRepository.php">src/AppBundle/Repository/GenusRepository.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EntityRepository</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">findAllPublishedOrderedByRecentlyActive</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;createQueryBuilder(<span class="hljs-string">'genus'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">            -&gt;andWhere(<span class="hljs-string">'genus.isPublished = :isPublished'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">            -&gt;setParameter(<span class="hljs-string">'isPublished'</span>, <span class="hljs-keyword">true</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;leftJoin(<span class="hljs-string">'genus.notes'</span>, <span class="hljs-string">'genus_note'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">            -&gt;orderBy(<span class="hljs-string">'genus_note.createdAt'</span>, <span class="hljs-string">'DESC'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">            -&gt;getQuery()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">            -&gt;execute();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That's it! Same philosophy of SQL joining... but it takes less work.</p>
+<p>Head back and refresh! Ok, the order <em>did</em> change. Look at the first one - the top
+note is from February 15th, the second genus has a note from February 11 and at the bottom,
+the most recent note is December 21st. I think we got it!</p>
+<p>Question: when we added the join, did it change what the query returned? Before,
+it returned an array of <code>Genus</code> objects... but now, does it also return the joined
+<code>GenusNote</code> objects? No: a join does <em>not</em> affect <em>what</em> is returned from the query:
+we're still <em>only</em> selecting from the <code>genus</code> table. There's a lot more about that
+in our <a href="../doctrine-queries/resume">Doctrine Queries</a> tutorial.</p>
+<p>Ok, that's it! That's everything - you are truly <em>dangerous</em> with Doctrine now.
+Sure, there <em>are</em> some more advanced topics - like Doctrine events, inheritance
+and <code>ManyToMany</code> relations - but we'll save those for another day. Get to work on
+that project... or keep going with me to learn more Symfony! I promise, more bad
+jokes - like worse than ever.</p>
+<p>See you next time!</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2924341670" id="dsq-comment-2924341670">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482485806">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2924341670">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-29</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2924341670" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2924341670" class="dsq-comment-text">
+	                                <p>Hey Maksym,</p><p>MySQL returns denormalized data as any SQL server when you use JOIN operations, that's why Doctrine normalizes this data for you. Doctrine knows that you query data FROM *genus* table, so it returns unique objects from it (actually, it hydrates objects based on denormalized data set). So all this magic handles by ORM itself.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2924281157" id="dsq-comment-2924281157">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2924281157">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-29</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2924281157" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2924281157" class="dsq-comment-text">
+	                                <p>If we run this query as raw sql (something like:<br>SELECT g.*, gn.createdAt FROM `genus` g<br>JOIN genus_note gn<br>ON gn.genus_id = <a href="http://disq.us/url?url=http%3A%2F%2Fg.id%3Ao1e46QbL4ery-yZZbeZ3U1YMges&amp;cuid=1175718" rel="nofollow noopener">g.id</a><br>WHERE g.is_published = 1<br>ORDER BY gn.createdAt DESC<br>), we get dozens of lines (it's 62 for me -- all those is_publish = 1)</p><p>How does Doctrine know that we actually wanted to *group* them?</p><p>I mean, without "GROUP BY <a href="http://disq.us/url?url=http%3A%2F%2Fg.name%3AU8plkyXdzJ56JFwXInrGShCpJIk&amp;cuid=1175718" rel="nofollow noopener">g.name</a>" line?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2919526585" id="dsq-comment-2919526585">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="query-with-join">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2919526585">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-26</span>
+	                            <span class="dsq-commenter-name">Martin</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2919526585" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2919526585" class="dsq-comment-text">
+	                                <p>Interesting. Thanks for the answer and for the excellent tutorial!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2919120308" id="dsq-comment-2919120308">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2919120308">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-26</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2919120308" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2919120308" class="dsq-comment-text">
+	                                <p>Good note Martin! We're using the {genusName} in the URL for the show page, which is NOT unique in the database. That was a lazy way of doing it - in real-life, we should make a unique "slug" field. Check out this comment for some more details about that: <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fdoctrine-relations%2Fquery-with-join%23comment-2870919195%3AFqEMbqIBvwu5em55BK6WKOSGpdY&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2918476896" id="dsq-comment-2918476896">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="query-with-join">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2918476896">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-26</span>
+	                            <span class="dsq-commenter-name">Martin</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2918476896" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2918476896" class="dsq-comment-text">
+	                                <p>The ranking didn't seem to be right in my /genus page, as when I clicked on the genuses, I had the following dates for the first note : Sept. 22, Sept. 19, Sept. 11, Sept.  18.</p><p>Turns out that the array_rand() function (LoadFixtures.php) returned Cucumania three times.</p><p>ID              Published                      Last note<br>2                    no                             Sept. 18<br>7                   yes                            Sept. 9<br>10                  no                             August 30</p><p>Cucumania appeared only once in my /genus list (the published one). It was ranked as if the date of the last note was September 9, but in the genus/Cucumania page, the date of the last note was September 18. That's because the showAction() method took the notes for all three ids (as it uses the genus name to select the notes).</p><p>Just throwing that out in case in could prevent some head-scratching for someone.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2870919195" id="dsq-comment-2870919195">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2870919195">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-01</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2870919195" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2870919195" class="dsq-comment-text">
+	                                <p>Hi Yang!</p><p>No,  you're absolutely correct :). If you have 2 rows with the same name, then you will have a problem. Basically:</p><p>1) On the list page, it's no problem: all genus will be returned from the query and printed<br>2) But when you go to /genus/Balaena, the findOneBy() function will find the *first* matching result.</p><p>So, what I did in this tutorial was a bit of a "shortcut". In real-life, when I want pretty URLs like this, I'll add a "slug" field, which is *unique* in the database and is automatically set by lowercasing &amp; cleaning out the "name" field (e.g. balaena). I use the StofDoctrineExtensionsBundle to do this, which is smart enough to make sure that this field is always unique (it would make the first one balaena and the second one balaena-1). With a unique field, you won't have this problem.</p><p>Very good question!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2866833898" id="dsq-comment-2866833898">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_fSkgMG99ER/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21577/5300/avatar92.jpg?1475849830">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2866833898">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-30</span>
+	                            <span class="dsq-commenter-name">Yang Liu</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2866833898" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2866833898" class="dsq-comment-text">
+	                                <p>Hi, one question. You created your genus names from a list. Is it possible query will be messed up if you got 2 genuses with the same name?<br>fixtures created 2 rows with the same name "Balaena" for me. In the listAction (/genus page), datas are shown correctly(# of species is 9016 for one and 4078 for the other). however, when I dump($genus) in the showAction(/genus/Balaena page), I get the same data no matter which Balaena I clicked in the list. Did I do something wrong? Or maybe findOneBy-function has problem with data with the same name?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2641551225" id="dsq-comment-2641551225">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/RHochstenbach/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/588/7540/avatar92.jpg?1461682041">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2641551225">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-25</span>
+	                            <span class="dsq-commenter-name">Roy Hochstenbach</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2641551225" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2641551225" class="dsq-comment-text">
+	                                <p>Indeed, that's what was causing it. Instead of getRepository('AppBundle:Genus') I had getRepository('AppBundle:GenusNote'). Thanks :-)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2640338885" id="dsq-comment-2640338885">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2640338885">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-24</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2640338885" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2640338885" class="dsq-comment-text">
+	                                <p>Hi Roy!</p><p>This is basically a "Method not found" error - the EntityRepository has a magic __call method that makes this method look different :). Three things to check:</p><p>1) Double-check that you don't have any typos on the name in either GenusRepository or GenusController (you probably don't, as you mentioned you changed it in both spots - but just in case)</p><p>2) Make sure that you're asking for -&gt;getRepository('AppBundle:Genus') - make sure you're not asking for some other class's repository.</p><p>3) Make sure that when you ask for -&gt;getRepository('AppBundle:Genus'), you're getting back an instance of `GenusRepository`. As long as you have the property repositoryClass configuration above Genus, you should. But to be sure, you can do this:</p><p><code><pre>dump($this-&gt;getDoctrine()-&gt;getManager()-&gt;getRepository('AppBundle:Genus'));die;<br></pre></code></p><p>I hope one of these things helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2635328886" id="dsq-comment-2635328886">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/RHochstenbach/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/588/7540/avatar92.jpg?1461682041">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2635328886">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-21</span>
+	                            <span class="dsq-commenter-name">Roy Hochstenbach</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2635328886" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2635328886" class="dsq-comment-text">
+	                                <p>When I change the method name to 'findAllPublishedOrderedByRecentlyActive' in both GenusRepository and GenusController, I get the following error when accessing a genus:</p><p>Undefined method 'findAllPublishedOrderedByRecentlyActive'. The method name must start with either findBy or findOneBy!<br>in vendor/doctrine/orm/lib/Doctrine/ORM/EntityRepository.php at line 226</p><p>I've tried to clear the Symfony cache, but the issue remains.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2595293860" id="dsq-comment-2595293860">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2595293860">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2595293860" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2595293860" class="dsq-comment-text">
+	                                <p>Wow, I did NOT know that - that's awesome (I never tried it, because even though it makes sense, it feels contrary to how most things work in Doctrine: very explicitly). I'll add a note to the tutorial. Now, if Doctrine is able to do this... I would love to remove the need to specify the inversedBy option on the mapped side. I've never (yet) looked into the code, but that has always felt like it should be unnecessary.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2591618255" id="dsq-comment-2591618255">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/christophecoevoet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/5588/6490/avatar92.jpg?1459088448">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2591618255">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-27</span>
+	                            <span class="dsq-commenter-name">Christophe Coevoet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2591618255" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2591618255" class="dsq-comment-text">
+	                                <p>&gt; And this is the second reason you might decide to map the inverse side of the relation:<br>it's required if you're doing a JOIN in this direction.</p><p>That's not true. As of Doctrine 2.3 or 2.4 (I don't remember anymore but both are already old anyway), arbitrary joins are supported, allowing to perform such joins without defining bidirectional relations.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_query-with-join';var disqus_url = 'https://knpuniversity.com/screencast/doctrine-relations/query-with-join';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="resume">
+            Finish Course <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/doctrine-relations/query-with-join" addthis:title="Mastering Doctrine Relationships in Symfony">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"doctrine-relations","courseIsOwned":false,"chapter":"Query across a JOIN (and Love it)","chapterNumber":10,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Mastering Doctrine Relationships in Symfony';
+        Core.courseId = 81
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'doctrine-relations';
+                    Core.chapterTitle = 'Query across a JOIN (and Love it)';
+            Core.chapterNumber = 10;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'query-with-join';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

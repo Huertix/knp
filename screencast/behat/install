@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>From Install to JS Testing > BDD, Behat, Mink and other Wonderful Things | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 39184
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: BDD\x20Features <i class="fa fa-play"></i>',
+            'url': '/screencast/behat/bdd-features#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="**Looking for Behat v2.5 of the tutorial?** See https://knpuniversity.com/screencast/behat-v25.
+
+Behat is my absolute favorite library to use. First, it let&#039;s me think about the *behavior*
+of my features first, *before* I start developing. In this tutorial, we&#039;ll do that, and it&#039;ll
+change the way you develop. Second, Behat turns that written behavior into functional tests
+against your application. Does your feature behave correctly? Just run the automated robots
+to find out!
+
+Along the way, we&#039;ll master Mink - the partner library to Behat - and solve all sorts of common
+problems, like:
+
+* Running scenarios in a real browser
+* Properly waiting or JavaScript events
+* Leveraging Behat hooks
+* Multiple contexts
+* Loading Database fixtures and clearing data
+* Bootstrapping your application (specifically Symfony)
+* Using the authenticated user
+* Tagging scenarios
+* How to put BDD into practice
+* Keeping the velociraptors in their pen.
+
+Let&#039;s do this!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="From Install to JS Testing">
+<meta property="og:description" content="**Looking for Behat v2.5 of the tutorial?** See https://knpuniversity">
+<meta property="og:url" content="http://knpuniversity.com/screencast/behat/install">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/behat:caf59f3b22c82c95d3caee5bb0d20cbe4d123cf7/behatv3.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="install#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        1.
+                            From Install to JS Testing
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">BDD, Behat, Mink and other Wonderful Things</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="install" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        From Install to JS Testing
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="bdd-features" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        BDD Features
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:56</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/behat/bdd-features/activity/298" title="Challenge 2.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/behat/bdd-features/activity/299" title="Challenge 2.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="scenarios" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Scenarios
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/behat/scenarios/activity/300" title="Challenge 3.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/behat/scenarios/activity/301" title="Challenge 3.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="using-behat" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Behat
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/behat/using-behat/activity/303" title="Challenge 4.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">1 challenge</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="behat-hooks-background" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Behat Hooks Background
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:49</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/behat/behat-hooks-background/activity/304" title="Challenge 5.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">1 challenge</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="using-mink" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Mink
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="finding-elements" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Finding Elements by CSS and Name
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:48</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="behat-loves-mink" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Behat Loves Mink (Free Definitions from MinkExtension)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:56</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="scenario-outline" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Scenario Outline
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="mink-inside-feature-context" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Mink Session inside FeatureContext
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:00</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="suites" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Context Organization and Behat Suites
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="login-scenario" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Building a Login Scenario
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:57</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="control-database" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Controlling the Database
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="clear-data-symfony-extension" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        The SymfonyExtension &amp; Clearing Data Between Scenarios
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="practicing-finding-debugging" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Practice: Find Elements, Login with 1 Step and Debug
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:51</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="get-authenticated-user" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        When *I* do Something: Handling the Current User
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="practicing-bdd" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        Practicing BDD: Plan, then Build
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 8:09</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="javascript-waiting" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Master JavaScript with Waits &amp; Debugging
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="javascript-debugging-screenshots" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Debugging and Taking Screenshots with JavaScript
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:33</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="tables" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        Gherkin Tables: Given I have the following:
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:37</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="html-tables" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                21.
+                        Finding inside HTML Tables
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:20</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="complex-delete" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                22.
+                        Clicking a Row in a Table (i.e. Complex Selectors)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 8:55</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fixtures-tags" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                23.
+                        Tagging Scenarios in order to Load Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/behat" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">From Install to JS Testing</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>BDD, Behat, Mink and other Wonderful Things Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered video-js-16x9"
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/538943085_960x540.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/141808753.hd.mp4?s=a156b6b599c95bc1cc79f6f661a393f780dc0d7a&amp;profile_id=113&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/141808753.sd.mp4?s=eb7e557914bf94522640edb4170f2a22b057c852&amp;profile_id=112&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="install#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../../tracks/extras" class="btn btn-lg btn-success">Back to the <i>Dev Tools</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="install#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="bdd-features#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="install#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="install#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/behat/edit/behat3/knpu/install.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Welcome to the magical world of Behat, my favorite library. No joke 
+this thing is the best. Behat is about two things:</p>
+<h2 id="bdd-functional-testing-and-planning-a-feature">BDD, Functional Testing and... Planning a Feature??? <a class="headerlink" href="install#bdd-functional-testing-and-planning-a-feature" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>First, functionally testing your application. Which means writing code that will
+open a browser, fill out a form, hit submit and verify text on the other side.</p>
+<p>Why test your application? Well, imagine you are in charge of safety at Jurassic
+Park, your job is to make sure guests aren't eaten by dinosaurs. You need to be 
+certain that the new pterodactyl exhibit that's being put in won't turn off the
+electric fence around the velociraptor pen. No tests? Good luck, they know how to
+open doors. </p>
+<p>And second, designing your application. As developers we'll often just start coding
+without thinking about what we're building or how the feature will behave.</p>
+<p>Using behavior driven development, which Behat helps you do, you'll actually plan things
+out beforehand. </p>
+<p>Imagine a world where communication on your team is perfect, you always deliver exactly
+what your client wants, electricity on the raptor fence never goes down and chocolate
+ice cream is always free. Yep, that's where we're going. </p>
+<h2 id="behat-docs">Behat Docs <a class="headerlink" href="install#behat-docs" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Over in the browser, let's surf to the Behat documentation. In this tutorial we're covering
+version 3, and for whatever reason when I recorded this the website still defaults to version 
+2.5. So double check that you are actually looking at version 3's documentation. </p>
+<p>I've got our project, the raptor store, loaded here. This is where dinosaurs go for the
+newest iphone and other cool electronics. There's a homepage, an admin section and that's
+basically it. This store is built using a very small Symfony2 application -- but hey,
+don't panic if you're not using Symfony: everything here will translate to whatever
+you're using.</p>
+<p>Cool, we've got a search box, let's look up some sweet Samsung products. And here
+are the two results we have. I want to start this whole Behat thing by testing this. 
+Hold onto your butts, let's going to get this thing running! </p>
+<h2 id="install-and-configuration">Install and Configuration <a class="headerlink" href="install#install-and-configuration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Over in the terminal run <code>composer require</code> and instead of using <code>behat/behat</code> we'll grab:
+<code>behat/mink-extension</code> and <code>behat/mink-goutte-driver</code>:</p>
+<pre><code class="language-bash"><div class="line">composer require behat/mink-extension behat/mink-goutte-driver</div></code></pre>
+<p>These are plugins for Behat and another library called Mink and they require Behat and
+Mink. We see the Mink library downloaded here,  and the Behat library downloaded
+down there. So life is good! </p>
+<p>Once you've downloaded Behat you'll have access to an executable called <code>./vendor/bin/behat</code>
+or just <code>bin/behat</code> for Symfony2 users. Running it now gives us a nice strong error:</p>
+<pre><code class="language-bash"><div class="line">vendor/bin/behat</div></code></pre>
+<p>That's ok because we need to run it with <code>--init</code> at the end just one time in
+our application:</p>
+<pre><code class="language-bash"><div class="line">vendor/bin/behat --init</div></code></pre>
+<p>This did an underwhelming amount of things for us. It created two directories and one file. </p>
+<p>In PhpStorm we see a <code>features</code> directory, a <code>bootstrap</code> directory and a little <code>FeatureContext.php</code>
+file and that's all of it:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3bda2edfd5">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="features/bootstrap/FeatureContext.php">features/bootstrap/FeatureContext.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Behat</span>\<span class="hljs-title">Behat</span>\<span class="hljs-title">Context</span>\<span class="hljs-title">Context</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Behat</span>\<span class="hljs-title">Behat</span>\<span class="hljs-title">Context</span>\<span class="hljs-title">SnippetAcceptingContext</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="5-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 5 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FeatureContext</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Context</span>, <span class="hljs-title">SnippetAcceptingContext</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>While we're here, I'll add a use statement for <code>MinkContext</code> and make it extend that.
+I'll explain that in a minute:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6eb54475e1">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-25" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            25 lines <span class="meta-divider"></span> <span title="features/bootstrap/FeatureContext.php">features/bootstrap/FeatureContext.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Behat</span>\<span class="hljs-title">MinkExtension</span>\<span class="hljs-title">Context</span>\<span class="hljs-title">MinkContext</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="9-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 9 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FeatureContext</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">MinkContext</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Context</span>, <span class="hljs-title">SnippetAcceptingContext</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-25" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 25
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>One last bit of setup: at the root of your project create a <code>behat.yml</code> file. I'll paste in some
+content to get us started:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="2d211c6e36">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            6 lines <span class="meta-divider"></span> <span title="behat.yml">behat.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">default:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    extensions:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code">        Behat\MinkExtension:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">            base_url:</span> http://localhost:<span class="hljs-number">8000</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-attr">            goutte:</span> ~</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When we run Behat it will looks for a <code>behat.yml</code> file and this tells it:</p>
+<blockquote><p>Yo! Our application lives at localhost:8000, so look for it there.</p>
+</blockquote>
+<h2 id="your-first-feature-and-scenario">Your First Feature and Scenario <a class="headerlink" href="install#your-first-feature-and-scenario" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Behat is installed, let's get to writing features! In the <code>features</code> directory create a new file
+called <code>search.feature</code> and we'll just start describing the search feature on the raptor store
+using a language called Gherkin which you're about to see here. </p>
+<p><div class="code-block-wrapper" data-code-block-guid="c1178e9e4e">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-11" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            11 lines <span class="meta-divider"></span> <span title="features/search.feature">features/search.feature</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-keyword">Feature</span>: Search</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code">  In order to find products dinosaurs love</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code">  As a website user</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">  I need to be able to search for products</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="5-11" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 5 - 11
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Here I'm just using human readable language to describe the search feature in general. Within
+each feature we'll have many different scenarios or user flows. So let's start with 
+<code>Scenario: Searching for a product that exists</code>. Now using very natural language I'll describe
+the flow. </p>
+<p><div class="code-block-wrapper" data-code-block-guid="918291181c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-11" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            11 lines <span class="meta-divider"></span> <span title="features/search.feature">features/search.feature</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">  Scenario</span>: Search for a word that exists</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-keyword">    Given </span>I am on <span class="hljs-string">"/"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-keyword">    When </span>I fill in <span class="hljs-string">"searchTerm"</span> with <span class="hljs-string">"Samsung"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-keyword">    And </span>I press <span class="hljs-string">"search_submit"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"><span class="hljs-keyword">    Then </span>I should see <span class="hljs-string">"Samsung Galaxy S II"</span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Don't stress out about the formatting of this, we'll cover that in detail. </p>
+<p>The only two things that should look weird to you are <code>searchTerm</code> and <code>search_submit</code> because
+they are weird. <code>searchTerm</code> is the <code>name</code> attribute of this box here, and <code>search_submit</code> is the
+<code>id</code> of this button. We'll talk more about this later: I'm actually breaking some rules. But
+I want to get this working as quickly as possible. </p>
+<h2 id="running-behat">Running Behat <a class="headerlink" href="install#running-behat" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Ready for me to blow your mind? Just by writing this one scenario we now have a test for our app.
+In the terminal run <code>./vendor/bin/behat</code> and boom! It just read that scenario and actually went
+to our homepage, filled in the search box, pressed the button and verified that "Samsung Galaxy"
+was rendering on the next page. Why don't we see this happen? By default, it runs things using
+invisible curl request instead of opening up a real browser. </p>
+<h2 id="testing-javascript">Testing JavaScript <a class="headerlink" href="install#testing-javascript" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The downside to this is that if you have JavaScript on your page that this scenario depends on, it
+isn't going to work since this isn't actually opening up a real browser. So, how can we run
+this in a real browser? There are actually a bunch of different ways. The easiest is by
+using Selenium. </p>
+<p>Grab another library with <code>composer require behat/mink-selenium2-driver</code>. You'll also need to download
+the selenium server which is really easy, it's just a jar file. Click this link here under downloads 
+to get the <a href="http://www.seleniumhq.org/download/">Selenium Standalone Server</a>. I already have
+this, so I'm not actually going to download it.</p>
+<p>To run things in Selenium, open a new tab in your terminal, and run the jar file that you just downloaded.
+For me that's</p>
+<pre><code class="language-bash"><div class="line">java -jar ~/Downloads/selenium-server-standalone-2.45.0.jar</div></code></pre>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>Firefox <code>47.0.0</code> and lower is not supported at all since Selenium <code>3.0.0</code> - update Firefox
+to the latest version and install the new <a href="https://github.com/mozilla/geckodriver">geckodriver</a> for it in order to use
+the latest Selenium server.</p>
+</div><p>This will load and run as a daemon, so it should just hang there. </p>
+<p>Our library is done downloading and we just need to activate it in our <code>behat.yml</code> with the line:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="98773813b9">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-7" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            7 lines <span class="meta-divider"></span> <span title="behat.yml">behat.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">default:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    extensions:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code">        Behat\MinkExtension:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="4-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 4 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">            selenium2:</span> ~</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This gives me the option to use goutte to run the test using curl requests or Selenium to have things
+run in a browser. By default, this will just select goutte. So how do we make it use Selenium? I'm so
+glad you asked! </p>
+<p>Above the scenario that you want to run in Selenium add <code>@javascript</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c3d8cb8532">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-12" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            12 lines <span class="meta-divider"></span> <span title="features/search.feature">features/search.feature</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">  <span class="hljs-annotation">@javascript</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-keyword">  Scenario</span>: Search for a word that exists</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-12" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 12
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And that's it. Go back to the terminal and let's rerun this test. It actually opens the browser,
+it's quick but you can see it clicking around to complete the scenario. Cool!</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>FireFox is buggy with the new Selenium 3 server that's why it's preferable to use Google Chrome.
+You can explicitly specify the browser in the <code>behat.yml</code> config file:</p>
+<pre><code class="language-yaml"># behat.yml
+default:
+  extensions:
+    Behat\MinkExtension:
+      browser_name: chrome</code></pre>
+</div><p>We write human readable instructions and they turn into functional tests, and this just barely
+scratches the surface of how this will change your development. Let's keep going and figure out
+what's really going on here.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3056688169" id="dsq-comment-3056688169">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3056688169">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-17</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3056688169" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3056688169" class="dsq-comment-text">
+	                                <p>Thanks for sharing the link! And yea, I know what you mean - Behat docs are a bit light on some setup details... which is a shame, because it's SO rewarding to work with afterwards :). Happy you got there!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3056444180" id="dsq-comment-3056444180">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_c2LjiV3BqG/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23323/2645/avatar92.jpg?1481819588">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3056444180">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-17</span>
+	                            <span class="dsq-commenter-name">James D</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3056444180" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3056444180" class="dsq-comment-text">
+	                                <p>FYI, I found this article on Gecko webdrivers super handy:</p><p><a href="http://disq.us/url?url=http%3A%2F%2Fmichalzalecki.com%2Fsetup-selenium-with-geckodriver-and-chromedriver%2F%3AhkvBkE2qABs7mOKNflW3hYAzIEQ&amp;cuid=1175718" rel="nofollow noopener">http://michalzalecki.com/setup...</a></p><p>Also also, thanks so much for this course. I've been meaning to get round to learning Behat properly for months and I've always had set up problems. This is the first place I've found that explains how to get started properly.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3043738216" id="dsq-comment-3043738216">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3043738216">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-09</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3043738216" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3043738216" class="dsq-comment-text">
+	                                <p>Sweet! So happy that worked - and thank you for the follow-up! Awesome!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3041096502" id="dsq-comment-3041096502">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_c2LjiV3BqG/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23323/2645/avatar92.jpg?1481819588">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3041096502">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-07</span>
+	                            <span class="dsq-commenter-name">James D</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3041096502" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3041096502" class="dsq-comment-text">
+	                                <p>Bingo! Worked a treat, thanks Ryan. I downloaded the Mac archive from <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fmozilla%2Fgeckodriver%2Freleases%3Am2-HoMplaVuKOHGuCAoN4jc6LUw&amp;cuid=1175718" rel="nofollow noopener">https://github.com/mozilla/gec...</a>, unzipped it, put the executable in my project root (though I guess it could have gone anywhere, and might more sensibly be kept somewhere like /usr/local/share or something.</p><p>As you described, I added the path to the executable to my path, and now I can run tests with Selenium.</p><p>Thanks again for your help!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3035616293" id="dsq-comment-3035616293">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3035616293">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-05</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3035616293" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3035616293" class="dsq-comment-text">
+	                                <p>Hey James!</p><p>Yea, Selenium is temporarily in a weird place right now as they've recently released their 3.0 version of the server, which has some differences with how the old one works. As I understand it, you need to also download the gecko-driver in order to use Firefox (<a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fmozilla%2Fgeckodriver%2Freleases%29%3A4pPJV_1D8zSDOUfV_WzILB_y_Iw&amp;cuid=1175718" rel="nofollow noopener">https://github.com/mozilla/gec...</a> or the Chrome driver to use Chrome (<a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fmozilla%2Fgeckodriver%2Freleases%29%3A4pPJV_1D8zSDOUfV_WzILB_y_Iw&amp;cuid=1175718" rel="nofollow noopener">https://github.com/mozilla/gec...</a>. I *think* that you just need to make sure these are in your path (i.e. that you can just say chromedriver from the command line) - I don't *think* that you actually need to run them manually. I'm doing a lot of "think" because, while I have the new Selenium 3 server running on my machine, I had the chrome-driver installed a long time ago, so I'm not 100% positive what I might have done with my setup way back then.</p><p>Anyways, let me know if downloading gecko-driver helps. Otherwise, we'll find the solution. I think we may need a note on this tutorial about the new setup steps with Selenium.</p><p>Cheers and apologies for the inconvenience with Selenium!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3034227526" id="dsq-comment-3034227526">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_c2LjiV3BqG/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23323/2645/avatar92.jpg?1481819588">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3034227526">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-04</span>
+	                            <span class="dsq-commenter-name">James D</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3034227526" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3034227526" class="dsq-comment-text">
+	                                <p>Hey - I'm having a little bit of trouble with the Selenium part of this tutorial. I can run the scenario without Selenium, but when I try to do it using the @javascript option, Selenium opens up a Firefox window then just hangs. After a while I get a message saying:</p><p>Could not open connection: Unable to connect to host 127.0.0.1 on port 7055 after 45000 ms.</p><p>...followed by a load of console output from Firefox that I don't really understand.</p><p>Any suggestions for what to do next would be much appreciated.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2917691509" id="dsq-comment-2917691509">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2917691509">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2917691509" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2917691509" class="dsq-comment-text">
+	                                <p>Ah, great news!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2915240357" id="dsq-comment-2915240357">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_idpJQYpFjJ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20654/9029/avatar92.jpg?1478365637">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2915240357">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-23</span>
+	                            <span class="dsq-commenter-name">Thierno Diop</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2915240357" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2915240357" class="dsq-comment-text">
+	                                <p>I notify the owner of the server about the problem and he fixed it buy setting varnish Thx a lot</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2915170966" id="dsq-comment-2915170966">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2915170966">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-23</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2915170966" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2915170966" class="dsq-comment-text">
+	                                <p>Yea, I agree that it sounds like a session-saving issue. But since you say that you *can* see session files created, and that they are created on each request, then it makes me wonder if Varnish is stripping the cookies so that each request (to Symfony) looks like a fresh request (i.e. one that has no cookie). I would remove Varnish, at least to test, and see if that fixes the problem.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2910581020" id="dsq-comment-2910581020">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_idpJQYpFjJ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20654/9029/avatar92.jpg?1478365637">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2910581020">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-22</span>
+	                            <span class="dsq-commenter-name">Thierno Diop</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2910581020" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2910581020" class="dsq-comment-text">
+	                                <p>No i did that dump to verify if the session was working i asked to the owner of the server he tell me that he installed varnish and since i juste replaced a project who was on the server with mine i mean its the same domain i think that is the problem</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2910202561" id="dsq-comment-2910202561">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2910202561">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-22</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2910202561" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2910202561" class="dsq-comment-text">
+	                                <p>The PHPSESSID does not store in cookies for this domain. You can see it in Google Chrome Developer Tool. I think it's because you have a dump statement in DefaultController.php on line 17. Please, remove it and check again.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2910180522" id="dsq-comment-2910180522">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_idpJQYpFjJ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20654/9029/avatar92.jpg?1478365637">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2910180522">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-22</span>
+	                            <span class="dsq-commenter-name">Thierno Diop</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2910180522" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2910180522" class="dsq-comment-text">
+	                                <p>My hostname is <a href="http://disq.us/url?url=http%3A%2F%2Fsenegeek.com%3AUl86t0w6OieMHNZBA6O7U8Uq5SI&amp;cuid=1175718" rel="nofollow noopener">senegeek.com</a> so i think thats not the problem </p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2910176955" id="dsq-comment-2910176955">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2910176955">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-22</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2910176955" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2910176955" class="dsq-comment-text">
+	                                <p>One possible cause for this is having a host name without a domain part (.com, .org, etc.), e.g. http://example/ instead of <a href="http://disq.us/url?url=http%3A%2F%2Fexample.com%2F%3An0peNdLersmf0a6Nx5fpJAPFcJk&amp;cuid=1175718" rel="nofollow noopener">http://example.com/</a></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2910166101" id="dsq-comment-2910166101">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_idpJQYpFjJ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20654/9029/avatar92.jpg?1478365637">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2910166101">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-22</span>
+	                            <span class="dsq-commenter-name">Thierno Diop</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2910166101" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2910166101" class="dsq-comment-text">
+	                                <p>Thx for your response <br>Session are saved in the folder var/sessions but the problem is that for every request it create one file in the session folder</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2910115308" id="dsq-comment-2910115308">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2910115308">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-22</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2910115308" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2910115308" class="dsq-comment-text">
+	                                <p>Hey Thierno,</p><p>You should configure session properly - most likely session can't be stored on your server. Where do you store session? If it stores in files - look at <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Freference%2Fconfiguration%2Fframework.html%23save-path%3AyypEKvfKr69O1IazqjcW6PwpUYs&amp;cuid=1175718" rel="nofollow noopener">save_path</a> option and ensure you setup permissions for it correctly on the server. Let me know if it helps.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2909396729" id="dsq-comment-2909396729">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_idpJQYpFjJ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20654/9029/avatar92.jpg?1478365637">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2909396729">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-21</span>
+	                            <span class="dsq-commenter-name">Thierno Diop</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2909396729" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2909396729" class="dsq-comment-text">
+	                                <p>Hi Ryan i have a probleme with the guard authentication I use symfony 3.1 in my project the guard authentication work fine in my local machine but when i deploy to the server if the authentication succed i am redirecting to the home page but i loose the authentication and become anonymous again.<br>I set a session variable to show it in another page but it turn that the variable was deleted .<br>So i think that the session is deleted every request but i dont know why.<br>Really need help Thx</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2801862683" id="dsq-comment-2801862683">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2801862683">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-25</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2801862683" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2801862683" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="ciudadano82:disqus" href="https://disq.us/url?url=https%3A%2F%2Fdisqus.com%2Fby%2Fciudadano82%2F%3ApH9Ox4YVZZarmt-6A6Jtm8RLWWc&amp;cuid=1175718" rel="nofollow noopener">ciudadano82</a> ,</p><p>You don't have to install GuardBundle for Symfony 3.1 because Guard Component provides with Symfony out of the box since Symfony 2.8, so just start using it without installation! :)</p><p>Check this blog post page for more information: <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fblog%2Fnew-in-symfony-2-8-guard-authentication-component%3AWI8_fM8aYh_cMHWZXRpGjhmmGb8&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/blog/new-in...</a> .</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2796163085" id="dsq-comment-2796163085">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ciudadano82/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/25/5887/avatar92.jpg?1475334073">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2796163085">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-21</span>
+	                            <span class="dsq-commenter-name">ciudadano82</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2796163085" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2796163085" class="dsq-comment-text">
+	                                <p>Hi! I'm having trouble trying to download the guardBundle with composer, i've installed symfony 3.1.2 (currently the last version available), but i get the following error:<br>Your requirements could not be resolved to an installable set of packages.</p><p>  Problem 1<br>    - Conclusion: remove symfony/symfony v3.1.2<br>    - Conclusion: don't install symfony/symfony v3.1.2<br>....<br> - don't install symfony/security-bundle v2.8.8|don't install symfony/symfony v3.1.2<br>    - Installation request for symfony/symfony == 3.1.2.0 -&gt; satisfiable by symfony/symfony[v3.1.2].<br>    - Installation request for knpuniversity/guard-bundle ~0.1@dev -&gt; satisfiable by knpuniversity/guard-bundle[0.2, 0.3, v0.1].</p><p>Any help, please?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754625382" id="dsq-comment-2754625382">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/viral_champanery/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754625382">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Viral Champanery</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754625382" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754625382" class="dsq-comment-text">
+	                                <p>yes, right .. that was the one of the concern about this. to update the version . i  just  tring to do the same as  i got document in  following link<br><a href="https://disq.us/url?url=https%3A%2F%2Fpackagist.org%2Fpackages%2Fknpuniversity%2Fguard-bundle%3ATx4zfQzHPn4ybGp3wn49WOL7HH8&amp;cuid=1175718" rel="nofollow noopener">https://packagist.org/packages...</a></p><p> In above link  it shows in symfony 2.3  so that i was trying to do  that .... thats  fine..thanks to supporting .... its very to chat with you..  .. vchampanery@gmail.com    keep in contact ...</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754618996" id="dsq-comment-2754618996">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754618996">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754618996" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754618996" class="dsq-comment-text">
+	                                <p>Hm, I think you need to update your Symfony application first, at least to the ^2.6 as we can see from dependencies, but it would be better upgrade to the 2.7 as this is a LTS (Long Term Support) version. Looks like this bundle can't be correctly installed on Symfony 2.3.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754602806" id="dsq-comment-2754602806">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/viral_champanery/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754602806">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Viral Champanery</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754602806" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754602806" class="dsq-comment-text">
+	                                <p>sorry bro,  i  have tried in that also  but it will give the same error ... may be the reason my symfony 2.3.*  version ..  but i am not sure about it</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754583806" id="dsq-comment-2754583806">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754583806">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754583806" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754583806" class="dsq-comment-text">
+	                                <p>That's because your symfony/security-bundle has unsatisfiable version. Could you try to update it to <code> "symfony/security-bundle": "^2.6"</code> in your composer.json file?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754575419" id="dsq-comment-2754575419">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/viral_champanery/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754575419">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Viral Champanery</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754575419" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754575419" class="dsq-comment-text">
+	                                <p>hi, <br>   When i put this   " "require" : { "knpuniversity/guard-bundle": "0.1"    "   in my composer.jsno file and try to composer update  following error shows :</p><p>Your requirements could not be resolved to an installable set of packages.</p><p>  Problem 1</p><p>    - Installation request for knpuniversity/guard-bundle 0.1 -&gt; satisfiable by knpuniversity/guard-bundle[v0.1].</p><p>    - Conclusion: remove symfony/symfony v2.3.23</p><p>    - knpuniversity/guard-bundle v0.1 requires symfony/security-bundle ~2.6 -&gt; satisfiable by symfony/security-bundle[v2.6.0, v2.6.1, v2.6.10, v2.6.11, v2.6.12, v2.6.13, v2.6.2, v2.6.3, v2.6.4, v2.6.5, v2.6.6, v2.6.7, v2.6.8, v2.6.9, v2.7.0, v2.7.1, v2.7.10, v2.7.11, v2.7.12, v2.7.13, v2.7.14, v2.7.2, v2.7.3, v2.7.4, v2.7.5, v2.7.6, v2.7.7, v2.7.8, v2.7.9, v2.8.0, v2.8.1, v2.8.2, v2.8.3, v2.8.4, v2.8.5, v2.8.6, v2.8.7].</p><p>    - don't install symfony/security-bundle v2.6.0|don't install symfony/symfony v2.3.23</p><p>    - don't install symfony/security-bundle v2.6.1|don't install symfony/symfony v2.3.23</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754560322" id="dsq-comment-2754560322">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754560322">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754560322" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754560322" class="dsq-comment-text">
+	                                <p>Hm, if you already installed guard library - that's not so bad. What error do you have during the GuardBundle installation?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754487793" id="dsq-comment-2754487793">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/viral_champanery/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754487793">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Viral Champanery</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754487793" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754487793" class="dsq-comment-text">
+	                                <p>Hi victor,</p><p>    Thanks for giving me valuable time ,<br>     I have the my code in 2.3.23 symfony version  and it allows me to  add only guard   but not guardBundle .so can you help me out with this. that i can make user login, changes password. functionality useing guardBundle in current version .. Is it possible to have with Fos.use bundle as well .. both in a one system ....</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754466537" id="dsq-comment-2754466537">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754466537">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754466537" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754466537" class="dsq-comment-text">
+	                                <p>Hey, Viral!</p><p>There's the <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fknpuniversity%2FKnpUGuardBundle%3AsjTamumLe51sc8ENdy7K9EEJeHo&amp;cuid=1175718" rel="nofollow noopener">KnpUGuardBundle</a> which you need to install first, because out-of-the-box Guard component available since Symfony ^2.8. only. But keep in mind that some dependencies should be updated to "^2.6". Check composer.json file of KnpUGuardBundle bundle to get more information about versions of dependencies.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2754369261" id="dsq-comment-2754369261">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/viral_champanery/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2754369261">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-28</span>
+	                            <span class="dsq-commenter-name">Viral Champanery</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2754369261" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2754369261" class="dsq-comment-text">
+	                                <p>Hi,  i have my application in symfony 2.3  so  can i integrate it with this . because when i put composer update i got error like this " Unrecognized options "knpu_guard" under "security.firewalls.main"  "    in my security.yml it is like " knpu_guard:<br>                authenticators:<br>                    - app.form_login_authenticator     "</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2515320014" id="dsq-comment-2515320014">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/checkmark_abc/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/8027/634/avatar92.jpg?1383518773">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2515320014">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-02-15</span>
+	                            <span class="dsq-commenter-name">Shaun</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2515320014" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2515320014" class="dsq-comment-text">
+	                                <p>Setting up the DB after downloading the course code was quite tricky, solved by trial and error, and really needs to be documented. From within ../start/<br>1) php app/console doctrine:database:create<br>2) php app/console doctrine:schema:update --force<br>3) php app/console doctrine:fixtures:load</p><p>Hopefully Ryan can review the steps above and check whether that's the best approach.</p><p>(I just finished the Drupal 8 series by the way, and totally loved it. I just had to say that).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2513960446" id="dsq-comment-2513960446">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_XvTOyGsPIs/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12512/3183/avatar92.jpg?1455500375">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2513960446">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-02-15</span>
+	                            <span class="dsq-commenter-name">Daniel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2513960446" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2513960446" class="dsq-comment-text">
+	                                <p>Thanks it worked, I all set with symphony 3 as well. Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2508452251" id="dsq-comment-2508452251">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2508452251">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-02-11</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2508452251" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2508452251" class="dsq-comment-text">
+	                                <p>Hey Daniel!</p><p>I have not totally set it up yet on Symfony 3, but I know at least that behat/mink is not compatible with Symfony 3 yet. Well, actually, it IS compatible - on its master branch, but there has not (yet) been a release with these compatibility changes. So, at the very least, you'll need to require behat/mink at the version dev-master. For Behat, you will need version 3.1 their of *their* library, which is not released fully yet. Try using ^3.1@dev in composer.json - or dev-master, that should do it.</p><p>Some bundles/libraries have been slow to tag releases of their Symfony-3 compatible versions. It's made using some libs with Symfony 3 a pain. It should get better :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2505904401" id="dsq-comment-2505904401">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_XvTOyGsPIs/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12512/3183/avatar92.jpg?1455500375">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2505904401">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-02-10</span>
+	                            <span class="dsq-commenter-name">Daniel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2505904401" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2505904401" class="dsq-comment-text">
+	                                <p>Hi Ryan! What about having this setup for BDD in symfony3? Have you tried it? I got a myriad of composer conflicts, too long to be put here</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2410803406" id="dsq-comment-2410803406">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/tomhv/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/18095/2640/avatar92.jpg?1452695314">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2410803406">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-12-15</span>
+	                            <span class="dsq-commenter-name">tomhv</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2410803406" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2410803406" class="dsq-comment-text">
+	                                <p>Awesome, thanks!  That makes a lot of sense.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2410788637" id="dsq-comment-2410788637">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2410788637">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-12-15</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2410788637" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2410788637" class="dsq-comment-text">
+	                                <p>This is a *great* question... so I talked to some of the guys at KnpLabs about it. I'll make a few points:</p><p>1) The first important thing is communication. If *you* know that you will ultimately need features and scenarios, then when planning with your client, you should sit down and communicate (ask questions, etc) in a way that will ultimately allow you to easily write those features/scenarios. Using BDD clarifies your planning process, and you can use that to help your client plan.</p><p>2) Regardless of whether you ultimately write the features/scenario or your client does (see my next point), you should validate the features/scenarios with your client. That will get them invested in the Gherkin process and avoid those ugly miscommunications about features :).</p><p>3) I don't think it will always work, but you may be able to get your client invested enough in Gherkin that *they* start to write the scenarios. During our discussion about this, we basically agreed that you will always need to "translate" their scenarios a little bit (Gherkin is natural language, but it still has structure). Really, even my point (1) above was about translating your conversation with them into written scenarios. There will always be a translation step, but the smaller you can make that translation, the less translation "cost" you will have (time to translate, mistakes in not translating what they mean perfectly, etc).</p><p>Thanks to these guys for our conversation about your cool question: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FDjeg%3Amk_DlyTI5qmYi8bYdJQlbqCV4xE&amp;cuid=1175718" rel="nofollow noopener">https://github.com/Djeg</a> and <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fdocteurklein%3AXpPmC7hlyP_RgOsbNnW6zSjzL8g&amp;cuid=1175718" rel="nofollow noopener">https://github.com/docteurklei...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2410727301" id="dsq-comment-2410727301">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/tomhv/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/18095/2640/avatar92.jpg?1452695314">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2410727301">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-12-15</span>
+	                            <span class="dsq-commenter-name">tomhv</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2410727301" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2410727301" class="dsq-comment-text">
+	                                <p>Where does Behat fit into the requirements-gathering process?  Do you sit and write the features with the client?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2358215526" id="dsq-comment-2358215526">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2rQC4i3S6J/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2358215526">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-13</span>
+	                            <span class="dsq-commenter-name">AJ</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2358215526" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2358215526" class="dsq-comment-text">
+	                                <p>Thanks!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2358082668" id="dsq-comment-2358082668">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2358082668">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-13</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2358082668" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2358082668" class="dsq-comment-text">
+	                                <p>Got it fixed now thanks to your comment!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2358001110" id="dsq-comment-2358001110">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2rQC4i3S6J/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2358001110">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-13</span>
+	                            <span class="dsq-commenter-name">AJ</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2358001110" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2358001110" class="dsq-comment-text">
+	                                <p>This video is different from the script. Was that intentional?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_install';var disqus_url = 'https://knpuniversity.com/screencast/guard/install';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="bdd-features#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/behat/install" addthis:title="BDD, Behat, Mink and other Wonderful Things">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"behat","courseIsOwned":false,"chapter":"From Install to JS Testing","chapterNumber":1,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'BDD, Behat, Mink and other Wonderful Things';
+        Core.courseId = 70
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'behat';
+                    Core.chapterTitle = 'From Install to JS Testing';
+            Core.chapterNumber = 1;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'install';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

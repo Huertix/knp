@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Collections: The HAL Way > RESTful APIs in the Real World Course 2 | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 38785
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Link\x20to\x20a\x20Subordinate\x20Resource\x21 <i class="fa fa-play"></i>',
+            'url': '/screencast/rest-ep2/link-all-the-resources#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Making RESTful APIs is hard, really hard. There are a lot of concepts
+to know - resources, representations, HTTP methods, status codes, etc.
+
+[Course 1](http://knpuniversity.com/screencast/rest) got us really comfortable
+with all the terminology. So in episode 2, we&#039;re attacking the *hard*
+stuff:
+
+* Using a serializer
+* Token Authentication System (Silex&#039;s security system)
+* Hypermedia versus media
+* The HAL hypermedia type
+* The HATEOAS PHP library
+* The HAL Browser
+* Embedding resources (versus adding links)
+* Tricks with Behat for testing API&#039;s
+* Pagination and filtering
+* A lot of other pieces in between!
+
+This stuff is not easy. But if you make it through, you&#039;ll be armed to
+attack whatever API need you have. And for documenting your API, see
+[Course 3](http://knpuniversity.com/screencast/rest-ep3)
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Collections: The HAL Way">
+<meta property="og:description" content="Making RESTful APIs is hard, really hard. There are a lot of concepts
+to know - resources, representations, HTTP methods, status codes, etc">
+<meta property="og:url" content="http://knpuniversity.com/screencast/rest-ep2/hal-collection">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/rest-ep2:3045e08e8fa65ec0d207e42cdf47bb2f02a3e490/rest2.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="hal-collection#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        22.
+                            Collections: The HAL Way
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">RESTful APIs in the Real World Course 2</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="serializer" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        The Serializer: Swiss-Army Knife of APIs
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:58</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="serializer-configuration" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Serializer Configuration (SerializationContext)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="serializer-annotations" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Serializer Annotations
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:59</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="requiring-authentication" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Requiring Authentication
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:32</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authentication-via-token" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Authorization via a Token
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="securing-more-endpoints" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Securing More Endpoints
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authentication-error-format" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Authentication Error Format
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="centralizing-error-response-creation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Centralizing Error Response Creation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:25</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="creating-tokens-in-the-api" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Creating Token Resources in the API
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 10:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="reuse-consistency" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Reuse and Consistency
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="token-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Validate that Token Resource
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:51</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="battle-resource-feature" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        New Battle Resource (the Scenario)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:06</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="battle-resource-new" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Start (Create) an Epic Battle (Resource)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="get-one-battle" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        GET Your (One) Battle On
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="link-battle-programmer" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Battles and Programmer - Link them!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="hateoas-installation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        I &lt;3 HATEOAS Installation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="hateoas-router" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        HATEOAS Loves Routers
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:12</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="hateoas-linking" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Adding Real Links with HATEOAS
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="hypermedia-media" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Hypermedia vs. Media (Buzzwords!)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:50</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="embedded-resources" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        We can Embed Resources Too
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:58</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="hal-browser" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                21.
+                        Fun with the HAL Browser!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="hal-collection" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                22.
+                        Collections: The HAL Way
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:25</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="link-all-the-resources" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                23.
+                        Link to a Subordinate Resource!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:23</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="api-homepage" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                24.
+                        A Homepage for your API?
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="pagination" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                25.
+                        API Pagination Done Easily
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 8:48</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="filtering" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                26.
+                        Filtering and HATEOAS (The Buzzword)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/rest-ep2" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Collections: The HAL Way</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>RESTful APIs in the Real World Course 2 Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="link-all-the-resources#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="hal-collection#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="hal-collection#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (3)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/rest/edit/master/knpu/episode2/hal-collection.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Let's go to one other endpoint - <code>/api/programmers</code>:</p>
+<pre><code>Put this into the Hal Browser:
+
+http://localhost:8000/api/programmers</code></pre>
+<p>Here, things don't quite work out as well. The response body on the right
+is the same as the properties on the left. That might not look wrong to you,
+but the format for our collection is not correct yet according to HAL.</p>
+<h2 id="hal-collection-format">Hal Collection Format <a class="headerlink" href="hal-collection#hal-collection-format" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>If we look back at the HAL Primer doc, you'll see that <em>this</em> is what a collection
+resource should look like:</p>
+<pre><code class="language-json">{
+    "_links": {
+        "self": {
+            "href": "http://example.org/api/user?page=3"
+        },
+        "first": {
+            "href": "http://example.org/api/user"
+        },
+        "prev": {
+            "href": "http://example.org/api/user?page=2"
+        },
+        "next": {
+            "href": "http://example.org/api/user?page=4"
+        },
+        "last": {
+            "href": "http://example.org/api/user?page=133"
+        }
+    }
+    "count": 3,
+    "total": 498,
+    "_embedded": {
+        "users": [
+            {
+                "_links": {
+                    "self": {
+                        "href": "http://example.org/api/user/mwop"
+                    }
+                },
+                "id": "mwop",
+                "name": "Matthew Weier O'Phinney"
+            },
+            {
+                "_links": {
+                    "self": {
+                        "href": "http://example.org/api/user/mac_nibblet"
+                    }
+                },
+                "id": "mac_nibblet",
+                "name": "Antoine Hedgecock"
+            }
+        ]
+    }
+}</code></pre>
+<h3 id="collections-are-collection-resources">Collections are "Collection Resources" <a class="headerlink" href="hal-collection#collections-are-collection-resources" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>By the way, we've talked about resources like Programmer and Battle, but with
+the collection endpoints - like <code>/api/programmers</code> - the collection itself
+is known as a resource. So this is a collection resource. And in HAL, the
+way this works is that all of the items in the collection are considered
+to be embedded resources. If you imagine that this is <code>/api/users</code>, all the
+users live under the <code>_embedded</code> key. The only true properties - if you have
+any - relate to the collection itself: things like the total number of items
+in the collection or what page you're on.</p>
+<p>And above, you'll see that this collection has pagination and it's using
+the links to help the client know how to get to other pages. We're going
+to do this exact same thing later, which is awesome and it'll be really easy.</p>
+<h2 id="structuring-our-collections">Structuring Our Collections <a class="headerlink" href="hal-collection#structuring-our-collections" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>But for now, I want to get things into this structure. First, before we
+implement it, you guys know what we're going to do, we're going to update
+our test. In our <code>programmer.feature</code>, the scenario for the collection <em>was</em>
+looking for a <code>programmers</code> property to be the array. But now, it's going
+to be <code>_embedded.programmers</code>. Let's go even one step further and say that
+the first item in this should be the UnitTester:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6d3abadd9c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-132" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            132 lines <span class="meta-divider"></span> <span title="features/api/programmer.feature">features/api/programmer.feature</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-82" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 82
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="83"></td>
+            <td class="blob-code">  Scenario</span>: GET a collection of programmers</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="84"></td>
+            <td class="blob-code"><span class="hljs-keyword">    Given </span>the following programmers exist:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="85"></td>
+            <td class="blob-code">      <span class="hljs-string">|</span> nickname    <span class="hljs-string">|</span> avatarNumber <span class="hljs-string">|</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="86"></td>
+            <td class="blob-code">      <span class="hljs-string">|</span> UnitTester  <span class="hljs-string">|</span> <span class="hljs-number">3</span>            <span class="hljs-string">|</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="87"></td>
+            <td class="blob-code">      <span class="hljs-string">|</span> CowboyCoder <span class="hljs-string">|</span> <span class="hljs-number">5</span>            <span class="hljs-string">|</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="88"></td>
+            <td class="blob-code"><span class="hljs-keyword">    When </span>I request <span class="hljs-string">"GET /api/programmers"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="89"></td>
+            <td class="blob-code"><span class="hljs-keyword">    Then </span>the response status code should be <span class="hljs-number">200</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="90"></td>
+            <td class="blob-code"><span class="hljs-keyword">    And </span>the <span class="hljs-string">"_embedded.programmers"</span> property should be an array</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="91"></td>
+            <td class="blob-code"><span class="hljs-keyword">    And </span>the <span class="hljs-string">"_embedded.programmers"</span> property should contain <span class="hljs-number">2</span> items</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="92"></td>
+            <td class="blob-code"><span class="hljs-keyword">    And </span>the <span class="hljs-string">"_embedded.programmers.0.nickname"</span> property should equal <span class="hljs-string">"UnitTester"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="93-132" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 93 - 132
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So its nickname should equal UnitTester. This is line 84, so let's run this
+test first to make sure it fails:</p>
+<pre><code>php vendor/bin/behat features/api/programmer.feature:84</code></pre>
+<p>And it does.</p>
+<h2 id="the-hateoas-collectionrepresentation">The HATEOAS CollectionRepresentation <a class="headerlink" href="hal-collection#the-hateoas-collectionrepresentation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The HATEOAS library has its own way of dealing with collections. If you scroll
+to the top of its docs, you'll see a section all about this:</p>
+<pre><code class="language-php">// From the HATEOAS documentation
+use Hateoas\Representation\PaginatedRepresentation;
+use Hateoas\Representation\CollectionRepresentation;
+
+$paginatedCollection = new PaginatedRepresentation(
+    new CollectionRepresentation(
+        array($user1, $user2, ...),
+        'users', // embedded rel
+        'users' // xml element name
+    ),
+    'user_list', // route
+    array(), // route parameters
+    1, // page
+    20, // limit
+    4, // total pages
+    'page',  // page route parameter name, optional, defaults to 'page'
+    'limit', // limit route parameter name, optional, defaults to 'limit'
+    false    // generate relative URIs
+);
+</code></pre>
+<p>First of all, don't worry about this <code>PaginatedRepresentation</code> thing, we're
+going to talk about that later - it's not nearly as scary as it looks here.
+If we have a collection that doesn't need pagination, all we need to do is
+create this <code>CollectionRepresentation</code> object. </p>
+<p>Open <code>ProgrammerController</code> and go down to listAction. Right now we're taking
+the programmers, putting them onto a programmer key and serializing that.
+Instead, create a new <code>CollectionRepresentation</code> - I'll use my IDE to auto-complete
+that, which automatically adds a <code>use</code> statement at the top of the file.
+The <code>CollectionRepresentation</code> takes two arguments: the items that are
+inside the collection and the key that these should live under. I could use
+anything here, but I'll use <code>programmers</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="8e4c18e4d0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-154" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            154 lines <span class="meta-divider"></span> <span title="src/KnpU/CodeBattle/Controller/Api/ProgrammerController.php">src/KnpU/CodeBattle/Controller/Api/ProgrammerController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-72" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 72
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="73"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">listAction</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="74"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="75"></td>
+            <td class="blob-code">        $programmers = <span class="hljs-keyword">$this</span>-&gt;getProgrammerRepository()-&gt;findAll();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="76"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="77"></td>
+            <td class="blob-code">        $collection = <span class="hljs-keyword">new</span> CollectionRepresentation(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="78"></td>
+            <td class="blob-code">            $programmers,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">            <span class="hljs-string">'programmers'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="80"></td>
+            <td class="blob-code">            <span class="hljs-string">'programmers'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="81"></td>
+            <td class="blob-code">        );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="82"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="83"></td>
+            <td class="blob-code">        $response = <span class="hljs-keyword">$this</span>-&gt;createApiResponse($collection, <span class="hljs-number">200</span>, <span class="hljs-string">'json'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="84"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="85"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> $response;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="86"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="87-154" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 87 - 154
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Just choose something that makes sense, then be consistent so that whenever
+your API clients see a <code>programmers</code> key, they know what it contains. </p>
+<p>Now, we'll just pass this new object directly to <code>createApiResponse</code>. And
+hey, that's it! Let's try the test:</p>
+<pre><code>php vendor/bin/behat features/api/programmer.feature:84</code></pre>
+<p>And this time it passes! So whenever you have a collection resource, use
+this object. If it's paginated, stay tuned.</p>
+<h2 id="celebrate-with-hal-browser">Celebrate with Hal (Browser) <a class="headerlink" href="hal-collection#celebrate-with-hal-browser" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>And now that we're following the rules of HAL, if we go back to the HAL browser
+and re-send the request, you get a completely different page. This time it says 
+we have no properties, since our collection has no keys outside of the embedded stuff, 
+and below it shows our embedded programmers and we can see the data for each. Each 
+programmer even has a <code>self</code> link, which we can follow to move our client to that 
+new URL and see the data for that one programmer. If it has any other links, we could 
+keep going by following those. So hey, this is getting kind of fun! And as you'll see, 
+the HAL browser can help figure out what new links can be added to make life better.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3060678648" id="dsq-comment-3060678648">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_KfkemKpZmW/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3060678648">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-20</span>
+	                            <span class="dsq-commenter-name">emm</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3060678648" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3060678648" class="dsq-comment-text">
+	                                <p>I agree with you its not a big deal because behat tests are passing.<br>So your answer may help someone else by saying its not a big deal :).</p><p>cheers to y'all!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3059631580" id="dsq-comment-3059631580">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3059631580">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-19</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3059631580" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3059631580" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="disqus_kfkemkpzmw:disqus" href="https://disqus.com/by/disqus_KfkemKpZmW/" rel="nofollow noopener">emm</a>!</p><p>Thanks for sharing - in case it helps anyone else :). I personally couldn't repeat the error - I updated to the latest Hal Browser (and used the version in the screencast) - but when I go to /api/programmers (where I have no _links)... it works ok! I'm not sure why - but not big deal either way :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3057922711" id="dsq-comment-3057922711">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_KfkemKpZmW/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3057922711">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-18</span>
+	                            <span class="dsq-commenter-name">emm</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3057922711" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3057922711" class="dsq-comment-text">
+	                                <p>Hi there! I had problem when i tried viewing with HALbrowser - /api/progrmmers or any route that didn't have _links outside _embedded items. its caused by hal.js line 16. "HAL.._links..undefined" look at your inspector console. I just commented that line(probably i should do something more sophisticated) and everything seems to work fine, even when the are _links. I hope this helps someone.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_hal-collection';var disqus_url = 'https://knpuniversity.com/screencast/rest-ep2/hal-collection';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="link-all-the-resources#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/rest-ep2/hal-collection" addthis:title="RESTful APIs in the Real World Course 2">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"rest-ep2","courseIsOwned":false,"chapter":"Collections: The HAL Way","chapterNumber":22,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'RESTful APIs in the Real World Course 2';
+        Core.courseId = 48
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'rest-ep2';
+                    Core.chapterTitle = 'Collections: The HAL Way';
+            Core.chapterNumber = 22;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'hal-collection';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

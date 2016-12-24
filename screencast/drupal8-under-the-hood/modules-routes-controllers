@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Modules, Routes and Controllers > Drupal 8: Under the Hood | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 39470
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: The\x20Drupal\x20Console\x20\x26\x20Route\x20Cache <i class="fa fa-play"></i>',
+            'url': '/screencast/drupal8-under-the-hood/drupal-console-route-cache#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Drupal 8 comes with a shiny new objecy-oriented base, and a lot of hype surrounding
+it. But personally, I *love* it. So in this screencast, I&#039;ll take you - Drupal 7
+dev - through all of the new concepts, paradigms, terms and patterns in Drupal 8.
+
+We&#039;ll go beyond how to *do* something and explore how things *actually work*
+in D8. What are routes? How can I use events to tap into core parts of the system?
+What&#039;s all this dependency injection and service stuff? What&#039;s this Drupal Console
+thing I keep hearing about?
+
+If you&#039;re serious about mastering D8, then let&#039;s go!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Modules, Routes and Controllers">
+<meta property="og:description" content="Drupal 8 comes with a shiny new objecy-oriented base, and a lot of hype surrounding
+it. But personally, I *love* it">
+<meta property="og:url" content="http://knpuniversity.com/screencast/drupal8-under-the-hood/modules-routes-controllers">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/drupal8-under-the-hood:4433a5e44f1611e410016f954b1dfa6d1caca06f/drupal-tutorial.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="modules-routes-controllers#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        2.
+                            Modules, Routes and Controllers
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Drupal 8: Under the Hood</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="installation-web-server" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Installation, Composer and Git!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:48</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="modules-routes-controllers" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Modules, Routes and Controllers
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="drupal-console-route-cache" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        The Drupal Console &amp; Route Cache
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:51</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="routing-wildcards" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Routing Wildcards
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:56</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="debugging" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Debugging!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="webprofiler" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        The webprofiler
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:09</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="what-is-the-service-container" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        What is the Service Container?
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:53</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="create-service" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Create a Service
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="configure-service" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Configuring a New Service
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:44</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="get-service-from-container" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        How to Get a Service in the Controller
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:45</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="shortcuts-use-services" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        The Magic Behind Shortcuts Methods is: Services
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="service-arguments" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Service Arguments
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="config-parameters" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Configuration Parameters
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="override-core-drupal" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Overriding Core Drupal
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:56</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="events-versus-hooks" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Drupal Events versus Hooks
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:26</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="event-subscriber-tags" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        Event Subscribers and Dependency Injection Tags
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:25</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="event-arguments-request" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        Event Arguments and the Request
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="render-array-events" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        The Render Array... and Event Listeners
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/drupal8-under-the-hood" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Modules, Routes and Controllers</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Drupal 8: Under the Hood Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered video-js-16x9"
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/544265165_960x540.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/145955300.hd.mp4?s=e42a7e946429dd056cf6a25969c96e8df39e3ba1&amp;profile_id=113&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/145955300.sd.mp4?s=19859b918a7594d7dbe6303911d7787917be046d&amp;profile_id=112&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="modules-routes-controllers#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../../tracks/drupal" class="btn btn-lg btn-success">Back to the <i>Drupal 8</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="modules-routes-controllers#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="drupal-console-route-cache#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="modules-routes-controllers#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="modules-routes-controllers#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/drupal-under-the-hood/edit/master/knpu/modules-routes-controllers.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <h2 id="creating-a-module">Creating a Module <a class="headerlink" href="modules-routes-controllers#creating-a-module" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Let's do something fun, like create a custom page. Like always, any custom code will
+live in a module. And modules live in the <code>modules/</code> directory. Create a new one
+called <code>dino_roar</code>. To make Drupal fall in love with your module, create the info
+file: <code>dino_roar.info.yml</code>. If you loved the old <code>.info</code> files, then you'll feel
+all warm and fuzzy with these: it's the same thing, but now in the YAML format.</p>
+<p>Inside give it a <code>name</code>: <code>Dino ROAR</code>, a <code>type</code>: <code>module</code>, <code>description</code>: <code>Roar at you</code>,
+<code>package</code>: <code>Sample</code> and <code>core</code>: <code>8.x</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="47cb97853b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            6 lines <span class="meta-divider"></span> <span title="modules/dino_roar/dino_roar.info.yml">modules/dino_roar/dino_roar.info.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">name:</span> Dino ROAR</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">type:</span> module</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">description:</span> <span class="hljs-string">"ROOOOOAR at you"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">package:</span> Sample</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-attr">core:</span> <span class="hljs-number">8.</span>x</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>If YAML is new to you, cool! It's pretty underwhelming: just a colon separated key-value
+pair. But make sure you have at least one space after the colon. Yaml also supports
+hierarchies of data via indentation - but there's none of that in this file.</p>
+<p>Module ready! Head back to the browser and go into the "Extend" section. With any
+luck we'll see the module here. There it is under "Sample": "Dino ROAR". It sounds
+terrifying. Check the box and press the install button anyways. What's the worst
+that could happen?</p>
+<p>Nothing! But now we can build that page I keep talking about.</p>
+<h2 id="add-a-route">Add a Route <a class="headerlink" href="modules-routes-controllers#add-a-route" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>In any modern framework - and I <em>am</em> including Drupal in this category, yay! - creating
+a page is two steps. First, define the URL for the page via a <em>route</em>. That's your
+first buzzword in case you're writing things down.</p>
+<p>Second, create a <em>controller</em> for that page. This is a function that you'll write
+that actually builds the page. It's also another buzzword: controller.</p>
+<p>If these are new buzzwords for you, that's ok - they're just a new spin on some old
+ideas.</p>
+<p>For step 1, create a new file in the module: <code>dino_roar.routing.yml</code>. Create a new
+route called <code>dino_says</code>: this is the internal name of the route and it isn't important
+yet:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9b6139ca56">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-7" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            7 lines <span class="meta-divider"></span> <span title="modules/dino_roar/dino_roar.routing.yml">modules/dino_roar/dino_roar.routing.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">dino_says:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="2-7" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 2 - 7
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Go in 4 spaces - or 2 spaces, it doesn't matter, just be consistent - and add
+a new property to this route called <code>path</code>. Set it to <code>/the/dino/says</code>: the URL to
+the new page:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="06bbe73381">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-7" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            7 lines <span class="meta-divider"></span> <span title="modules/dino_roar/dino_roar.routing.yml">modules/dino_roar/dino_roar.routing.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">dino_says:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    path:</span> /the/dino/says</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="3-7" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 3 - 7
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Below <code>path</code>, a few more route properties are needed. The first, is <code>defaults</code>, with
+a <code>_controller</code> key beneath it:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a2cf7b7376">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-7" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            7 lines <span class="meta-divider"></span> <span title="modules/dino_roar/dino_roar.routing.yml">modules/dino_roar/dino_roar.routing.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">dino_says:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    path:</span> /the/dino/says</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">    defaults:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">        _controller:</span> Drupal\dino_roar\Controller\RoarController::roar</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="5-7" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 5 - 7
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The <code>_controller</code> key tells Drupal which <em>function</em> should be called when someone
+goes to the URL for this exciting page. Set this to <code>Drupal\dino_roar\Controller\RoarController::roar</code>.
+This is a namespaced class followed by <code>::</code> and then a method name. We'll create
+this function in a second.</p>
+<p>Also add a <code>requirements</code> key with a <code>_permission</code> key set to <code>access content</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="500850cb81">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-7" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            7 lines <span class="meta-divider"></span> <span title="modules/dino_roar/dino_roar.routing.yml">modules/dino_roar/dino_roar.routing.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">dino_says:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="2-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 2 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-attr">    requirements:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">        _permission:</span> <span class="hljs-string">'access content'</span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>We won't talk about permissions now, but this is what will allow us to view the page.</p>
+<p>In YAML, you usually don't <em>need</em> quotes, except in some edge cases with special
+characters. But it's always safe to surround values with quotes. So if you're in
+doubt, use quotes! I don't need them around <code>access content</code>... but it makes me fee
+good.</p>
+<h2 id="add-a-controller-function">Add a Controller Function <a class="headerlink" href="modules-routes-controllers#add-a-controller-function" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Step 1 complete: we have a route. For Step 2, we need to create the controller: the
+function that will actually build the page. Inside of the <code>dino_roar</code> module create
+an <code>src</code> directory and then a <code>Controller</code> directory inside of that. Finally, add
+a new PHP class called <code>RoarController</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6d877d5dd9">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-14" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            14 lines <span class="meta-divider"></span> <span title="modules/dino_roar/src/Controller/RoarController.php">modules/dino_roar/src/Controller/RoarController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-meta">&lt;?php</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="2-14" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 2 - 14
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, stop! Fun fact: <em>every</em> class you create will have a namespace at the top. If
+you're not comfortable with namespaces, they're really easy. So easy that we teach
+them to you in 120 seconds in our 
+<a href="../php-namespaces-in-120-seconds/resume">namespaces tutorial</a>.
+So pause this video, check that out and then everything we're about to do will seem
+much more awesome.</p>
+<p>But you can't just set the namespace to <em>any</em> old thing: there are rules. It must
+start with <code>Drupal\</code>, then the name of the module - <code>dino_roar\</code>, then whatever directory
+or directories this file lives in after <code>src/</code>. This class lives in <code>Controller</code>.
+Your class name also has to match the filename, + <code>.php</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c2b41f7c39">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-14" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            14 lines <span class="meta-divider"></span> <span title="modules/dino_roar/src/Controller/RoarController.php">modules/dino_roar/src/Controller/RoarController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-meta">&lt;?php</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">Drupal</span>\<span class="hljs-title">dino_roar</span>\<span class="hljs-title">Controller</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="4-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 4 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RoarController</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="9-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 9 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>If you mess any of this up, Drupal isn't going to be able to find your class.</p>
+<p>The full class name is now <code>Drupal\dino_roar\Controller\RoarController</code>. Hey, this
+conveniently matches the <code>_controller</code> of our route!</p>
+<p>In <code>RoarController</code>, add the new <code>public function roar()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="0439d5ea82">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-14" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            14 lines <span class="meta-divider"></span> <span title="modules/dino_roar/src/Controller/RoarController.php">modules/dino_roar/src/Controller/RoarController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RoarController</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">roar</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h2 id="a-controller-returns-a-response">A Controller Returns a Response <a class="headerlink" href="modules-routes-controllers#a-controller-returns-a-response" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Now, you might be asking yourself what a controller function like this should return.
+And to that I say - excellent question! Brilliant! A controller should <em>always</em> return
+a Symfony <code>Response</code> object. Ok, that's not 100% true - but let me lie for just a
+<em>little</em> bit longer.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>The code-styling (4 spces indentation, etc) I'm using is called PSR-4. It's a great
+PHP standard, but is (I admit) different than the recommended Drupal standard.</p>
+</div><p>To return a response, say <code>return new Response()</code>. I'll let it autocomplete the
+<code>Response</code> class from Symfony's HttpFoundation namespace. When I hit tab to select this,
+PhpStorm adds the <code>use</code> statement to the top of the class automatically:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="17b55d0eb7">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-14" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            14 lines <span class="meta-divider"></span> <span title="modules/dino_roar/src/Controller/RoarController.php">modules/dino_roar/src/Controller/RoarController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">HttpFoundation</span>\<span class="hljs-title">Response</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RoarController</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">roar</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Response(<span class="hljs-string">'ROOOOOAR!'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That's important: whenever you reference a class, you <em>must</em> add a <code>use</code> statement
+for it. If you forget, you'll get the famous "Class Not Found" error.</p>
+<p>For the page content, we will of course <code>ROOOAR!</code>.</p>
+<p>That's it! That's everything. Go to your browser and head to <code>/the/dino/says</code>:</p>
+<blockquote><p><a href="http://localhost:8000/the/dino/says">http://localhost:8000/the/dino/says</a></p>
+</blockquote>
+<p>Hmm page not found. As a seasoned Drupal developer, you may be wondering, "uhh do I
+need to clear some cache?" My gosh, you're right!</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2399392579" id="dsq-comment-2399392579">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2399392579">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-12-08</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2399392579" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2399392579" class="dsq-comment-text">
+	                                <p>Hey guys!</p><p>Yes, you can of course create nodes in the admin interface like always. By "custom pages", I mean creating custom paths for custom interactions - not just for reading node content. For example, you could build an entire mini-application inside Drupal using routes that has *nothing* to do with the CMS - e.g. a set of pages where uses can send and receive messages or a set of pages containing a multi-step form for creating an "order" of some sort.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2398265912" id="dsq-comment-2398265912">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/Jgrubb/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/55/2084/avatar92.jpg?1476456135">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2398265912">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-12-07</span>
+	                            <span class="dsq-commenter-name">Jgrubb</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2398265912" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2398265912" class="dsq-comment-text">
+	                                <p>Pretty sure this was just intended to be a really simple demo module.  You can still create pages as you always have in the UI.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2397930463" id="dsq-comment-2397930463">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="modules-routes-controllers">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2397930463">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-12-07</span>
+	                            <span class="dsq-commenter-name">WEB BY DOUG</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2397930463" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2397930463" class="dsq-comment-text">
+	                                <p>The concept that custom pages are modules is new to me. I've been developing drupal sites since 4.7 and never heard that before. Is that a new concept in D8?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_modules-routes-controllers';var disqus_url = 'https://knpuniversity.com/screencast/drupal8-under-the-hood/modules-routes-controllers';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="drupal-console-route-cache#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/drupal8-under-the-hood/modules-routes-controllers" addthis:title="Drupal 8: Under the Hood">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"drupal8-under-the-hood","courseIsOwned":false,"chapter":"Modules, Routes and Controllers","chapterNumber":2,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Drupal 8: Under the Hood';
+        Core.courseId = 71
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'drupal8-under-the-hood';
+                    Core.chapterTitle = 'Modules, Routes and Controllers';
+            Core.chapterNumber = 2;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'modules-routes-controllers';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

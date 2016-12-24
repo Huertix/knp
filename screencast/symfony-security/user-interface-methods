@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>The UserInterface Methods (Keep some Blank!) > Symfony Security: Beautiful Authentication, Powerful Authorization | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 38358
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Rendering\x20that\x20Login\x20Form <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-security/rendering-login-form#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Ah, security! Quick run!
+
+Wait, come back! Security in Symfony is *awesome*! Seriously,
+between things called &quot;voters&quot; and the Guard authentication
+system, you can do anything you want inside of Symfony, and
+the code to do it is simple and expressive.
+
+Security has two sides: authentication (who are you?) and
+authorization (do you have access to do X). We&#039;ll talk about
+each of these, creating an traditional form login system
+*and* and API token authentication system using Json web tokens
+(not as scary as they sound!). Then, we&#039;ll turn to authorization,
+with roles, voters and other good stuff:
+
+* Security &amp; Firewall Fundamentals
+* Creating a custom login form
+* Making a User (ooOOOoo)
+* User Providers (why you need them, but don&#039;t care)
+* Password Encryption
+* Logging out!
+* Protecting entire URLs with access_control(s)
+* IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED
+* Checking access with roles! ROLE_USER
+* Denying access in a controller
+* What are voters?
+* Role hierarchies
+* Impersonation (`switch_user`)
+* Registration Form
+* Manual authentication
+
+... and how to create a back door into your site. Just kidding!
+Let&#039;s make some secure sites!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="The UserInterface Methods (Keep some Blank!)">
+<meta property="og:description" content="Ah, security! Quick run!
+
+Wait, come back! Security in Symfony is *awesome*! Seriously,
+between things called &amp;quot;voters&amp;quot; and the Guard authentication
+system, you can do anything you want inside of Symfony, and
+the code to do it is simple and expressive.
+
+Security has two sides: authentication (who are you?) and
+authorization (do you have access to do X)">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-security/user-interface-methods">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-security:cfae786aa1f6535885fa8d5d09e578870082c672/sf-ep6.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="user-interface-methods#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        2.
+                            The UserInterface Methods (Keep...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony Security: Beautiful Authentication, Powerful Authorization</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-class" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        The All-Important User Class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="user-interface-methods" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The UserInterface Methods (Keep some Blank!)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:19</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="rendering-login-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Rendering that Login Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:32</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="all-about-firewalls" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        All About Firewalls
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="login-form-authenticator" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        The LoginFormAuthenticator
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authenticator-get-user-check-credentials" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Authenticator: getUser, checkCredentials &amp; Success/Failure
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:31</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-provider" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        The Mysterious &quot;User Provider&quot;
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="logout-and-last-username" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Logging out &amp; Pre-filling the Email on Failure
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:21</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-plain-password" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Users Need Passwords (plainPassword)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:32</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="encoding-user-password" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Doctrine Listener: Encode the User&#039;s Password
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-encoder-configuration" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Configuring the Encoder in security.yml
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authorization-roles" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Authorization: access_control and Roles
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:17</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="deny-access-inside-controller" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Denying Access in a Controller
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:38</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dynamic-roles" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Dynamic Roles
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="the-user-object" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Fetch me a User Object!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:33</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="role-hierarchy" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        Role Hierarchy
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="impersonation-switch-user" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        Impersonation (Login as Someone Else)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-registration-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Registration Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="validation-unique-entity" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Validation with the UniqueEntity Constraint
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="conditional-validation-groups" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        Validation Groups: Conditional Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:00</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="automatic-login-handling" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                21.
+                        Automatically Login after Registration!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-security" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">The UserInterface Methods (Keep some Blank!)</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony Security: Beautiful Authentication, Powerful Authorization Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="rendering-login-form#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="user-interface-methods#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="user-interface-methods#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (17)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep6-security/user-interface-methods.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Our job: fill in the <em>5</em> methods from <code>UserInterface</code>. But check this out - I'm
+going rogue - I'm only going to implement <em>2</em> of them: <code>getUsername()</code> and <code>getRoles()</code>.</p>
+<h2 id="getusername">getUsername() <a class="headerlink" href="user-interface-methods#getusername" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>First <code>getUsername()</code>... is super-unimportant. Just return <em>any</em> unique user string
+you want - a username, an email, a uuid, a funny, but unique joke - whatever. This
+is only used to show you <em>who</em> is logged in when you're debugging.</p>
+<p>In our app, our users won't have a username - but they <em>will</em> have an email. Add a
+<code>private $email</code> property then just use that in <code>getUsername()</code>: <code>return $this-&gt;email</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6e32695c22">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-48" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            48 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $email;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    <span class="hljs-comment">// needed by the security system</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getUsername</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;email;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-46" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 46
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And add a setter for that method:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c8c0b7368d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-48" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            48 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-42" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 42
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setEmail</span><span class="hljs-params">($email)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;email = $email;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>We'll eventually need that to create users.</p>
+<h2 id="getroles">getRoles() <a class="headerlink" href="user-interface-methods#getroles" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Cool: half-way done! Now: <code>getRoles()</code>. We'll talk roles later with authorization,
+but these are basically permissions we want to give the user. For now, give every
+user the same, one role: <code>ROLE_USER</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d1a940cb2b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-42" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            42 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getRoles</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> [<span class="hljs-string">'ROLE_USER'</span>];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="21-40" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 21 - 40
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h3 id="what-about-getpassword-getsalt-and-erasecredentials">What about getPassword(), getSalt() and eraseCredentials()? <a class="headerlink" href="user-interface-methods#what-about-getpassword-getsalt-and-erasecredentials" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>So what about <code>getPassword()</code>, <code>getSalt()</code> and <code>eraseCredentials()</code>? Keep them blank:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="0b7348fc04">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-42" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            42 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getPassword</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        <span class="hljs-comment">// leaving blank - I don't need/have a password!</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getSalt</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">        <span class="hljs-comment">// leaving blank - I don't need/have a password!</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">eraseCredentials</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">        <span class="hljs-comment">// leaving blank - I don't need/have a password!</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-40" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 40
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Whaat? It turns out, you <em>only</em> need these if your app is personally responsible
+for storing and checking user passwords. In our app - to start - we're <em>not</em> going
+to have passwords: we're just going to let anyone login with a single, central, hardcoded
+password. But there are also real-world situations where your app isn't responsible
+for managing and checking passwords.</p>
+<p>If you have one of these, feel ok leaving these blank.</p>
+<h2 id="setting-up-the-user-entity">Setting up the User Entity <a class="headerlink" href="user-interface-methods#setting-up-the-user-entity" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>So in our application, we want to store users in the database. So let's set this
+class up with Doctrine. Copy the <code>use</code> statement from <code>SubFamily</code> and paste it here:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="588606deb8">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-63" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            63 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Doctrine</span>\<span class="hljs-title">ORM</span>\<span class="hljs-title">Mapping</span> <span class="hljs-title">as</span> <span class="hljs-title">ORM</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-63" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 63
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, I'll put my cursor inside the class, press <code>Command</code>+<code>N</code> - or use the
+"Code"-&gt;"Generate" menu - and select "ORM class":</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9115aaa7d2">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-63" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            63 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"> * <span class="hljs-doctag">@ORM</span>\Entity</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"> * <span class="hljs-doctag">@ORM</span>\Table(name="user")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"> */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-63" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 63
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, add a <code>private $id</code> property and press <code>Command</code>+<code>N</code> one more time. This time,
+choose "ORM annotation" and highlight both fields:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="e7fd832f18">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-63" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            63 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\GeneratedValue(strategy="AUTO")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="integer")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $id;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="string", unique=true)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $email;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="26-61" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 26 - 61
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Oh, and while we're here, let's add <code>unique=true</code> for the email field:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1281ea6267">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-63" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            63 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="string", unique=true)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $email;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="26-61" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 26 - 61
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Perfect: we have a fully functional <code>User</code> class. Sure, it only has an <code>id</code> and
+<code>email</code>, but that's enough!</p>
+<p>Since we just added a new entity, let's generate a migration:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:diff</div></code></pre>
+<p>I'll copy the class and open it up quickly, just to make sure it looks right:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="95a97d3e03">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="app/DoctrineMigrations/Version20160524105319.php">app/DoctrineMigrations/Version20160524105319.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Version20160524105319</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractMigration</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">up</span><span class="hljs-params">(Schema $schema)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        <span class="hljs-comment">// this up() migration is auto-generated, please modify it to your needs</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;abortIf(<span class="hljs-keyword">$this</span>-&gt;connection-&gt;getDatabasePlatform()-&gt;getName() != <span class="hljs-string">'mysql'</span>, <span class="hljs-string">'Migration can only be executed safely on \'mysql\'.'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, email VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="23-26" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 23 - 26
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">down</span><span class="hljs-params">(Schema $schema)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">        <span class="hljs-comment">// this down() migration is auto-generated, please modify it to your needs</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;abortIf(<span class="hljs-keyword">$this</span>-&gt;connection-&gt;getDatabasePlatform()-&gt;getName() != <span class="hljs-string">'mysql'</span>, <span class="hljs-string">'Migration can only be executed safely on \'mysql\'.'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'DROP TABLE user'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Looks great!</p>
+<h2 id="adding-user-fixtures">Adding User Fixtures <a class="headerlink" href="user-interface-methods#adding-user-fixtures" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Finally, let's add some users to the database. Open our trusty <code>fixtures.yml</code>.
+I'll copy the <code>SubFamily</code> section, change the class to <code>User</code> and give these keys
+<code>user_1..10</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a49bedd518">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-26" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            26 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">AppBundle\Entity\User:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    user_{1..10}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-26" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 26
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Then, the only field is email. Set it to <code>weaverryan+&lt;current()&gt;@gmail.com</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="b15b8f1f4c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-26" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            26 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">AppBundle\Entity\User:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    user_{1..10}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        email:</span> weaverryan+&lt;current()&gt;@gmail.com</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The <code>current()</code> function will return 1 through 10 as Alice loops through our set.
+That'll give us <code>weaverryan+1@gmail.com</code> up to <code>weaverryan+10@gmail.com</code>. And if you
+didn't know, Gmail ignores everything after a <code>+</code> sign, so these will all be delivered
+to <code>weaverryan@gmail.com</code>. There's your Internet hack for the day.</p>
+<p>Ok, let's roll! Don't forget to run the migration first:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:migrate</div></code></pre>
+<p>And then load the fixtures:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:fixtures:load</div></code></pre>
+<p>Hey hey: you've got users in the database. Let's let 'em login.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026936737" id="dsq-comment-3026936737">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026936737">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026936737" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026936737" class="dsq-comment-text">
+	                                <p><a data-dsq-mention="disqus_wprdnbgunr:disqus" href="https://disqus.com/by/disqus_WprdNbguNr/" rel="nofollow noopener">Lampje</a> Hmm, yea, I agree - it all looks good to me. If you use <code>&lt;email()&gt;</code> instead, do you get the same error? I mean, duplicate constraint "weaverryan+1@gmail.com"? Or is a duplicate constraint error with a *different* email (I'm trying to see if weaverryan+1@gmail.com is sneaking into the code in some other way). Or, what happens if you change weaverryan+ to something else in the fixtures file? Basically, if you play around a bit, do you see any other strange behavior?</p><p>It was a good idea to copy the code from the finished dir: those files are created programmatically from the *real* code that worked for the screencast, so it's definitely correct/good files to work from.</p><p>Let me know if you find out anything else - this is *very* strange!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026246576" id="dsq-comment-3026246576">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_WprdNbguNr/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12500/5070/avatar92.jpg?1481037465">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026246576">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">Lampje</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026246576" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026246576" class="dsq-comment-text">
+	                                <p>Yes, i get `'SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'weaverryan+1@gmail.com' for key</p><p>'UNIQ_8D93D649E7927C75''` 3 times.</p><p>I'm a bit further in the chapter and this still persists.. I've copied the .yml from the 'finished' dir, just to be sure that this doesn't have to do with tab's or something silly like that.</p><p>I've checked A, no other entries than:</p><p></p><pre><code><br>AppBundle\Entity\Genus:<br>AppBundle\Entity\GenusNote:<br>AppBundle\Entity\SubFamily:<br>AppBundle\Entity\User:<br></code></pre><p></p><p>No luck on B neither:</p><p></p><pre><code><br>AppBundle\Entity\User:<br>    user_{1..10}:<br>        email: weaverryan+&lt;current()&gt;@gmail.com<br></code></pre><p></p><p>C:</p><p></p><pre><code><br>/**<br> * @param string $email<br> */<br>public function setEmail( $email ) {<br>   $this-&gt;email = $email;<br>}<br></code></pre><p></p><p>Don't know if it matters, i'm using: 10.1.9-MariaDB as database.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026111578" id="dsq-comment-3026111578">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026111578">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026111578" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026111578" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="disqus_wprdnbgunr:disqus" href="https://disqus.com/by/disqus_WprdNbguNr/" rel="nofollow noopener">Lampje</a>!</p><p>Bah, that is strange! When you use &lt;email()&gt; (good idea btw), what exact error do you get? Does it say "Duplicate entry 'weaverryan+1@gmail.com'"? Or does it say "Duplicate entry" but with a different email address? I'm sure this is something small, I would check a few things:</p><p>A) Make sure you don't have any other AppBundle\Entity\User entries in your fixtures file somewhere<br>B) Make sure don't have another email key under your users in the fixtures file<br>C) Double-check that your setEmail() method in User doesn't have anything funny</p><p>I've never had a problem with the randomization with Alice... which is why I'm looking for a simple answer :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026023810" id="dsq-comment-3026023810">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_WprdNbguNr/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12500/5070/avatar92.jpg?1481037465">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026023810">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">Lampje</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026023810" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026023810" class="dsq-comment-text">
+	                                <p>On the bottom of page 2, i'm trying to load the fixtures but it returns this error:</p><p> [Doctrine\DBAL\Exception\UniqueConstraintViolationException]<br>  An exception occurred while executing 'INSERT INTO user (email) VALUES (?)' with params ["weaverryan+1@gmail.com"]:<br>  SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'weaverryan+1@gmail.com' for key 'UNIQ_8D93D6<br>  49E7927C74'</p><p>  [Doctrine\DBAL\Driver\PDOException]<br>  SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'weaverryan+1@gmail.com' for key 'UNIQ_8D93D6<br>  49E7927C74'</p><p>  [PDOException]<br>  SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'weaverryan+1@gmail.com' for key 'UNIQ_8D93D6<br>  49E7927C74'</p><p>The user table remains empty...<br>Changing fixtures.yml to email: &lt;email()&gt; gives the same result (3 errors)</p><p>Manually inserting directly into the table causes no problems.<br>Que pasa?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3019493390" id="dsq-comment-3019493390">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ziedhajsalah/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23095/2133/avatar92.jpg?1480071086">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3019493390">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-25</span>
+	                            <span class="dsq-commenter-name">zied haj salah</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3019493390" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3019493390" class="dsq-comment-text">
+	                                <p>Hi Ryan, very clear now , it works for me.<br>I knew migrations from rails and when I got stack I thought that it is not the same idea, but your answer clarified everything.<br>Thanks.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3018678649" id="dsq-comment-3018678649">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3018678649">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3018678649" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3018678649" class="dsq-comment-text">
+	                                <p>Hey Zied!</p><p>Ah, here is the secret! In your database, the migrations library creates and manages a table called migration_versions. Whenever you execute a migration, it adds a new row in this table to record that the migration has finished. In fact, each time that you run <code>doctrine:migrations:migrate</code>, it looks at each file in your <code>app/DoctrineMigrations</code> directory, and checks the <code>migration_versions</code> table for each file to see if it has already been executed. If it *has*, it does not execute it. If it has *not*, then it executes it and records a new row in the table.</p><p>In our project (and this is the way I recommend doing it), we have created a migration for *every* database change (i.e. a migration to create every table). My guess is that you may have somehow created the <code>genus</code> table via some method *other* than running your migrations (e.g. by running <code>doctrine:schema:update --force</code> or <code>doctrine:schema:create</code>). Basically, you should never do this :), because it means that you have a <code>genus</code> table, but your <code>migration_versions</code> table is still empty. So when you try to execute your migrations, it runs *all* of the migrations, including those that try to build the <code>genus</code> table.</p><p>This whole system that uses the <code>migration_versions</code> table is designed so that things are very predictable when you deploy to production: when you run <code>doctrine:migrations:migrate</code>, Doctrine will look at the <code>migration_versions</code> table in your production database to determine exactly which migration files have already been executed and which have not been executed yet.</p><p>If you find yourself in a spot where your system is "messed up" and you've accidentally created some tables in a method *other* than by running your migrations, then I recommend (locally on your development machine) to restart from scratch:</p><p><code><br>bin/console doctrine:database:drop --force<br>bin/console doctrine:database:create<br>bin/console doctrine:migrations:migrate<br></code></p><p>This will drop the database, which is important because it will drop your <code>migration_versions</code> table. Then, it will run all of your existing migrations. NOW, you can create a new entity and run <code>doctrine:migrations:diff</code>. It will correctly generate, and when you run <code>doctrine:migrations:migrate</code>, Doctrine will know that you only have *one* new migration to execute.</p><p>Let me know if this helps! Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3018209545" id="dsq-comment-3018209545">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ziedhajsalah/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23095/2133/avatar92.jpg?1480071086">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3018209545">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">zied haj salah</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3018209545" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3018209545" class="dsq-comment-text">
+	                                <p>Thank for your explanation.<br>1- What i doesn't understand is the following:<br>When i create a new entity and then i run doctrine:migrations:diff, it will generate a migration to create only the table corresponding to this entity. So why when i run doctrine:migrations:migrate it attempt to execute the older migrations not only the latest.<br>2- I figure out the situation by running doctrine:migrations:execute 20161124132920 (the last migration) is that correct?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3018107044" id="dsq-comment-3018107044">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3018107044">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3018107044" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3018107044" class="dsq-comment-text">
+	                                <p>Hi Zied,</p><p>First of all, *you* should always double check the queries inside any new migration, you can't just rely on Doctrine here. So if you see something that could break your production, i.e. potential data loss - then you need to correct the migration queries.</p><p>At second - you should understand well how migrations works and how to use it. If you decide to manage your DB with migrations - then you better need to forget about "bin/console doctrine:schema:update --force", because if you tweak your DB schema with this command - I bet your migrations failed on the next migrate.</p><p>Now let's consider the example: you create a new entity. It's a new entity, so it's a new table, which you have not had on prod yet, i.e. in your DB on prod one missing table for now. When you run "bin/console doctrine:migration:diff" - it will create a migration with query which create this table. Then you will need to run this migration on production server which creates this new table for you. So in this case no any data loss, everything is fine.</p><p>P.S. you probably won't lose your data on prod when migration recreate a table - this migration just will fail with error "Table already exist".</p><p>I hope I understand you right and it'll clarify something for you. Let me know if it makes sense for you.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3018048516" id="dsq-comment-3018048516">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ziedhajsalah/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23095/2133/avatar92.jpg?1480071086">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3018048516">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">zied haj salah</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3018048516" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3018048516" class="dsq-comment-text">
+	                                <p>Hello Victor<br>I have the same case.<br>here i don't understand why Migration have to create genus table that already exists and the last migration file generated via doctrine:migrations:diff don't include any database action related to this table. I mean if i was in production i risque to loose my data to recreate this table?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2889973695" id="dsq-comment-2889973695">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2889973695">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-12</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2889973695" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2889973695" class="dsq-comment-text">
+	                                <p>Hey Yang!</p><p>Yes, you definitely understand things correctly :). But, doctrine:fixtures:load is pretty smart: it attempts to *order* the DELETE queries to avoid constraint violations (e.g it would delete the Genus table before trying to delete the SubFamily table). This doesn't *always* work (sometimes you have circular references), but it does *most* of the time. But you're also right that if you set the "on delete" behavior, then that would make deleting easier. For example:</p><p></p><pre><code><br>// in Genus.php<br>/**<br> * @ORM\ManyToOne(targetEntity="AppBundle\Entity\SubFamily")<br> * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")<br> */<br>private $subFamily;<br></code></pre><p></p><p>With this setup, if a SubFamily were deleted, then all related Genus would also be deleted. As you know, this is done by setting the foreign key relationship in the database (i.e. the delete is done by the database itself). I usually *don't* set onDelete behavior until/unless I need it... because bad things can happen :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2888879527" id="dsq-comment-2888879527">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_fSkgMG99ER/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21577/5300/avatar92.jpg?1475849830">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2888879527">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-12</span>
+	                            <span class="dsq-commenter-name">Yang Liu</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2888879527" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2888879527" class="dsq-comment-text">
+	                                <p>hm... in the script, you used bin/console doctrine:fixtures:load to update the fixtures. But I thought it won't work, at least not directly? As I understand it, fixtures:load always try to purge the old datas from the tables and then create new. I got some constraint violation with subfamily and genus entities. I guess its because the subFamily in the genus entity is not set to "discard on delete/update"? So I had to drop the database and recreate this, then run migrate and fixutres:load. This works then.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2859776232" id="dsq-comment-2859776232">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2859776232">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2859776232" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2859776232" class="dsq-comment-text">
+	                                <p>Hey Zoé!</p><p>Hmm, yea - some of the code blocks on this page were out-of-date! Thanks for leaving this comment! In the video, we *only* create an email field (not a username field) and return the email field in getUsername(). I just updated the incorrect code blocks to reflect this. But of course, you can do whatever you want - and your setup is equally valid :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2859240438" id="dsq-comment-2859240438">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/zobelleton/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21306/2072/avatar92.jpg?1472144793">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2859240438">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">Zoé Belleton</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2859240438" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2859240438" class="dsq-comment-text">
+	                                <p>In the class \AppBundle\Entity\User, the property is $username, not $name. So I have updated my fixtures.yml to match with this :</p><p>AppBundle\Entity\User:<br>    user_{1..10}:<br>        username: &lt;lastname()&gt;<br>        email: weaverryan+&lt;current()&gt;@gmail.com<br>The opposite operation is possible too : change the property to $name and there will be no need to update the fixtures.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2858823083" id="dsq-comment-2858823083">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2858823083">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2858823083" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2858823083" class="dsq-comment-text">
+	                                <p>Ah, usually database creation is up to you. Migrations could create tables as you can see in the code of migrations for this course, but you have to create a DB manually, i.e. I mean you could create it easily by running the command:<br></p><pre><code><br>$ bin/console doctrine:database:create<br></code></pre><p></p><p>And when your DB exists - then start running migrations!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2858699355" id="dsq-comment-2858699355">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_7JHbmPt1qr/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2858699355">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">claire</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2858699355" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2858699355" class="dsq-comment-text">
+	                                <p>Hey Victor,</p><p>aaa I see thank you for explaining that. I dropped the table and I ran migration but now getting this error:</p><p>  [Doctrine\DBAL\Exception\ConnectionException]</p><p>  An exception occured in driver: SQLSTATE[HY000] [1049] Unknown database 'claire_test'</p><p>I used ./bin/console doctrine:migrations:migrate</p><p>Is that the command to use to run all migrations ?</p><p>Thank you!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2858695417" id="dsq-comment-2858695417">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2858695417">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2858695417" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2858695417" class="dsq-comment-text">
+	                                <p>Hey @claire,</p><p>You did it right to drop this table, but you didn't have to create it. Migration will create this table for you. This's exactly what migration trying to do based on the error message you got: "Base table or view already exists: 1050 Table 'genus' already exists". So the right solution is: Drop `genus` table and don't create it, just run a migration. If you will still get similar errors, try to drop database at all and run all migrations from scratch. And don't forget to load fixtures after it.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2858660199" id="dsq-comment-2858660199">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_7JHbmPt1qr/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2858660199">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">claire</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2858660199" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2858660199" class="dsq-comment-text">
+	                                <p>Hi,</p><p>I having a bit of trouble with the migration. In the first instance I got an error that said the tables already exisit etc. So I dropped them and created them again and then did the migration. Im still getting the same error.</p><p>Migration 20160818095005 failed during Execution. Error An exception occurred while executing 'CREATE TABLE genus (id INT AUTO_INCREMENT NOT NULL, sub_family_id INT NOT NULL, name VARCHAR(255) NOT NULL, species_count INT NOT NULL, fun_fact VARCHAR(255) DEFAULT NULL, is_published TINYINT(1) NOT NULL, first_discovered_at DATE NOT NULL, INDEX IDX_38C5106ED15310D4 (sub_family_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB':</p><p>SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'genus' already exists.</p><p>The database was working before adding the User Table and I am not too sure where I have gone wrong here.</p><p>Thank you, <br>Claire</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_user-interface-methods';var disqus_url = 'https://knpuniversity.com/screencast/symfony-security/user-interface-methods';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="rendering-login-form#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-security/user-interface-methods" addthis:title="Symfony Security: Beautiful Authentication, Powerful Authorization">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-security","courseIsOwned":false,"chapter":"The UserInterface Methods (Keep some Blank!)","chapterNumber":2,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony Security: Beautiful Authentication, Powerful Authorization';
+        Core.courseId = 78
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-security';
+                    Core.chapterTitle = 'The UserInterface Methods (Keep some Blank!)';
+            Core.chapterNumber = 2;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'user-interface-methods';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

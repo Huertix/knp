@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Yaml for Service Definitions > Journey to the Center of Symfony: The Dependency Injection Container | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 20633
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Parameters <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-journey-di/parameters#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Let&#039;s not just *use* Symfony, let&#039;s conquer it! In this series, we&#039;re
+going to rip open the code that builds and boots Symfony&#039;s Container
+to see how it really works. Yes, this is geeky, and yes it&#039;s sweet!
+
+Besides the occassional [dinosaur](http://upload.wikimedia.org/wikipedia/commons/a/a0/Amazing_Stories_June_1926.jpg),
+expect to do the following on our adventure:
+
+* Build a container from scratch
+* Master the **ContainerBuilder** and **Definition** objects: the backbones to the container
+* See how Definitions are built with YAML
+* Dump the container to PHP code and use it
+* See how Symfony *builds* the container (woh)
+* Learn how DependencyInjection Extension classes work (i.e. the guys who process all that `config.yml` stuff)
+* Discover existing compiler passes and create your own
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Yaml for Service Definitions">
+<meta property="og:description" content="Let&amp;#039;s not just *use* Symfony, let&amp;#039;s conquer it! In this series, we&amp;#039;re
+going to rip open the code that builds and boots Symfony&amp;#039;s Container
+to see how it really works. Yes, this is geeky, and yes it&amp;#039;s sweet!
+
+Besides the occassional [dinosaur](http://upload">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-journey-di/yaml">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-journey-di:2069840da60f17835afd095e72296700f2d9b670/sf2-journey-container.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="yaml#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        4.
+                            Yaml for Service Definitions
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Journey to the Center of Symfony: The Dependency Injection Container</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="container-in-the-wild" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Creating a Container in the Wild
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:44</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="definition" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Definitions: Teach the Container
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="definition-unlocked" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Definition Unlocked
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="yaml" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Yaml for Service Definitions
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:01</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="parameters" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Parameters
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dumper" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        The Container Dumper
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="symfony-builds-the-container" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        How Symfony Builds the Container
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dependency-injection-extensions" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Dependency Injection Extensions
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="compiler-passes" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Compiler Passes
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:34</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-journey-di" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Yaml for Service Definitions</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Journey to the Center of Symfony: The Dependency Injection Container Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $10.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="parameters#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="yaml#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="yaml#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (6)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony-journey/edit/master/knpu/container/yaml.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Creating service definitions in PHP is just <em>one</em> way to do things: you can
+configure this same stuff purely in Yaml or XML. And since Symfony uses Yaml
+files, let's use them too.</p>
+<p>Up top, create a <code>$loader</code> object - set it to <code>new YamlFileLoader()</code> from
+the DependencyInjection component. This takes two arguments: the <code>$container</code>
+and a new <code>FileLocator</code>. That's a really simple object that says: "Yo, look
+for files inside of a <code>config</code> directory". To make it read a Yaml file, call
+<code>load()</code> and point it at a new file called <code>services.yml</code>.</p>
+<p><div class="code-block-wrapper" data-code-block-guid="8fbb0e03c0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-44" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            44 lines <span class="meta-divider"></span> <span title="dino_container/roar.php">dino_container/roar.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">$container = <span class="hljs-keyword">new</span> ContainerBuilder();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">$loader = <span class="hljs-keyword">new</span> YamlFileLoader($container, <span class="hljs-keyword">new</span> FileLocator(<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/config'</span>));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">$loader-&gt;load(<span class="hljs-string">'services.yml'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-44" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 44
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This code tells the container to go find service definitions in this file. </p>
+<p>Now create a <code>config/</code> directory and put that <code>services.yml</code> in there. Our
+goal is to move all of this <code>Definition</code> stuff into that Yaml file. We'll
+start with the <code>logger</code>. I'll comment out <em>all</em> of the <code>$loggerDefinition</code>
+stuff, but keep it as reference:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1a40d1cd72">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-44" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            44 lines <span class="meta-divider"></span> <span title="dino_container/roar.php">dino_container/roar.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"><span class="hljs-comment">/*</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">$loggerDefinition = new Definition('Monolog\Logger');</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="18-27" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 18 - 27
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">*/</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="29-44" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 29 - 44
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h2 id="definitions-in-services-yml">Definitions in services.yml <a class="headerlink" href="yaml#definitions-in-services-yml" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The <em>whole</em> purpose of this Yaml file is to build service <code>Definition</code> objects.
+So it should be no surprise why we start with a <code>services</code> key. Next, since
+the nickname of the service is <code>logger</code>, put that. Indented below this is
+<em>anything</em> needing to configure this <code>Definition</code> object: to train the container
+on how to create the <code>logger</code> service.</p>
+<p>Almost every service will at least have two parts: the <code>class</code> - set it to
+<code>Monolog\Logger</code> and <code>arguments</code>. We know we have 2 arguments. The first is
+the string <code>main</code> and the second is an array with a reference to another
+service. To add the first, just say <code>main</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="768089b63c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            6 lines <span class="meta-divider"></span> <span title="dino_container/config/services.yml">dino_container/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    logger:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">        class:</span> Monolog\Logger</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">        arguments:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> <span class="hljs-string">'main'</span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Before we put the second argument, let's just make sure things are <em>not</em>
+exploding so far:</p>
+<pre><code class="language-bash"><div class="line">php dino_container/roar.php</div></code></pre>
+<p>No explosion! It's printing out to the screen, but if you look in the log,
+it's not adding anything there - the new ones should be from 8:46.</p>
+<p>When we say "go load services.yml", it creates a new <code>Definition</code> object
+for <code>logger</code>. But that logger doesn't have any handlers yet, so it's reverting
+to that default mode where it just dumps to the screen.</p>
+<p>To hook up the first handler, our constructor needs a second argument. Add
+another line with a dash, then paste <code>logger.stream_handler</code>. If we did <em>just</em>
+this, it'll pass this in as a string. In PHP code, this is where we passed in
+a <code>Reference</code> object. To make this create a Reference, we put an <code>@</code> symbol
+in front. I'll surround this in quotes - but you don't technically need to:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="87b68caad8">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-8" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            8 lines <span class="meta-divider"></span> <span title="dino_container/config/services.yml">dino_container/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    logger:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">        class:</span> Monolog\Logger</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">        arguments:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> <span class="hljs-string">'main'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> <span class="hljs-string">'@logger.stream_handler'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-8" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 8
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Try it! Woh, explosion! Argument 2 should be an array, but I'm passing an
+object. I was sloppy. For my second argument, I'm passing literally <em>one</em>
+object. But we know the second argument is an array of objects. So in Yaml,
+we need to surround this with square brackets to make that an array:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="562d313058">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-8" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            8 lines <span class="meta-divider"></span> <span title="dino_container/config/services.yml">dino_container/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    logger:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">        class:</span> Monolog\Logger</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">        arguments:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> <span class="hljs-string">'main'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> [<span class="hljs-string">'@logger.stream_handler'</span>]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-8" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 8
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This time, no errors!</p>
+<pre><code class="language-bash"><div class="line">php dino_container/roar.php</div><div class="line">tail dino_container/dino.log</div></code></pre>
+<p>The console message is gone, but the log file gets it.</p>
+<p>The big point is that you can create <code>Definition</code> objects by hand, OR use
+a config file to do that for you. When <code>services.yml</code> is loaded, it <em>is</em>
+creating those same <code>Definition</code> objects.</p>
+<p>And as you'll see in a bit, if you want to get really advanced, you'll want
+to understand both ways.</p>
+<h2 id="addmethodcall-in-yaml">addMethodCall in Yaml <a class="headerlink" href="yaml#addmethodcall-in-yaml" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Next, we need to move over the <code>addMethodCall</code> stuff. In Yaml, add a <code>calls</code>
+key. The bummer of the <code>calls</code> key is that it has a funny syntax. Add a new
+line with a dash like <code>arguments</code>. We know that the method is called <code>debug</code>
+and we need to pass that method a single string argument. In Yaml, it translates
+to this. Inside square brackets pass <code>debug</code>, then another set of square
+brackets for the arguments. If we wanted to pass three arguments, we'd just
+put a comma-separated list. We'll just paste the message in as the only argument:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="279fe0a6fa">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-10" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            10 lines <span class="meta-divider"></span> <span title="dino_container/config/services.yml">dino_container/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    logger:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">        class:</span> Monolog\Logger</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="4-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 4 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">        calls:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> [<span class="hljs-string">'debug'</span>, [<span class="hljs-string">'Logger just got started!!!'</span>]]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="9-10" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 9 - 10
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>I know that's ugly. But under the hood, that's just calling <code>addMethodCall</code>
+on the <code>Definition</code> and passing it <code>debug</code> and this arguments array. Let's go
+back to the terminal and try it:</p>
+<pre><code class="language-bash"><div class="line">php dino_container/roar.php</div><div class="line">tail dino_container/dino.log</div></code></pre>
+<p>Tail the logs, and boom! Our extra "logger has started" message is back.
+Now let's do the same for the other method call. It's exactly the same, except
+the argument is a service. Copy that name, add a new line under <code>calls</code>,
+say <code>pushHandler</code>, <code>@</code> then the paste our handler name:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d0fc3830d9">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-11" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            11 lines <span class="meta-divider"></span> <span title="dino_container/config/services.yml">dino_container/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"><span class="hljs-attr">    logger:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="3-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 3 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">        calls:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> [<span class="hljs-string">'pushHandler'</span>, [<span class="hljs-string">'@logger.std_out_handler'</span>]]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> [<span class="hljs-string">'debug'</span>, [<span class="hljs-string">'Logger just got started!!!'</span>]]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-11" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 11
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Test it out.</p>
+<pre><code class="language-bash"><div class="line">php dino_container/roar.php</div></code></pre>
+<p>Yes! Both handlers are back! And congrats! Our entire <code>logger</code> definition
+is now in Yaml. And this is a pretty complicated example - most services
+are just a class and arguments. Celebrate by removing the commented-out
+<code>$loggerDefinition</code> stuff. </p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2802625126" id="dsq-comment-2802625126">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="yaml">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2802625126">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-25</span>
+	                            <span class="dsq-commenter-name">shing</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2802625126" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2802625126" class="dsq-comment-text">
+	                                <p>Awesome. Thanks for the quick reply!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2802560110" id="dsq-comment-2802560110">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2802560110">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2802560110" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2802560110" class="dsq-comment-text">
+	                                <p>Hi there!</p><p>I just tried it, and I *am* able to Refactor-&gt;Rename a YAML key (PhpStorm 2016.1 with activated Symfony plugin). However, it doesn't really work - I think it only has "YAML" intelligence - somehow maybe replacing other YAML keys that reference this (I'm not really sure). What I mean is: when I refactored the name of the service, it did *not* refactor my usage of that service from inside a controller.</p><p>So, I also find and replace to do this. It's why I like to make sure my service names are *just* long enough to be unique strings in my project. I also use "git grep service_name" to quickly find the usages.</p><p>In other words, afaik, you're not missing anything - I don't think it works sadly!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2801949646" id="dsq-comment-2801949646">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="yaml">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2801949646">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-25</span>
+	                            <span class="dsq-commenter-name">shing</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2801949646" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2801949646" class="dsq-comment-text">
+	                                <p>Is it me or it's not possible to refactor name for yaml services in phpstorm?</p><p>I'm using phpstorm 2016.2 and when I try to refactor and rename, it wont let me with an "error message" that has a thunderbolt and ''is not a valid identifier. I'm currently doing find all and replace.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2068700148" id="dsq-comment-2068700148">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/michaelsypes/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/15345/9813/avatar92.jpg?1480968856">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2068700148">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-08</span>
+	                            <span class="dsq-commenter-name">Michael Sypes</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2068700148" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2068700148" class="dsq-comment-text">
+	                                <p>Ah, yes! I left out an array nesting. (I am going to stick with my original stance, however, that the syntax used for each could be the same, in terms of using  dashes or brackets to indicate arrays) Readers/Viewers should still check out both of our links to the Symfony documents, so they are clear in understanding what the YAML is presenting.</p><p>Great series! Great site!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2068547094" id="dsq-comment-2068547094">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2068547094">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-08</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2068547094" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2068547094" class="dsq-comment-text">
+	                                <p>Hey Michael!</p><p>For a minute, I thought you were right - and I was excited because your way looks much easier to me! The problem is that there can be multiple calls, so the syntax would *really* look like this:</p><p></p><pre><code><br>services:<br>    my_service:<br>        class: KnpU\SomeClass<br>        calls:<br>            -<br>                - 'debug'<br>                - ['Logger just started!']<br>            -<br>                - 'info'<br>                - ['It is still starting!!']<br></code></pre><p></p><p>But in Symfony 2.7, there *is* a slightly shorter syntax <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fblog%2Fnew-in-symfony-2-7-dependency-injection-improvements%23improved-yaml-service-definition-syntax%3ASP_jmKTt46aUh93aIPkqmNNIxPU&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/blog/new-in...</a> - it's still a bit complex, but better.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2064128860" id="dsq-comment-2064128860">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/michaelsypes/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/15345/9813/avatar92.jpg?1480968856">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2064128860">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-05</span>
+	                            <span class="dsq-commenter-name">Michael Sypes</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2064128860" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2064128860" class="dsq-comment-text">
+	                                <p>There's an implied complexity where there is none: "The bummer of the calls key is that it has a funny syntax..."<br>As I understand YAML (see <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fcomponents%2Fyaml%2Fyaml_format.html%29%3AUftQAfaaxm1hYlH1uJq9fQCGEw8&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a>, the calls key could have the same syntax as that used by the arguments key, i.e.</p><p>calls:<br>      - 'debug'<br>    - ['Logger just got started!!!']</p><p>or vice-versa, arguments could be written as calls is</p><p>arguments: ['main', ['@logger.stream_handler']]</p><p>Feel free to correct me if I'm wrong</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_yaml';var disqus_url = 'https://knpuniversity.com/screencast/symfony-journey-di/yaml';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="parameters#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-journey-di/yaml" addthis:title="Journey to the Center of Symfony: The Dependency Injection Container">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-journey-di","courseIsOwned":false,"chapter":"Yaml for Service Definitions","chapterNumber":4,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Journey to the Center of Symfony: The Dependency Injection Container';
+        Core.courseId = 59
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-journey-di';
+                    Core.chapterTitle = 'Yaml for Service Definitions';
+            Core.chapterNumber = 4;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'yaml';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

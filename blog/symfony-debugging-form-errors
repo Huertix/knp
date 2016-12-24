@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Accessing and Debugging Symfony Form Errors | KnpUniversity</title>
+
+                <link href="../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+        <link rel="stylesheet" href="../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+                    <script src="../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../js/routing?callback=fos.Router.setData"></script>
+            
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="PHP and Symfony Tutorial Screencasts - with free videos, scripts, and code downloads!">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Accessing and Debugging Symfony Form Errors">
+<meta property="og:description" content="Inspired by an old StackOverflow post, we&#039;ll investigate why
+it&#039;s so hard to get *all* of the errors of a form and unlock
+some new tricks by understanding the form hierarchy.
+">
+<meta property="og:url" content="http://knpuniversity.com/blog/symfony-debugging-form-errors">
+    <meta property="og:image" content="http://knpuniversity.com/uploads/blog/symfony-debugging-form-errors.png">
+
+<meta name="twitter:card" content="summary">
+
+
+            </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin ">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="symfony-debugging-form-errors#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../tracks.1">Tracks</a></li>
+          <li><a href="../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../pricing.1">Pricing</a></li>
+        <li><a href="../training">Training</a></li>
+                <li class="visible-xs"><a href="../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../logout">Sign Out</a></li>
+
+            <li><a href="../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="blog-article">
+
+    <a href="https://github.com/knpuniversity/blog/edit/master/symfony-debugging-form-errors.md" class="btn btn-sm pull-right btn-blog js-analytics-blog-edit" target="_blank">Edit this post</a>
+    <h1>Accessing and Debugging Symfony Form Errors</h1>
+    <div class="row">
+    <div class="col-xs-12">
+        <div class="blog-article-info">
+            <p class="blog-article-info-author">
+                By
+                                
+                <a href="https://github.com/weaverryan">weaverryan</a>
+                                    and 2 others
+                                in
+                <a href="../blog?category=symfony">Symfony</a> on Jan 10th 2014
+                <a href="symfony-debugging-form-errors#comments" class="blog-article-info-comment"><i class="fa fa-comment"></i> comments</a>
+            </p>
+        </div>
+    </div>
+</div>
+<div class="row">
+        <div class="col-xs-12">
+        <div class="text-center">
+            <a href="symfony-debugging-form-errors"><img class="blog-article-img" src="../imagine/blog_image/uploads/blog/symfony-debugging-form-errors.png" alt="Accessing and Debugging Symfony Form Errors"></a>
+        </div>
+    </div>
+</div>
+
+    <div class="blog-article-container">
+
+        <div class="markdown-content">
+            <h1 id="accessing-and-debugging-symfony-form-errors">Accessing and Debugging Symfony Form Errors <a class="headerlink" href="symfony-debugging-form-errors#accessing-and-debugging-symfony-form-errors" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>I recently saw an old post on StackOverflow called
+<a href="http://stackoverflow.com/questions/6978723/symfony2-how-to-get-form-validation-errors-after-binding-the-request-to-the-fo">How to get form validation errors after binding the request to the form</a>.
+It has a lot of answers, most of them are only partially right and a lot
+are outdated. So, I wanted to look at the <em>right</em> answer, and why it's that
+way :).</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>To see real examples of using forms and customizing form rendering, start
+off with our Symfony2 Series (<a href="../screencast/symfony2-ep2/registration-form">Episode 2</a> and <a href="http://knpuniversity.com/screencast/symfony2-ep4/form-customizationsespecially">Episode 4</a>.</p>
+</div><h2 id="debugging">Debugging <a class="headerlink" href="symfony-debugging-form-errors#debugging" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>First, if you're trying to figure out what errors you have and which field
+each is attached to, you should use the
+<code>Form::getErrorsAsString()</code>
+method that was introduced in Symfony 2.1 (so a long time ago!). Use it temporarily
+in a controller to see what's going on::</p>
+<pre><code>public function formAction(Request $request)
+{
+    $form = $this-&gt;createForm(new ProductType());
+
+    $form-&gt;handleRequest($request);
+    if ($form-&gt;isValid()) {
+        // ... form handling
+    }
+
+    var_dump($form-&gt;getErrorsAsString());die;
+
+    $this-&gt;render(
+        'DemoBundle:Product:form.html.twig',
+        array('form' =&gt; $form-&gt;createView())
+    );
+}</code></pre>
+<p>That's it. To make things even simpler, you also have the <a href="http://symfony.com/blog/new-in-symfony-2-4-great-form-panel-in-the-web-profiler">Form panel</a> of
+the web debug toolbar in Symfony 2.4. So, debugging form errors</p>
+<h2 id="why-form-gt-geterrors-doesn-t-work">Why $form-&gt;getErrors() doesn't Work <a class="headerlink" href="symfony-debugging-form-errors#why-form-gt-geterrors-doesn-t-work" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>As of Symfony 2.5, we have a new tool! <code>$form-&gt;getErrors(true)</code> <em>will</em>
+return <em>all</em> of the errors from <em>all</em> of the fields on your form.</p>
+</div><p>Raise your hand virtually if you've tried doing this to debug a form::</p>
+<pre><code>public function formAction(Request $request)
+{
+    $form = $this-&gt;createForm(new ProductType());
+
+    $form-&gt;handleRequest($request);
+    if ($form-&gt;isValid()) {
+        // ... form handling
+    }
+
+    var_dump($form-&gt;getErrors());die;
+
+    $this-&gt;render(
+        'DemoBundle:Product:form.html.twig',
+        array('form' =&gt; $form-&gt;createView())
+    );
+}</code></pre>
+<p>What do you get? Almost definitely an empty array, even when the form has
+lots of errors. Yea, I've been there too.</p>
+<p>The reason is that a form is actually more than just one <code>Form</code> object:
+it's a tree of <code>Form</code> objects. Each field is represented by its <em>own</em> <code>Form</code>
+object and the errors for that field are stored on it.</p>
+<p>Assuming the form has <code>name</code> and <code>price</code> fields, how can we get the errors
+for each field?</p>
+<pre><code class="language-php">$globalErrors = $form-&gt;getErrors()
+$nameErrors = $form['name']-&gt;getErrors();
+$priceErrors = $form['price']-&gt;getErrors();</code></pre>
+<p>By saying <code>$form['name']</code>, we get the <code>Form</code> object that represents <em>just</em>
+the <code>name</code> field, which gives us access to <em>just</em> the errors attached to
+that field. This means that there's no <em>one</em> spot to get <em>all</em> of the errors
+on your entire form. Saying <code>$form-&gt;getErrors()</code> gives you only "global"
+errors, i.e. errors that aren't attached to any specific field (e.g. a CSRF token
+failure).</p>
+<h2 id="render-all-the-errors-at-the-top-of-your-form">Render all the Errors at the Top of your Form <a class="headerlink" href="symfony-debugging-form-errors#render-all-the-errors-at-the-top-of-your-form" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>As of Symfony 2.5, you can use <code>$form-&gt;getErrors(true)</code> to get an array
+of <em>all</em> the errors in your form. Yay!</p>
+</div><p>One common question is how you might render all of your errors in one big
+list at the top of your form. Again, there's no <em>one</em> spot where you can
+get a big array of <em>all</em> of the errors, so you'd need to build it yourself::</p>
+<pre><code>// a simple, but incomplete (see below) way to collect all errors
+$errors = array();
+foreach ($form as $fieldName =&gt; $formField) {
+    // each field has an array of errors
+    $errors[$fieldName] = $formField-&gt;getErrors();
+}</code></pre>
+<p>We can iterate over <code>$form</code> (a <code>Form</code> object) to get all of its fields.
+And again, remember that each field (<code>$formField</code> here), is also a <code>Form</code>
+object, which is why we can call
+<code>Form::getErrors()</code>
+on each.</p>
+<p>In reality, since a form can be many-levels deep, this solution isn't good
+enough. Fortunately, someone already posted a more complete one on
+<a href="http://stackoverflow.com/a/8216192/805814">Stack Overflow</a> (see the 2.1 version).</p>
+<p>From here, you can pass these into your template and render each. Of course,
+you'll need to make sure that you don't call <code>{{ form_errors() }}</code> on any
+of your fields, since you're printing the errors manually (and remember that
+<code>form_row</code> calls <code>form_errors</code> automatically).</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>Each field also has an <a href="http://symfony.com/doc/current/reference/forms/types/text.html#error-bubbling">error_bubbling</a> option. If this is set to <code>true</code>
+(it defaults to <code>false</code> for most fields), then the error will "bubble"
+and attach itself to the parent form. This means that if you set this
+option to <code>true</code> for <em>every</em> field, all errors would be attached to
+the top-level Form object and could be rendered by calling <code>{{ form_errors(form) }}</code>
+in Twig.</p>
+</div><h2 id="accessing-errors-inside-twig">Accessing Errors Inside Twig <a class="headerlink" href="symfony-debugging-form-errors#accessing-errors-inside-twig" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>We can also do some magic in Twig with errors using magical things called
+<em>form variables</em>. These guys are <em>absolutely fundamental</em> to customizing
+how your forms render.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>If you're new to form theming and variables and need to master them,
+check out <a href="../screencast/symfony2-ep4/form-customizations">Episode 4</a> of our Symfony series.</p>
+</div><p>Normally, field errors are rendered in Twig by calling <code>form_errors</code> on
+each individual field:</p>
+<pre><code class="language-html+jinja">{{ form_errors(form) }}
+
+{{ form_label(form.name) }}
+{{ form_widget(form.name) }}
+{{ form_errors(form.name) }}</code></pre>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>The <code>form_row</code> function calls <code>form_errors</code> internally.</p>
+</div><p>Just like in the controller, the errors are attached to the individual fields
+themselves. Hopefully it make sense now why <code>form_errors(form)</code> renders <em>global</em>
+errors and <code>form_errors(form.name)</code> renders the errors attached to the
+name field.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>Once you're in Twig, each field (e.g. <code>form</code>, <code>form.name</code>) is an instance
+of :symfonyclass:<code>Symfony\\Component\\Form\\FormView</code>.</p>
+</div><p>If you need to customize how the errors are rendered, you can always use
+<a href="../screencast/symfony2-ep4/form-customizations">form theming</a>. But you can also do it by leverage form variables:</p>
+<pre><code class="language-html+jinja">{{ form_errors(form) }}
+
+{{ form_label(form.name) }}
+{{ form_widget(form.name) }}
+
+{% if form.name.vars.errors|length &gt; 0 %}
+&lt;ul class="form-errors name"&gt;
+    {% for error in form.name.vars.errors %}
+        {{ error }}
+    {% endfor %}
+&lt;/ul&gt;
+{% endif %}</code></pre>
+<p>The key here is <code>form.name.vars</code>: a strange array of "variables" that you
+have access to on <em>every</em> field. One of the variables you have access to
+is <code>errors</code>, but there are many others, like <code>label</code> and <code>required</code>.
+Each variable is normally used internally to render the field, but you can
+use them manually if you need to:</p>
+<pre><code class="language-html+jinja">&lt;label for="form.name.vars.id"&gt;
+    {{ form.name.vars.label }} {{ form.name.vars.required ? '*' : '' }}
+&lt;/label&gt;</code></pre>
+<p>To find out what variables a field has, just dump them:</p>
+<pre><code class="language-html+jinja">{{ dump(form.price.vars) }}</code></pre>
+<p>Now that you know about the magic <code>form.vars</code>, you could also use it to render
+all validation errors at the top of your form. This will only work for simple forms
+(i.e. forms without nested fields), which most forms are:</p>
+<pre><code class="language-html+jinja">{% set messages = [] %}
+{% for child in form.children %}
+    {% for error in child.vars.errors %}
+        {% set messages = messages|merge([error.message]) %}
+    {% endfor %}
+{% endfor %}
+{% if messages|length %}
+    &lt;ul&gt;
+        {% for message in messages %}
+            &lt;li&gt;{{ message }}&lt;/li&gt;
+        {% endfor %}
+    &lt;/ul&gt;
+{% endif %}</code></pre>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>When you are form theming, these variables become accessible in your
+form theme template as local variables inside the form blocks (e.g.
+simply <code>label</code> or <code>id</code>).</p>
+</div><h2 id="takeaways">Takeaways <a class="headerlink" href="symfony-debugging-form-errors#takeaways" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>The key lesson is this: <strong>each form is a big tree</strong>. The top level <code>Form</code> has
+children, each which is also a <code>Form</code> object (or a <code>FormView</code> object
+when you're in Twig). If you want to access information about a field (is
+it required? what are its errors?), you need to first get access to the <em>child</em>
+form and go from there.</p>
+<h2 id="learn-more">Learn More <a class="headerlink" href="symfony-debugging-form-errors#learn-more" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Stuck on other Symfony topics or want to learn Symfony from the context of
+an actual project? Check out our Getting Started with <a href="../screencast/tag/symfony">Symfony Series</a> and
+cut down on your learning curve!</p>
+
+        </div>
+
+        <div class="blog-article-sharing-buttons cf">
+            <h2>Enjoyed the post? Share it!</h2>
+
+            
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/blog/symfony-debugging-form-errors" addthis:title="Accessing and Debugging Symfony Form Errors">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+        </div>
+    </div>
+
+    <!-- Blog buttons panel start -->
+    <div class="blog-article-share-block">
+
+        <!-- Next/Previous blog posts -->
+        <div class="row">
+            <div class="col-xs-12">
+                                    <a href="collaboration" class="blog-article-previous">
+                        <span class="pull-left"><i class="fa fa-arrow-left"></i> Previous post</span>
+                    </a>
+                
+                                    <a href="requirejs-bower-grunt" class="blog-article-next">
+                        <span class="pull-right">Next post <i class="fa fa-arrow-right"></i></span>
+                    </a>
+                            </div>
+        </div>
+
+        <!-- Comments panel start -->
+        <div class="sidebar">
+            <aside id="comments">
+                <h3>Leave a comment!</h3>
+                    <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'blog_symfony\x2Ddebugging\x2Dform\x2Derrors';var disqus_url = 'https://knpuniversity.com/blog/symfony-debugging-form-errors';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- ESI TIME: 2016-12-23 15:06:55 -->
+
+        </div>
+    </div>
+</div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../about">About</a></li>
+                            <li><a class="knp-color-black" href="../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script>
+        jQuery(document).ready(function() {
+            /**
+             * Special tracking for the blog edit button
+             */
+            $('.js-analytics-blog-edit').on('click', function() {
+                Core.triggerAnalyticsEvent(
+                    'Contribute',
+                    'Edit',
+                    'Blog'
+                );
+            });
+        });
+    </script>
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+</body>
+</html>

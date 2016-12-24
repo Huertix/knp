@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Configuring DoctrineCacheBundle > Symfony Fundamentals: Bundles, Configuration &amp; Environments | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 33894
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Environments <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-fundamentals/understanding-environments#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="After the first course - [Joyful Development with Symfony](http://knpuniversity.com/screencast/symfony),
+you&#039;ve got Symfony up and running. CELEBRATION!
+
+In this episode, it&#039;s time to get down to work by learning the
+fundamental concepts of bundles, configuration and environments!
+We&#039;ll discover what all the files in a Symfony project do and why,
+the purpose of bundles and the power behind *environments*. So
+let&#039;s get to work: what we&#039;re about to learn will pay dividends
+for us in the future:
+
+- Where do services come from?
+- Installing an external bundle
+- Configuring bundles
+- Controller outside services
+- Using `config:dump-reference`
+- Understanding Symfony environments
+- Create your own environment
+- The `prod` environment and `cache:clear`
+- The famous `parameters.yml`
+- Where do routes come from?
+- `src/` versus `app`
+
+
+Ready, set, go!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Configuring DoctrineCacheBundle">
+<meta property="og:description" content="After the first course - [Joyful Development with Symfony](http://knpuniversity.com/screencast/symfony),
+you&amp;#039;ve got Symfony up and running">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-fundamentals/configure-cache-service">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-fundamentals:daecb966236cc294a510b0ec2067e37790d63af2/sf-fundamentals.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="configure-cache-service#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        5.
+                            Configuring DoctrineCacheBundle
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony Fundamentals: Bundles, Configuration &amp; Environments</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="install-bundles" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Bundles
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:55</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="using-services" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Using a Service
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="config.yml" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Config.yml: Control Center for Services
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="add-cache-service" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Adding a Cache Service
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="configure-cache-service" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Configuring DoctrineCacheBundle
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:26</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="understanding-environments" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Environments
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:59</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="config_dev.yml-config_prod.yml" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        config_dev.yml &amp; config_prod.yml
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="caching-by-environment" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Caching in the prod Environment Only
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="config-parameters" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Parameters: The Variables of Configuration
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="parameters.yml-kernel.root_dir" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        parameters.yml &amp; %kernel.root_dir%
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:48</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="mastering-route-loading" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Mastering Route config Loading
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-fundamentals" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Configuring DoctrineCacheBundle</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony Fundamentals: Bundles, Configuration &amp; Environments Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="understanding-environments#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="configure-cache-service#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="configure-cache-service#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep2-fundamentals/configure-cache-service.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>We have a new toy, I mean service! In <code>GenusController</code>, let's use it:
+<code>$cache = $this-&gt;get('')</code> and start typing <code>markdown</code>. Ah, there's our service!</p>
+<p><div class="code-block-wrapper" data-code-block-guid="34254489cc">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-55" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            55 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showAction</span><span class="hljs-params">($genusName)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        $funFact = <span class="hljs-string">'Octopuses can change the color of their body in just *three-tenths* of a second!'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $cache = <span class="hljs-keyword">$this</span>-&gt;get(<span class="hljs-string">'doctrine_cache.providers.my_markdown_cache'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="21-34" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 21 - 34
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-53" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 53
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Here's the goal: make sure the same string doesn't get parsed twice through markdown.
+To do that, create a <code>$key = md5($funFact);</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ea4c667e90">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-55" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            55 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $cache = <span class="hljs-keyword">$this</span>-&gt;get(<span class="hljs-string">'doctrine_cache.providers.my_markdown_cache'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        $key = md5($funFact);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="22-55" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 22 - 55
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>To use the cache service, add <code>if ($cache-&gt;contains($key))</code>. In this case,
+just set <code>$funFact = $cache-&gt;fetch($key);</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a1f40a624c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-55" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            55 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $cache = <span class="hljs-keyword">$this</span>-&gt;get(<span class="hljs-string">'doctrine_cache.providers.my_markdown_cache'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        $key = md5($funFact);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> ($cache-&gt;contains($key)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">            $funFact = $cache-&gt;fetch($key);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-28" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 28
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-55" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 30 - 55
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Else, we're going to need to parse through Markdown.</p>
+<p>Let's live <em>dangerously</em>: add a <code>sleep(1);</code> to pretend like our markdown transformation
+is <em>really</em> taking a long time. Next, parse the fun fact and finish with
+<code>$cache-&gt;save($key, $funFact)</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="7ee9751953">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-55" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            55 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> ($cache-&gt;contains($key)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">            $funFact = $cache-&gt;fetch($key);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        } <span class="hljs-keyword">else</span> {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">            sleep(<span class="hljs-number">1</span>); <span class="hljs-comment">// fake how slow this could be</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">            $funFact = <span class="hljs-keyword">$this</span>-&gt;get(<span class="hljs-string">'markdown.parser'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">                -&gt;transform($funFact);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">            $cache-&gt;save($key, $funFact);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-55" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 30 - 55
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's do this! Go back to the browser... and watch closely my friends. Refresh!
+Things are moving a bit slow. Yep: the web debug toolbar shows us 1048 ms. Refresh
+again. super fast! Just 41 ms: the cache is working! But... uhh... where is this
+being cached exactly?</p>
+<p>Out of the box, the answer is in <code>var/cache</code>. In the terminal, <code>ls var/cache</code>, then
+<code>ls var/cache/dev</code>:</p>
+<pre><code class="language-bash"><div class="line">ls var/cache/dev/</div></code></pre>
+<p>Hey! There's a <code>doctrine</code> directory with <code>cache/file_system</code>
+inside. <em>There</em> is our cached markdown.</p>
+<p>This bundle <em>assumed</em> that this is where we want to cache things. That was really
+convenient, but clearly, there needs to be a way to control that as well. </p>
+<h2 id="configuring-the-cache-path">Configuring the Cache Path <a class="headerlink" href="configure-cache-service#configuring-the-cache-path" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Rerun <code>config:dump-reference doctrine_cache</code>:</p>
+<pre><code class="language-bash"><div class="line">./bin/console config:dump-reference doctrine_cache</div></code></pre>
+<p>Ah, there's a <code>directory</code> key we can use to control things. In the editor, add this
+new <code>directory</code> key and set it to <code>/tmp/doctrine_cache</code> for now:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3cfda7cd88">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-78" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            78 lines <span class="meta-divider"></span> <span title="app/config/config.yml">app/config/config.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-72" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 72
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="73"></td>
+            <td class="blob-code"><span class="hljs-attr">doctrine_cache:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="74"></td>
+            <td class="blob-code"><span class="hljs-attr">    providers:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="75"></td>
+            <td class="blob-code"><span class="hljs-attr">        my_markdown_cache:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="76"></td>
+            <td class="blob-code"><span class="hljs-attr">            type:</span> file_system</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="77"></td>
+            <td class="blob-code"><span class="hljs-attr">            directory:</span> /tmp/doctrine_cache</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, back to the browser team. Refresh! Poseidon's beard, check out that HUGE error! 
+"Unrecognized option 'directory'". Remember, configuration is validated... which
+means we just messed something up. Oh yea: I see the problem: I need to have
+<code>file_system</code> and <em>then</em> <code>directory</code> below that. Add <code>file_system</code> above <code>directory</code>
+and then indent it to make things match:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="13416f8052">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-79" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            79 lines <span class="meta-divider"></span> <span title="app/config/config.yml">app/config/config.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-72" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 72
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="73"></td>
+            <td class="blob-code"><span class="hljs-attr">doctrine_cache:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="74"></td>
+            <td class="blob-code"><span class="hljs-attr">    providers:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="75"></td>
+            <td class="blob-code"><span class="hljs-attr">        my_markdown_cache:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="76"></td>
+            <td class="blob-code"><span class="hljs-attr">            type:</span> file_system</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="77"></td>
+            <td class="blob-code"><span class="hljs-attr">            file_system:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="78"></td>
+            <td class="blob-code"><span class="hljs-attr">                directory:</span> /tmp/doctrine_cache</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, try this out one more time.</p>
+<p>It should be slow the first time... yes! And then super fast the second time. In
+the terminal, we can even see a <code>/tmp/doctrine_cache/</code> directory:</p>
+<pre><code class="language-bash"><div class="line">ls /tmp/doctrine_cache/</div></code></pre>
+<p>Big picture time: bundles give you services, and those services can be controlled
+in <code>config.yml</code>. Every bundle works a little bit different - but if you understand
+this basic concept, you're on your way.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2984621255" id="dsq-comment-2984621255">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2984621255">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-04</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2984621255" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2984621255" class="dsq-comment-text">
+	                                <p>Hey Noby!</p><p>Yes and no :). A lot of the work we did was initial setup. So if you wanted to cache in a different route/controller, you wouldn't need to do much work at all: (A) add a new entry in config.yml under "doctrine_cache" and "providers" then (B) fetch that service in a controller and use it to cache. Not too much work.</p><p>But also, you likely won't need to cache very often. Of course, it depends on your application, but, for example, the vast majority of the routes/controllers on our site don't have any caching: it's just fast enough.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2984510131" id="dsq-comment-2984510131">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nobuyukifujioka/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20526/1524/avatar92.jpg?1480287706">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2984510131">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-04</span>
+	                            <span class="dsq-commenter-name">Nobuyuki Fujioka</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2984510131" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2984510131" class="dsq-comment-text">
+	                                <p>Hi, <br>Ok, a bit complicated. but, it is working now.<br>Do I have to do this process for every route page/function to have cache working?</p><p>Kind regards,<br>Noby</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2946564612" id="dsq-comment-2946564612">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2946564612">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-12</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2946564612" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2946564612" class="dsq-comment-text">
+	                                <p>Hey Marco,</p><p>Something wrong with the "markdown.parser" service definition in services.yml - please, double check its spelling and try to clear the cache. If it doesn't help you - please, show your "markdown.parser" service definition here.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2946394056" id="dsq-comment-2946394056">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/marco_koopman/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10316/3626/avatar92.jpg?1476271130">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2946394056">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-12</span>
+	                            <span class="dsq-commenter-name">Marco Koopman</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2946394056" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2946394056" class="dsq-comment-text">
+	                                <p>Hey I've fixed the typo but now it says You have requested a non-existent service "markdown.parser"</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2945584960" id="dsq-comment-2945584960">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/diego82/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9619/avatar92.jpg?1476223314">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2945584960">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-11</span>
+	                            <span class="dsq-commenter-name">diego82</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2945584960" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2945584960" class="dsq-comment-text">
+	                                <p>Yep! "sometimes people will open a directory that contains many projects, and this can confuse PhpStorm"</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2924707113" id="dsq-comment-2924707113">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2924707113">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-29</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2924707113" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2924707113" class="dsq-comment-text">
+	                                <p>Yo Marco,</p><p>I bet I know the problem. You made a type in this service name: it should be "markdown.parser" instead of "markdown.paser" ;)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2924689562" id="dsq-comment-2924689562">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="configure-cache-service">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2924689562">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-29</span>
+	                            <span class="dsq-commenter-name">Marco</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2924689562" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2924689562" class="dsq-comment-text">
+	                                <p>Hey! I get the error: You have requested a non-existent service "markdown.paser". Ive done everything in the video I dont know what is wrong please help :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2920357605" id="dsq-comment-2920357605">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2920357605">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-27</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2920357605" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2920357605" class="dsq-comment-text">
+	                                <p>Yes, it does. It seems like I had have quite a vague notion about Twig cache files.</p><p>And now I also understand why some people think Twig is too heavy. :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2919498920" id="dsq-comment-2919498920">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2919498920">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-26</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2919498920" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2919498920" class="dsq-comment-text">
+	                                <p>Yo Maksym!</p><p>Great question :). You're right that the Twig templates are cached to PHP files. But, the *output* of the templates is not cached. What I mean is: the Twig language is parsed and a PHP file is built in the cache. This cache is just a translation of the Twig language into the PHP language. If you looked at the cached Twig file (which you can do by browsing in var/cache/dev/twig), you'll find that it includes echo statements for variables that will be passed in at runtime. This cached file is used to render different content based on the different variables that you pass into it.</p><p>This also means that your controller code is *always* executed (since it needs to prepare the variables for the Twig template). And in this case, your controller code is actually the code that will be slow (as it parses the markdown). That's why we add that caching layer.</p><p>Does that make sense? There *are* of course ways to cache the *output* of your page (what you'd normally think of as some sort of "page caching"). We don't have a tutorial on this yet, but it's one of the coolest features of Symfony: <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fhttp_cache.html%3ADmhHEZswpE9NNPMxuVuqVAj6EWc&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2919434998" id="dsq-comment-2919434998">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2919434998">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-26</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2919434998" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2919434998" class="dsq-comment-text">
+	                                <p>But Twig caches its templates, doesn't it? So, do we really need another cache for markdown service?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2888834891" id="dsq-comment-2888834891">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2888834891">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-12</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2888834891" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2888834891" class="dsq-comment-text">
+	                                <p>Ah, good catch! For Windows users it makes sense since windows has a bit different file system, so it doesn't have "/tmp/" dir as Mac/Linux does. Probably, you could use C:\Users\&lt;username&gt;\AppData\Local\Temp instead, but I'd recommend to use the local Symfony cache dir, i.e. "%kernel.root_dir%/cache/doctrine_cache" rather.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2884081187" id="dsq-comment-2884081187">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="configure-cache-service">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2884081187">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-09</span>
+	                            <span class="dsq-commenter-name">Krzysztof</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2884081187" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2884081187" class="dsq-comment-text">
+	                                <p>I'm using Windows and I had a similar problem. I thought directory  tmp/doctrine_cache didn't exist but it did, just in other location. <br>It should be created in d:/xampp/htdocs/my_project/ but instead I found it directly in d:/. I don't know why. I googled it and I found I can use %kernel.root_dir%, so I changed my configuration from:</p><p>directory: /tmp/doctrine_cache</p><p>to</p><p>directory: %kernel.root_dir%/../tmp/doctrine_cache</p><p>and it worked.</p><p>Later I found out that these "kernel" parameters are described in next chapters of this course, :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2822183045" id="dsq-comment-2822183045">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2822183045">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-05</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2822183045" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2822183045" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="3amprogrammer:disqus" href="https://disqus.com/by/3amprogrammer/" rel="nofollow noopener">3amprogrammer</a> ,</p><p>You're right, Doctrine relates to the database, but also it relates to the <em>data</em> in common. Doctrine has a nice <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fdoctrine%2Fcache%3AaZrXkbfaLTJhOyud9WrJ2VCRfFE&amp;cuid=1175718" rel="nofollow noopener">doctrine/cache</a> library which helps to cache data, i.e. you could easily cache data which you fetch from a database, which in turn reduce a database server loading.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2822048915" id="dsq-comment-2822048915">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/3amprogrammer/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/18706/694/avatar92.jpg?1470710433">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2822048915">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-05</span>
+	                            <span class="dsq-commenter-name">3amprogrammer</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2822048915" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2822048915" class="dsq-comment-text">
+	                                <p>I have a silly question. Why caching markdown has anything to do with doctrine? I tough doctrine is related to database? That confuses me a bit.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2814532180" id="dsq-comment-2814532180">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2814532180">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-01</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2814532180" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2814532180" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="dankinchen:disqus" href="https://disqus.com/by/dankinchen/" rel="nofollow noopener">dankinchen</a> ,</p><p>If folder never appear after it was deleted - probably you have permission problem. To check it - use `ls -la` command.</p><p>Yes, you're right. The "Project" mode do not show you excluded directories. Excluded files are ignored by PhpStorm while searching, parsing, watching etc.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2812865715" id="dsq-comment-2812865715">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/dankinchen/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2812865715">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-31</span>
+	                            <span class="dsq-commenter-name">dankinchen</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2812865715" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2812865715" class="dsq-comment-text">
+	                                <p>I cannot get cache to work for me either. There were files in there but when I deleted the doctrine directory it never came back. I mapped $key to twig and dumped it and sure enough there was an md5 hash in there. You know another thing I cannot navigate to "dir var/cache/" I can only see the contents of var. When I switch between project files and project I get different content? Is this because in an earlier video you had us all exclude cache directory in phpstorm?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2810398248" id="dsq-comment-2810398248">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nathanielkolenberg/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/6637/7775/avatar92.jpg?1469806477">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2810398248">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-29</span>
+	                            <span class="dsq-commenter-name">Nathaniel Kolenberg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2810398248" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2810398248" class="dsq-comment-text">
+	                                <p>Thanks for getting back to me. After deleting the directory and refreshing, it seemed to work :)</p><p>Thanks a lot!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2802531320" id="dsq-comment-2802531320">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2802531320">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2802531320" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2802531320" class="dsq-comment-text">
+	                                <p>Hi Nathaniel!</p><p>Ah, thanks for the nice words! I'm very happy about this :).</p><p>About your question, I have a few ideas:</p><p>1) Obviously, make sure that you configure the "directory" key in config.yml set to /tmp/doctrine_cache. You said you followed word-for-word - but this was the most obvious thing to check, so let's start there!</p><p>2) If you delete the var/cache/dev/doctrine... directory and then refresh, is it re-created? Or does this directory just remain because we were using it earlier?</p><p>It's possible that there's some weird bug in the tutorial - I'm happy to help you dig into what's going on :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2797034505" id="dsq-comment-2797034505">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nathanielkolenberg/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/6637/7775/avatar92.jpg?1469806477">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2797034505">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-22</span>
+	                            <span class="dsq-commenter-name">Nathaniel Kolenberg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2797034505" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2797034505" class="dsq-comment-text">
+	                                <p>Hi <a data-dsq-mention="weaverryan:disqus" href="https://disq.us/url?url=https%3A%2F%2Fdisqus.com%2Fby%2Fweaverryan%2F%3APBIAkzK4hlYNCZurh4fY0tD6LIg&amp;cuid=1175718" rel="nofollow noopener">weaverryan</a>! Your tutorials are excellent w.r.t. Symfony! I just have one quick question regarding this one though. After coding along word for word, I find that the last directory: tmp/doctrine_cache doesn't exist for me when I try to ls into it, whereas the var/cache/dev/doctrine./cache/file_system/60 does exist. Any suggestion as to why this could be?<br>Thanks in advance!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2737674825" id="dsq-comment-2737674825">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2737674825">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2737674825" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2737674825" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="karlola:disqus" href="https://disqus.com/by/karlola/" rel="nofollow noopener">Karlola</a>!</p><p>Hmm, let's see if we can figure this out. First, *after* this chapter, we start getting fancier and only configuring the cache to work on one environment versus another. So, make sure that you don't have any of that code yet - else the cause could be something entirely different :).</p><p>If you're seeing no files, then we know that the cache isn't actually saving. In GenusController, make sure you have the <code>$cache-&gt;save($key, $funFact);</code> line in there. I might also <code>var_dump($key);</code> to make sure this is a real value (if, for some crazy reason this is a blank value, it might not be able to cache).</p><p>Let me know what you find out! Definitely focus on why the cache is not *saving*.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2734333143" id="dsq-comment-2734333143">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/karlola/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12261/446/avatar92.jpg?1411154216">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2734333143">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-16</span>
+	                            <span class="dsq-commenter-name">Karlola</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2734333143" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2734333143" class="dsq-comment-text">
+	                                <p>I've been coding along word-for-word, yet something is messed up with my caching: both the long path `var/cache/dev/doctrine/cache/file_system/` and our custom path `/tmp/doctrine_cache` contain no files or subfolders. The site loads with no explicit errors but also keeps sleeping for the ordered 1 second with every refresh. Where should I look for hints?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730707753" id="dsq-comment-2730707753">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730707753">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730707753" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730707753" class="dsq-comment-text">
+	                                <p>Cheers! And yea, I think Doctrine is much harder than Symfony :). Doctrine gets tricky with relationships, and it really just comes down to getting the configuration correct, then everything works nicely. Doctrine is also more "work" (more writing code) than something like Propel - another reason you sometimes hear bad things about it :).</p><p>Keep up the good work!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730618530" id="dsq-comment-2730618530">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730618530">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730618530" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730618530" class="dsq-comment-text">
+	                                <p>Yeah, I'm 100%(notreally) new to "Symfony" and Doctrine, I mean, not really that new to symfony itself, as I've been using a custom implementation of Silex from a friend for about 2 years, the learning curve into symfony, thats supposedly step, is not being so much as I expected it, surely because of my Silex experience.</p><p>Doctrine on the other hand, its a whole new world for me, as the Silex implementation that I've been using was based on propel1 (yes propel1 not propel2), and well I was worried that using Dogtrine*cough* was going to be a really tough act, but seeing how it works, is just neat, its still a bit black-magic-ish, but it matters not, just been reading about it for a day and half haha.</p><p>again Thanks for taking the time to reply.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730577547" id="dsq-comment-2730577547">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730577547">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730577547" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730577547" class="dsq-comment-text">
+	                                <p>Haha, yep - you totally answered your own question :). But to add some more, there end up being 3 possibilities (at least):</p><p>1) Add a different doctrine_cache in config.yml, config_dev.yml, config_prod.yml, etc, with different directories<br>2) Only configure in config.yml, but set the directory to something that includes `%kernel.environment%` - that's the environment name. Or, `%kernel.cache_dir%` - which is the path to the cache directory, which already differs by environment<br>3) Only configure in config.yml, but set directory to a parameter - like `%my_cache_dir%`. Then, set `my_cache_dir` under the parameters key in the other files (you could set a default in config.yml, then override in other config files).</p><p>The big thing is to understand how the config files load each other (which you clearly do!). Then, you start to see a lot of possibilities :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2729133893" id="dsq-comment-2729133893">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2729133893">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-13</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2729133893" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2729133893" class="dsq-comment-text">
+	                                <p>ok, so here I'm guessing, if i want to have cache for dev in one place, and cache for prod in another (just for the heck of it, lets just go with the argument of wanting to have ALOT of cache because i run dev, test, prod on the same directory, bleh bleh haha)</p><p>I would need to configure the cache (doctrine_cache) on config_prod/test/dev.yml ? and assign it whatever folder i want (lets just say .var/cache/{env}</p><p>where {env} is the environment (prod/test/dev) and it should work?</p><p>checking the conf files, i see test imports dev, whereas prod imports config.yml</p><p>so yes theoretically speaking it should work. ha! answering my question on the same question, isnt this quite nice!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2710021952" id="dsq-comment-2710021952">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2710021952">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-03</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2710021952" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2710021952" class="dsq-comment-text">
+	                                <p>Hey Mike!</p><p>Ah, so you get auto-completion at all when you try to reference the services? I'm not sure what else to try either :/. Is your PhpStorm project opened just to *one* Symfony project (sometimes people will open a directory that contains many projects, and this can confuse PhpStorm). Are you also on the latest versions of PhpStorm and the plugin? I'm just trying to think of possible reasons for this :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2709138099" id="dsq-comment-2709138099">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="configure-cache-service">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2709138099">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-02</span>
+	                            <span class="dsq-commenter-name">Mike</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2709138099" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2709138099" class="dsq-comment-text">
+	                                <p>Thanks for the info.</p><p>I tried what you said, but it still doesn't find the doctrine_cache.providers.my_markdown_cache when I start typing markdown. It did however remove all of the markdown.parser.max and markdown.parser.min options. Not really sure what else to try.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2704931066" id="dsq-comment-2704931066">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2704931066">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-31</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2704931066" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2704931066" class="dsq-comment-text">
+	                                <p>Hey Mike!</p><p>Yes, please do piggyback - I'd love if we could figure this out for everyone :).</p><p>So, you *are* seeing auto-completion on service ids, so that's the first thing to note. I think some people don't get auto-completion at all. And you *are* seeing a lot of valid services in your auto-completion - like markdown.parser.max (that's a real service that *should* auto-complete). The question just is, why aren't you seeing the new doctrine_cache... service?</p><p>One way or another, the likely cause is either that (A) your Symfony cache is out of date (fixing that is as simple as running the bin/console debug:container that we ran in the previous chapter) or (B) PhpStorm didn't see the update. From what I know, phpstorm uses a few strategies to know what your services are: it parses your YAML/XML files, but it also looks (I believe) at a dump container metadata file in your var/cache/dev directory. When you first load a page / run bin/console after making the config changes, that new file is dumped. PhpStorm may not be seeing this for some reason. Related to this, in the PhpStorm settings, under the Symfony plugin, there is a section called "Container". Here, you can actually manually point PhpStsorm at this dumped, XML file (it's called var/cache/dev/appDevDebugProjectContainer.xml). I've never had to do this, but perhaps it would make a difference?</p><p>This particular example is a little different overall, because we aren't configuring this service directly in one of our YAML files. So, PhpStorm relies on that dumped XML file - again, afaik - whereas normally it would also be parsing our YAML files to find our services.</p><p>I hope this helps - let me know if you find anything out!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2698905536" id="dsq-comment-2698905536">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="configure-cache-service">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2698905536">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-27</span>
+	                            <span class="dsq-commenter-name">Mike</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2698905536" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2698905536" class="dsq-comment-text">
+	                                <p>Hi - If I can just piggyback off of this question. I am also having the same problem. I have the plugin installed and enabled. When I watch your tutorials (which are great by the way!) my autocomplete never really looks the same as yours. For this exact example when I type markdown i see stuff like markdown.parser, markdown.parser.max, markdown.parser.min, etc. even if I try typing in doctrine_cache it does not autocomplete. Any ideas why?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2681260968" id="dsq-comment-2681260968">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2681260968">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2681260968" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2681260968" class="dsq-comment-text">
+	                                <p>I do have the Symfony plugin for PhpStorm, but I'm guessing you have this? If you do have this, make sure it's enabled for your project: <a href="http://disq.us/url?url=http%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fphpstorm%2Fsetup%3AJWm61JCxX7mT_yv28_bMvceVi8M&amp;cuid=1175718" rel="nofollow noopener">http://knpuniversity.com/scree...</a></p><p>This plugin is the one that gives you this auto-complete.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2677146292" id="dsq-comment-2677146292">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/konradzajc/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20591/4615/avatar92.jpg?1465212805">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2677146292">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-15</span>
+	                            <span class="dsq-commenter-name">Konrad Zając</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2677146292" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2677146292" class="dsq-comment-text">
+	                                <p>Hi,<br>I'm finding out I don't have the autocompletions you have i.e. the doctrine_cache.providers.my_markdown_cache<br>Do you have any special plugins?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_configure-cache-service';var disqus_url = 'https://knpuniversity.com/screencast/symfony-fundamentals/configure-cache-service';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="understanding-environments#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-fundamentals/configure-cache-service" addthis:title="Symfony Fundamentals: Bundles, Configuration &amp; Environments">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-fundamentals","courseIsOwned":false,"chapter":"Configuring DoctrineCacheBundle","chapterNumber":5,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony Fundamentals: Bundles, Configuration &amp; Environments';
+        Core.courseId = 80
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-fundamentals';
+                    Core.chapterTitle = 'Configuring DoctrineCacheBundle';
+            Core.chapterNumber = 5;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'configure-cache-service';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

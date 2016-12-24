@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Dependency Injection > Dependency Injection and the art of services and containers | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 22114
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Services\x20and\x20Dependency\x20Injection <i class="fa fa-play"></i>',
+            'url': '/screencast/dependency-injection/services#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Get your object-oriented skills sharp by exploring the ideas and reasons
+behind dependency injection. This simple principle separates developers
+who write functional code from those that are able to build great, and
+maintanable applications. In this tutorial, we&#039;ll see dependency injection
+in action, why it&#039;s important, and how it relates to services and service-oriented
+architecture. We&#039;ll also refactor our application to use a dependency
+injection container, using a fantastic - but simple - container called
+Pimple.
+
+If you&#039;re ready to take your object-oriented code to the next level, AND
+actually be excited about doing it, this tutorial is for you!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Dependency Injection">
+<meta property="og:description" content="Get your object-oriented skills sharp by exploring the ideas and reasons
+behind dependency injection. This simple principle separates developers
+who write functional code from those that are able to build great, and
+maintanable applications">
+<meta property="og:url" content="http://knpuniversity.com/screencast/dependency-injection/intro">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/dependency-injection:dfd9f72026f340fcc92d35de987ac0640ab79b68/di.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="intro#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        1.
+                            Dependency Injection
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Dependency Injection and the art of services and containers</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="intro" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Dependency Injection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:36</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="services" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Services and Dependency Injection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:19</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/services/activity/312" title="Challenge 2.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/services/activity/313" title="Challenge 2.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="injection-interfaces" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Injecting Config &amp; Services and using Interfaces
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:28</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/injection-interfaces/activity/314" title="Challenge 3.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/injection-interfaces/activity/315" title="Challenge 3.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/injection-interfaces/activity/316" title="Challenge 3.3: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">3 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="container" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Dependency Injection Container
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 10:23</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/container/activity/317" title="Challenge 4.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/container/activity/318" title="Challenge 4.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="container-in-your-project" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        A Container in your Project
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <div class="dropdown download-buy-buttons">
+              <button class="btn btn-success dropdown-toggle" type="button" id="downloadDropdown" data-toggle="dropdown" aria-expanded="true">
+                  <span><i class="fa fa-download"></i></span>
+                  <span class="hidden-xs">Download</span>
+                  <span class="caret"></span>
+              </button>
+              <ul class="list-unstyled dropdown-menu pull-right" role="menu" aria-labelledby="downloadDropdown">
+                  
+                  <li><a href="../get/dependency-injection/code/dfd9f72026f340fcc92d35de987ac0640ab79b68" class="js-analytics-download" data-download-type="code"><i class="fa fa-code"></i> Course Code</a></li>
+
+                                        <li><a href="http://knpuniversity.com/screencast/dependency-injection/intro/download/video" class="js-analytics-download" data-download-type="video"><i class="fa fa-video-camera"></i> This Video</a></li>
+                                        <li><a href="../get/dependency-injection/script/dfd9f72026f340fcc92d35de987ac0640ab79b68" class="js-analytics-download" data-download-type="script"><i class="fa fa-book"></i> Course Script</a></li>              </ul>
+          </div>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Dependency Injection</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Dependency Injection and the art of services and containers Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered "
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/536924855_960x600.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/140212051.hd.mp4?s=99c496066f66484d4e3993bac691beed742d11f5&amp;profile_id=113&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/140212051.sd.mp4?s=fc192c9e4eea4724315970fdc49cc3b9abb900dc&amp;profile_id=112&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="intro#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../../tracks/oo" class="btn btn-lg btn-success">Back to the <i>OO</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="intro#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="services#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="intro#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="intro#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (17)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/dependency-injection/edit/master/knpu/intro.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Hi guys! In this tutorial, we're going to talk about dependency injection,
+services, and dependency injection containers by looking at a simple one
+called Pimple. The great news is that understanding these things isn't hard,
+but it can dramatically increase the quality and maintainability of the
+code you write.</p>
+<p>As always, we'll be coding with a real example. Recently, we noticed that a lot
+of really nice rich people have been emailing us trying to give away their
+money. In this tutorial, we're going to create a simple app to help these
+fine people, we're calling it SendMoneyToStrangers.com.</p>
+<p>I've already bootstrapped a small app, which you can download. It uses an
+Sqlite database, so make sure you have it installed, then <code>chmod 777</code> the
+data directory and run a script that creates some dummy data for us:</p>
+<pre><code class="language-bash"><div class="line">chmod -R 777 data/</div><div class="line">php data/setupDb.php</div></code></pre>
+<p>The app is really simple:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9376f72c2a">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-25" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            25 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">require</span> <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/vendor/autoload.php'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">DiDemo</span>\<span class="hljs-title">Mailer</span>\<span class="hljs-title">SmtpMailer</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">$dsn = <span class="hljs-string">'sqlite:'</span>.<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/data/database.sqlite'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">$pdo = <span class="hljs-keyword">new</span> PDO($dsn);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">$mailer = <span class="hljs-keyword">new</span> SmtpMailer(<span class="hljs-string">'smtp.SendMoneyToStrangers.com'</span>, <span class="hljs-string">'smtpuser'</span>, <span class="hljs-string">'smtppass'</span>, <span class="hljs-string">'465'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">$sql = <span class="hljs-string">'SELECT * FROM people_to_spam'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-keyword">foreach</span> ($pdo-&gt;query($sql) <span class="hljs-keyword">as</span> $row) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    $mailer-&gt;sendMessage(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        $row[<span class="hljs-string">'email'</span>],</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        <span class="hljs-string">'Yay! We want to send you money for no reason!'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">        sprintf(<span class="hljs-string">&lt;&lt;&lt;EOF</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">Hi %s! We've decided that we want to send you money for no reason!</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">Please forward us all your personal information so we can make a deposit and don't ask any questions!</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">EOF</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        , $row[<span class="hljs-string">'name'</span>]),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-string">'YourTrustedFriend@SendMoneyToStrangers.com'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>It queries the database, then delivers emails to each person using some
+<code>SmtpMailer</code> class:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="304ed366c5">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-60" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            60 lines <span class="meta-divider"></span> <span title="src/DiDemo/Mailer/SmtpMailer.php">src/DiDemo/Mailer/SmtpMailer.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">DiDemo</span>\<span class="hljs-title">Mailer</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"> * Sends emails via SMTP</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"> */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SmtpMailer</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $hostname;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $pass;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $port;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">($hostname, $user, $pass, $port)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;hostname = $hostname;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;user = $user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;pass = $pass;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;port = $port;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="26-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 26 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sendMessage</span><span class="hljs-params">($recipientEmail, $subject, $message, $from)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-58" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 58
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="60"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>You could use any mailer library here, and I've made this class fake the
+sending of emails for simplicity. Instead, it just logs details to a file:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fe92cfe82b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-60" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            60 lines <span class="meta-divider"></span> <span title="src/DiDemo/Mailer/SmtpMailer.php">src/DiDemo/Mailer/SmtpMailer.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sendMessage</span><span class="hljs-params">($recipientEmail, $subject, $message, $from)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">        <span class="hljs-comment">// dummy implementation - this class is just used as an example</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">        <span class="hljs-comment">// hack - just log something so we can see it</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">        $logPath = <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/../../../logs/mail.log'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">        $logLines = <span class="hljs-keyword">array</span>();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">        $logLines[] = sprintf(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">            <span class="hljs-string">'[%s][%s:%s@%s:%s][From: %s][To: %s][Subject: %s]'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">            date(<span class="hljs-string">'Y-m-d H:i:s'</span>),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">            <span class="hljs-keyword">$this</span>-&gt;user,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">            <span class="hljs-keyword">$this</span>-&gt;pass,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">            <span class="hljs-keyword">$this</span>-&gt;hostname,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">            <span class="hljs-keyword">$this</span>-&gt;port,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">            $from,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">            $recipientEmail,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">            $subject</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code">        );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">        $logLines[] = <span class="hljs-string">'---------------'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code">        $logLines[] = $message;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code">        $logLines[] = <span class="hljs-string">'---------------'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="55"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="56"></td>
+            <td class="blob-code">        $fh = fopen($logPath, <span class="hljs-string">'a'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="57"></td>
+            <td class="blob-code">        fwrite($fh, implode(<span class="hljs-string">"\n"</span>, $logLines).<span class="hljs-string">"\n"</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="58"></td>
+            <td class="blob-code">        <span class="hljs-comment">// end hack</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>We're using <a href="http://knpuniversity.com/screencast/dependency-injection/knpuniversity.com/composer">Composer for autoloading</a> files in our <code>src/</code> directory
+with the following <code>composer.json</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="bcfc0e8ea4">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-11" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            11 lines <span class="meta-divider"></span> <span title="composer.json">composer.json</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code">{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="2-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 2 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">    <span class="hljs-attr">"autoload"</span>: {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">        <span class="hljs-attr">"psr-4"</span>: { <span class="hljs-attr">""</span>: <span class="hljs-string">"src/"</span> }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+</div><p>Tail the log file:</p>
+<pre><code class="language-bash"><div class="line">tail -f logs/mail.log</div></code></pre>
+<p>Then run the app via <code>php app.php</code> from the command line:</p>
+<pre><code class="language-bash"><div class="line">php app.php</div></code></pre>
+<p>You'll see two emails are sent to two lucky people.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3014498565" id="dsq-comment-3014498565">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3014498565">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-22</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3014498565" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3014498565" class="dsq-comment-text">
+	                                <p>Hi MassiB,</p><p>We're talking about REST API in general here, but if you're interested in OAuth only - we have a tutorial about OAuth2:<br><a href="http://disq.us/url?url=http%3A%2F%2Fknpuniversity.com%2Fscreencast%2Foauth%3AnvGiZ32o7v-VZGwXxaBMH9x6tPM&amp;cuid=1175718" rel="nofollow noopener">http://knpuniversity.com/scree...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3014468074" id="dsq-comment-3014468074">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/massib/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3014468074">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-22</span>
+	                            <span class="dsq-commenter-name">MassiB</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3014468074" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3014468074" class="dsq-comment-text">
+	                                <p>Hello,<br>I'm not sure - are we referring to Oauth or Oauth2 here?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2902839248" id="dsq-comment-2902839248">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shilpagov82/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2902839248">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-18</span>
+	                            <span class="dsq-commenter-name">shilpagov82</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2902839248" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2902839248" class="dsq-comment-text">
+	                                <p>This could be useful in helping you monitor REST APIs for performance and accuracy. Uptime Cloud Monitor supports monitoring REST APIs on a completely SAAS based model. <br>The setup is quick and easy. You can configure the REST API URL, the REST method (GET/ POST/ PUT/ DELETE), request parameters (if any), credentials required (if any), the monitoring frequency, the geographic location of the monitoring stations (from a choice of 15 stations across the globe). You can match the REST API response body against a specific string to ensure that the response is as expected.</p><p>You can also configure alerts (notified via SMS, Email, PagerDuty etc) to be triggered based on API downtime, performance degradation or API response verification failure.</p><p>More details on REST API Monitoring: <a href="http://disq.us/url?url=http%3A%2F%2Fcommunity.idera.com%2Fblog%2Fb%2Fcommunity_blog%2Fposts%2Fnew-rest-api-monitoring-using-uptime-cloud-mo%3ANWnoXSm_vV-5CRbVjHBEubZb_Gc&amp;cuid=1175718" rel="nofollow noopener">http://community.idera.com/blo...</a>...</p><p>You can also sign up for a 14 day free trial of Uptime Cloud Monitor</p><p>Disclaimer: I work at Uptime Cloud Monitor</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2670666210" id="dsq-comment-2670666210">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2670666210">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-11</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2670666210" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2670666210" class="dsq-comment-text">
+	                                <p>Hi Sudhir!</p><p>1. Your code for this part looks perfect, so I'm a bit confused to why you are being redirected incorrectly. When you view the HTML source of your page, do you see this?</p><p></p><pre><code><br>window.location.replace('/app_dev.php/login/flight');<br></code></pre><p></p><p>Or is the app_dev.php missing from this string? Also, try using window.location = '' instead of replace - just in case that's causing problems.</p><p>2. I'm not sure about this. What do you mean that it doesn't work when the method is POST? Do you mean that the AJAX request causes a 404? Or that it works but you cannot access your POST data? If you're not using the build-in web server, what web server are you using? Also, even if you're not using the built-in web server, you should point your web server at the "web" directory as the document root so that you have nice URLs like /app_dev.php/login (without the /web in front) :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2669742627" id="dsq-comment-2669742627">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/sudhir600/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/8230/5376/avatar92.jpg?1481801737">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2669742627">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-11</span>
+	                            <span class="dsq-commenter-name">Sudhir</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2669742627" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2669742627" class="dsq-comment-text">
+	                                <p>hi weaverryan</p><p>hope u r doing good.<br>in my current project i am facing a 2 issue.<br>here is my problem statement.</p><p>1. i am sending a ajax request to validate the login. when valid credentials matched  i am trying to redirecting on dashboard. <br>    my current url is www.projectUrl//web/app_dev.php/login/<br>   after that i want to redirect at www.projectUrl//web/app_dev.php/flight/<br>   in js file here is my code<br>  </p><pre>       window.setTimeout(function(){<br>               window.location.replace('{{ path ("/flight")}}');<br>                },1000)<br><br>using this code the redirection is going on  /login/flight. (i want app_dev.php/flight/). may u help me where i am doing worng. <br> </pre><p><br><br><br>2nd issue.<br>when i am using /web/app_dev.php/login/ (without symfony server:run) my post method didn't work.  ajax is working fine but i am not getting Post variable. surprising thing is if i am using GET method then its work never when i use POST.</p><p></p><pre>Here is my ajax code.<br><br> $.ajax({<br>        url : httpPath,  // path via parameter<br>        data: serializeData,<br>method: 'POST',<br>cache: false,<br>        contentType: 'application/json',<br>        timeout: 5000,<br>                    ...... <br><br></pre><p></p><p>may u help me where i am doing wrong..</p><p>Thanks in advance.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2657984101" id="dsq-comment-2657984101">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2657984101">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-04</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2657984101" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2657984101" class="dsq-comment-text">
+	                                <p>Ah, you're right - there's a problem in the dependency-injection tutorial - I just fixed this: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fknpuniversity%2Fdependency-injection%2Fcommit%2Fdfd9f72026f340fcc92d35de987ac0640ab79b68%3A_PyJ1Rh0ccpqLIu-pgbE_0UuiwY&amp;cuid=1175718" rel="nofollow noopener">https://github.com/knpuniversi...</a>. Thanks for pointing that out! I wanted to give you a proper GitHub shout, but I was only 90% sure that jhmnieuwenhuis is you :).</p><p>I plan to script out those installation instructions so that we can't possibly mess them up - you know, keeping docs in sync with code... not always easy.</p><p>Thanks!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2657259291" id="dsq-comment-2657259291">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_KpUMBr9n3E/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/18357/5054/avatar92.jpg?1456404955">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2657259291">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-04</span>
+	                            <span class="dsq-commenter-name">Hans Nieuwenhuis</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2657259291" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2657259291" class="dsq-comment-text">
+	                                <p>Ok, great.<br>But there is still no vendor directory in the start code.<br>And in the <a href="http://disq.us/url?url=http%3A%2F%2FREADME.md%3AjjlqoEmrcirVvvdn_9lxrQyVt5s&amp;cuid=1175718" rel="nofollow noopener">README.md</a> it says :</p><p>"You can also run Composer, though the `vendor/` directory should already have everything it needs:"</p><p>And if there is no vendor directory and composer is not run, the start code will not run.</p><p>Regards,</p><p>Hans</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2655487922" id="dsq-comment-2655487922">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2655487922">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-03</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2655487922" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2655487922" class="dsq-comment-text">
+	                                <p>Thanks Hans! We just fixed that - we left a library in there that's not used anymore :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2652014317" id="dsq-comment-2652014317">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_KpUMBr9n3E/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/18357/5054/avatar92.jpg?1456404955">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2652014317">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-01</span>
+	                            <span class="dsq-commenter-name">Hans Nieuwenhuis</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2652014317" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2652014317" class="dsq-comment-text">
+	                                <p>Update course code ?</p><p>In the course code composer.json there are still the lines for knpuniversity/gladiator.<br>And there is no vendor directory.</p><p>When I run composer install I get an error on gladiator, saying it can not be downloaded.<br>And I think it is nog longer needed or ??</p><p>I removed the gladiator lines from composer.json  and removed composer.lock and then I ran<br>composer install again, and now the application works...</p><p>Later on I also ran composer require pimple/pimple, and that also works fine/</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2344908654" id="dsq-comment-2344908654">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_1FEAgwUb7B/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2344908654">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-05</span>
+	                            <span class="dsq-commenter-name">Ammar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2344908654" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2344908654" class="dsq-comment-text">
+	                                <p>Hey thanks. It works perfectly now!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2342658470" id="dsq-comment-2342658470">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2342658470">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-04</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2342658470" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2342658470" class="dsq-comment-text">
+	                                <p>Hey Ammar!</p><p>It's an easy fix: just create a `logs` directory at the root of the project and make it writeable - the code is trying to write to a mail.log file in this directory. I just added a note about this to the project: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fknpuniversity%2Fdependency-injection%2Fcommit%2F27efdb11dafc9aa3a601df9b6a6b77eaeeae66ac%3AI4nPlR-dbrmY3F9jc9nd0LWsRoU&amp;cuid=1175718" rel="nofollow noopener">https://github.com/knpuniversi...</a></p><p>Thanks!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2341850200" id="dsq-comment-2341850200">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_1FEAgwUb7B/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2341850200">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-04</span>
+	                            <span class="dsq-commenter-name">Ammar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2341850200" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2341850200" class="dsq-comment-text">
+	                                <p>i get this error on running app.php</p><p>PHP Warning:  fopen(/var/www/public/dependency_injection/src/DiDemo/Mailer/../../../logs/mail.log): failed to open stream: No such file or directory in /var/www/public/dependency_injection/src/DiDemo/Mailer/SmtpMailer.php on line 56</p><p>PHP Warning:  fwrite() expects parameter 1 to be resource, boolean given in /var/www/public/dependency_injection/src/DiDemo/Mailer/SmtpMailer.php on line 57</p><p>PHP Warning:  fopen(/var/www/public/dependency_injection/src/DiDemo/Mailer/../../../logs/mail.log): failed to open stream: No such file or directory in /var/www/public/dependency_injection/src/DiDemo/Mailer/SmtpMailer.php on line 56</p><p>PHP Warning:  fwrite() expects parameter 1 to be resource, boolean given in /var/www/public/dependency_injection/src/DiDemo/Mailer/SmtpMailer.php on line 57</p><p>i am assuming the log files are not being generated due to sqlite db connectivity issues. I am using scotch box vm and it comes it sqlite. How do i setup a username and pass in setupdb.php?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2327521998" id="dsq-comment-2327521998">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/cferthorney/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/16919/9408/avatar92.jpg?1464902059">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2327521998">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-26</span>
+	                            <span class="dsq-commenter-name">David Thorne</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2327521998" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2327521998" class="dsq-comment-text">
+	                                <p>Thanks Ryan, helps a lot. I'll hold off till 2.8/3.0 are out and videos are completed. Looking forward to them, keep up the good work!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2327380489" id="dsq-comment-2327380489">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2327380489">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-26</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2327380489" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2327380489" class="dsq-comment-text">
+	                                <p>Hey David!</p><p>Actually, since Symfony 2.8 and 3 come out in about a month, we'll start to record complete updates to the latest versions really soon. Until then (as you eluded to), I would wait to learn Symfony. If we show you an out-dated way of doing something, you'll get a deprecation warning in the web debug toolbar - so you'll know it's outdated. More importantly, the new way is usually pretty close (e.g. a method name change) from the way we show things.</p><p>I hope that helps - updates coming soon!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2327363652" id="dsq-comment-2327363652">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/cferthorney/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/16919/9408/avatar92.jpg?1464902059">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2327363652">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-26</span>
+	                            <span class="dsq-commenter-name">David Thorne</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2327363652" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2327363652" class="dsq-comment-text">
+	                                <p>Whilst Symfony 2.4 is still an officially supported LTS release, it is no longer the standard LTS if you follow the Symfony best practices.  Whilst putting together a whole new series on 2.7 is a lot of work, any chance on either a mini series on the core differences or indeed a single video if that seems more applicable?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2132354160" id="dsq-comment-2132354160">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2132354160">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-12</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2132354160" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2132354160" class="dsq-comment-text">
+	                                <p>Hey Léo!</p><p>You're really close :). You need to move into the "start" directory and run a "composer install" (or a php composer.phar install depending on how you have Composer installed). We do talk about this - but it's a few more chapters from now :) <a href="http://disq.us/url?url=http%3A%2F%2Fknpuniversity.com%2Fscreencast%2Frest%2Fproject-routing%23project-routing%3Ahkilfn1wLlgW2rHlq7gvHBhy55Y&amp;cuid=1175718" rel="nofollow noopener">http://knpuniversity.com/scree...</a></p><p>Let me know if that helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2132263052" id="dsq-comment-2132263052">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/leo__li/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/5562/5330/avatar92.jpg?1481145468">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2132263052">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-12</span>
+	                            <span class="dsq-commenter-name">Léo Li</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2132263052" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2132263052" class="dsq-comment-text">
+	                                <p>Excuse me, when I ran this "php app.php", I got a error:<br>```</p><p>PHP Warning:  require(/Users/AJ/Sites/knpuniversity-dependency-injection/start/vendor/autoload.php): failed to open stream: No such file or directory in /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php on line 3</p><p>PHP Stack trace:</p><p>PHP   1. {main}() /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php:0</p><p>Warning: require(/Users/AJ/Sites/knpuniversity-dependency-injection/start/vendor/autoload.php): failed to open stream: No such file or directory in /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php on line 3</p><p>Call Stack:</p><p>    0.0008     228408   1. {main}() /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php:0</p><p>PHP Fatal error:  require(): Failed opening required '/Users/AJ/Sites/knpuniversity-dependency-injection/start/vendor/autoload.php' (include_path='.:/usr/local/Cellar/php56/5.6.3/lib/php') in /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php on line 3</p><p>PHP Stack trace:</p><p>PHP   1. {main}() /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php:0</p><p>Fatal error: require(): Failed opening required '/Users/AJ/Sites/knpuniversity-dependency-injection/start/vendor/autoload.php' (include_path='.:/usr/local/Cellar/php56/5.6.3/lib/php') in /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php on line 3</p><p>Call Stack:</p><p>    0.0008     228408   1. {main}() /Users/AJ/Sites/knpuniversity-dependency-injection/start/app.php:0<br>```</p><p>And I can't find __DIR__.'/vendor/autoload.php' this file in the package, neither the "logs\mail.log".<br>Am I missing some step?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_intro';var disqus_url = 'https://knpuniversity.com/screencast/oauth/intro';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="services#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/dependency-injection/intro" addthis:title="Dependency Injection and the art of services and containers">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"dependency-injection","courseIsOwned":true,"chapter":"Dependency Injection","chapterNumber":1,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Dependency Injection and the art of services and containers';
+        Core.courseId = 34
+        Core.courseIsOwned = true;
+        Core.courseSlug = 'dependency-injection';
+                    Core.chapterTitle = 'Dependency Injection';
+            Core.chapterNumber = 1;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'intro';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

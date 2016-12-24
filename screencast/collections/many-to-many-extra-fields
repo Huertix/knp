@@ -1,0 +1,2986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ManyToMany with Extra Fields > Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 42165
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Join\x20Entity\x20App\x20Refactoring <i class="fa fa-play"></i>',
+            'url': '/screencast/collections/join-entity-refactoring#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="With the [basic of Doctrine relations](http://knpuniversity.com/screencast/doctrine-relations)
+behind us, it&#039;s time to dive deeper and get our hands dirty with some real-world,
+but complex collections. Honestly, this is the *hardest* part of Doctrine: so
+let&#039;s get it *right*:
+
+* Creating ManyToMany associations
+* Querying on ManyToMany relations
+* Mapping the inverse (collection) side of a relation
+* (bonus) Using DoctrineExtension for clean URL slugs
+* Keeping the owning &amp; inverse sides in-sync
+* Using `orphanRemoval` to delete items in a collection
+* Using `cascade` to save items in a collection
+* Counting collections in the `EXTRA_LAZY` way
+* Rendering relationship data from both sides
+* Filtering collections efficiently with Criteria (mind will be blown)
+* Dealing with complex collection forms
+* Adding &quot;extra&quot; data to the &quot;join table&quot;
+
+Doctrine relationships take a little bit more work to get setup. So let&#039;s
+master this stuff, setup our relationships to win, and get back to work.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="ManyToMany with Extra Fields">
+<meta property="og:description" content="With the [basic of Doctrine relations](http://knpuniversity.com/screencast/doctrine-relations)
+behind us, it&amp;#039;s time to dive deeper and get our hands dirty with some real-world,
+but complex collections">
+<meta property="og:url" content="http://knpuniversity.com/screencast/collections/many-to-many-extra-fields">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/collections:c6f9bb103a37193c3e0e994da8386d9e09bd1ed3/symfony-collections.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="many-to-many-extra-fields#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        16.
+                            ManyToMany with Extra Fields
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="clean-url-slugs" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Give me Clean URL Strings (slugs!)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="doctrine-extensions-sluggable" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        DoctrineExtensions: Sluggable
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:59</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="refactoring-carefully" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Refactoring Carefully
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-many-setup" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        ManyToMany Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="insert-many-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Inserting into a ManyToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fetch-collection-items" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Fetching Items from a ManyToMany Collection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:45</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-many-inverse" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        ManyToMany: The Inverse Side of the Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:45</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="removing-items" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Removing a ManyToMany Item
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="hooking-up-remove-scientist-js" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Hooking up the Scientist Removal JavaScript
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:50</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-many-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        ManyToMany &amp; Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:30</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="joins-and-extra-lazy-fetch" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Joining Across a ManyToMany + EXTRA_LAZY Fetch
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:34</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="entity-type-checkboxes" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        EntityType Check Boxes with ManyToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="saving-inverse-side-collection" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Saving the Inverse Side of a ManyToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="by-reference-adder-remover" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Form by_reference + Adder and Remover
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="synchronizing-mapping-inverse" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Synchronizing Owning &amp; Inverse Sides
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="many-to-many-extra-fields" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        ManyToMany with Extra Fields
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 8:20</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="join-entity-refactoring" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        Join Entity App Refactoring
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="refactoring-for-new-collections" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Using the new OneToMany Collections
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="embedded-form-collection" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Embedded Form Collections
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:36</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="collection-allow-delete" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        Collection Delete &amp; allow_delete
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:49</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="collection-delete-orphan-removal" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                21.
+                        Deleting an Item from a Collection: orphanRemoval
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="add-new-collection-prototype" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                22.
+                        CollectionType: Adding New with the Prototype
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="add-new-collection-cascade-persist" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                23.
+                        Adding to a Collection: Cascade Persist
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="embedded-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                24.
+                        Embedded Form Validation with @Valid
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="customizing-prototype" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                25.
+                        Customizing the Collection Form Prototype
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:56</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="form-events-readonly-embedded-field" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                26.
+                        Form Events: A readonly Embedded Field
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="easy-collection-filtering" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                27.
+                        Collection Filtering: The Easy Way
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="criteria-collection-filtering" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                28.
+                        Criteria System: Champion Collection Filtering
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/collections" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">ManyToMany with Extra Fields</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="join-entity-refactoring#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="many-to-many-extra-fields#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="many-to-many-extra-fields#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/extra-doctrine-collections/many-to-many-extra-fields.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Head back to <code>/genus</code> and click into one of our genuses. Thanks to our hard work,
+we can link genuses and users. So I know that Eda Farrell is a <code>User</code> that studies
+this <code>Genus</code>.</p>
+<p>But, hmm, what if I need to store a little extra data on that relationship, like
+the number of <em>years</em> that each <code>User</code> has studied the <code>Genus</code>. Maybe Eda has studied
+this <code>Genus</code> for 10 years, but Marietta Schulist has studied it for only 5 years.</p>
+<p>In the database, this means that we need our join table to have <em>three</em> fields
+now: <code>genus_id</code>, <code>user_id</code>, but also <code>years_studied</code>. How can we add that extra
+field to the join table?</p>
+<p>The answer is simple, you can't! It's not possible. Whaaaaat? </p>
+<p>You see, <code>ManyToMany</code> relationships only work when you have <em>no</em> extra fields on
+the relationship. But don't worry! That's by design! As soon as your join table need
+to have even <em>one</em> extra field on it, you need to build an entity class for it.</p>
+<h2 id="creating-the-genusscientist-join-entity">Creating the GenusScientist Join Entity <a class="headerlink" href="many-to-many-extra-fields#creating-the-genusscientist-join-entity" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>In your <code>Entity</code> directory, create a new class: <code>GenusScientist</code>. Open <code>Genus</code> and
+steal the ORM <code>use</code> statement on top, and paste it here:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="993b85317c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">Entity</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Doctrine</span>\<span class="hljs-title">ORM</span>\<span class="hljs-title">Mapping</span> <span class="hljs-title">as</span> <span class="hljs-title">ORM</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, add some properties: <code>id</code> - we could technically avoid this, but I like to
+give every entity an <code>id</code> - <code>genus</code>, <code>user</code>, and <code>yearsStudied</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6bd48a931b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">Entity</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Doctrine</span>\<span class="hljs-title">ORM</span>\<span class="hljs-title">Mapping</span> <span class="hljs-title">as</span> <span class="hljs-title">ORM</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-17" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 17
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $id;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-23" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 19 - 23
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $genus;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-29" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 29
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="31-34" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 31 - 34
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $yearsStudied;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Use the "Code"-&gt;"Generate" menu, or <code>Command</code>+<code>N</code> on a Mac, and select "ORM Class" to
+generate the class annotations:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="94b12b0f58">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">Entity</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Doctrine</span>\<span class="hljs-title">ORM</span>\<span class="hljs-title">Mapping</span> <span class="hljs-title">as</span> <span class="hljs-title">ORM</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"> * <span class="hljs-doctag">@ORM</span>\Entity</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"> * <span class="hljs-doctag">@ORM</span>\Table(name="genus_scientist")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"> */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Oh, and notice! This generated a table name of <code>genus_scientist</code>: that's perfect!
+I want that to match our existing join table: we're going to migrate it to this new structure.</p>
+<p>Go back to "Code"-&gt;"Generate" and this time select "ORM Annotation". Generate the annotations
+for <code>id</code> and <code>yearsStudied</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3da7ec4bbd">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\GeneratedValue(strategy="AUTO")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="integer")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $id;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-31" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 19 - 31
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="string")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $yearsStudied;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Perfect!</p>
+<p>So how should we map the <code>genus</code> and <code>user</code> properties? Well, think about it: each
+is now a classic <code>ManyToOne</code> relationship. Every <code>genus_scientist</code> row should have
+a <code>genus_id</code> column and a <code>user_id</code> column. So, above <code>genus</code>, say <code>ManyToOne</code> with
+<code>targetEntity</code> set to <code>Genus</code> Below that, add the optional <code>@JoinColumn</code> with
+<code>nullable=false</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c3910e1f72">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\ManyToOne(targetEntity="Genus")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\JoinColumn(nullable=false)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $genus;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Copy that and put the same thing above <code>user</code>, changing the <code>targetEntity</code> to <code>User</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="b342f5e9a8">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\ManyToOne(targetEntity="User")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\JoinColumn(nullable=false)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="31-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 31 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And... that's it! Finish the class by going back to the "Code"-&gt;"Generate" menu, or
+<code>Command</code>+<code>N</code> on a Mac, selecting Getters and choosing <code>id</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="eee82c282d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-36" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 36
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getId</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;id;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="41-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 41 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Do the same again for <code>Getters and Setters</code>: choose the rest of the properties:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="089d0ebe6e">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-41" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 41
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getGenus</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;genus;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setGenus</span><span class="hljs-params">($genus)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;genus = $genus;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getUser</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="55"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="56"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="57"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setUser</span><span class="hljs-params">($user)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="58"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;user = $user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="60"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="61"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getYearsStudied</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="63"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="64"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;yearsStudied;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="65"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="66"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="67"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setYearsStudied</span><span class="hljs-params">($yearsStudied)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="68"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="69"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;yearsStudied = $yearsStudied;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="70"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Entity, done!</p>
+<h2 id="updating-the-existing-relationships">Updating the Existing Relationships <a class="headerlink" href="many-to-many-extra-fields#updating-the-existing-relationships" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Now that the join table has an entity, we need to update the relationships in <code>Genus</code>
+and <code>User</code> to point to it. In <code>Genus</code>, find the <code>genusScientists</code> property. Guess
+what? This is <em>not</em> a <code>ManyToMany</code> to <code>User</code> anymore: it's now a <code>OneToMany</code> to
+<code>GenusScientist</code>. Yep, it's now the <em>inverse</em> side of the <code>ManyToOne</code> relationship
+we just added. That means we need to change <code>inversedBy</code> to <code>mappedBy</code> set to <code>genus</code>.
+And of course, <code>targetEntity</code> is <code>GenusScientist</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ba3f6b8402">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-204" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            204 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="17-71" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 17 - 71
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="72"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="73"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\OneToMany(targetEntity="GenusScientist", mappedBy="genus", fetch="EXTRA_LAZY")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="74"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="75"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $genusScientists;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="76-202" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 76 - 202
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="203"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>You <em>can</em> still keep the <code>fetch="EXTRA_LAZY"</code>: that works for any relationship
+that holds an array of items. But, we <em>do</em> need to remove the <code>JoinTable</code>: annotation:
+both <code>JoinTable</code> and <code>JoinColumn</code> can only live on the <em>owning</em> side of a relationship.</p>
+<p>There are more methods in this class - like <code>addGenusScientist()</code> that are now totally
+broken. But we'll fix them later. In <code>GenusScientist</code>, add <code>inversedBy</code> set to the
+<code>genusScientists</code> property on <code>Genus</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="4af5e7cd6f">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\ManyToOne(targetEntity="Genus", inversedBy="genusScientists")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\JoinColumn(nullable=false)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $genus;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Finally, open <code>User</code>: we need to make the exact same changes here.</p>
+<p>For <code>studiedGenuses</code>, the <code>targetEntity</code> is now <code>GenusScientist</code>, the relationship
+is <code>OneToMany</code>, and it's <code>mappedBy</code> the <code>user</code> property inside of <code>GenusScientist</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="37aa170934">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-243" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            243 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/User.php">src/AppBundle/Entity/User.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">UserInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-77" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 19 - 77
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="78"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\OneToMany(targetEntity="GenusScientist", mappedBy="user")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="80"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="81"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $studiedGenuses;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="82-241" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 82 - 241
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="242"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The <code>OrderBy</code> doesn't work anymore. Well, technically it <em>does</em>, but we can only
+order by a field on <code>GenusScientist</code>, not on <code>User</code>. Remove that for now.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>You should also add the <code>inversedBy="studiedGenuses"</code> to the <code>user</code> property in
+<code>GenusScientist</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fcbff085c6">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-71" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            71 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusScientist.php">src/AppBundle/Entity/GenusScientist.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusScientist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\ManyToOne(targetEntity="User", inversedBy="studiedGenuses")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\JoinColumn(nullable=false)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $user;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="31-70" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 31 - 70
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>It didn't hurt anything, but I forgot that!</p>
+</div><h2 id="the-truth-about-manytomany">The Truth About ManyToMany <a class="headerlink" href="many-to-many-extra-fields#the-truth-about-manytomany" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Woh! Ok! Step back for a second. Our <code>ManyToMany</code> relationship is now <em>entirely</em>
+gone: replaced by 3 entities and 2 classic <code>ManyToOne</code> relationships. And if you think
+about it, you'll realize that a <code>ManyToMany</code> relationship is nothing more than two
+<code>ManyToOne</code> relationships in disguise. All along, we could have mapped our original
+setup by creating a "join" <code>GenusScientist</code> entity with only <code>genus</code> and <code>user</code>
+<code>ManyToOne</code> fields. A <code>ManyToMany</code> relationship is just a convenience layer when
+that join table doesn't need any extra fields. But as soon as you <em>do</em> need extra,
+you'll need this setup.</p>
+<h2 id="generating-and-fixing-the-migration">Generating (and Fixing) the Migration <a class="headerlink" href="many-to-many-extra-fields#generating-and-fixing-the-migration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Last step: generate the migration:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:diff</div></code></pre>
+<p>Look in the <code>app/DoctrineMigrations</code> directory and open that migration:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="72ff5578d4">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-48" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            48 lines <span class="meta-divider"></span> <span title="app/DoctrineMigrations/Version20161017160251.php">app/DoctrineMigrations/Version20161017160251.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Version20161017160251</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractMigration</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">up</span><span class="hljs-params">(Schema $schema)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        <span class="hljs-comment">// this up() migration is auto-generated, please modify it to your needs</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;abortIf(<span class="hljs-keyword">$this</span>-&gt;connection-&gt;getDatabasePlatform()-&gt;getName() != <span class="hljs-string">'mysql'</span>, <span class="hljs-string">'Migration can only be executed safely on \'mysql\'.'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA885C4074C'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA8A76ED395'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP PRIMARY KEY'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD id INT AUTO_INCREMENT NOT NULL, ADD years_studied VARCHAR(255) NOT NULL'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA885C4074C FOREIGN KEY (genus_id) REFERENCES genus (id)'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA8A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD PRIMARY KEY (id)'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="29-32" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 29 - 32
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">down</span><span class="hljs-params">(Schema $schema)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">        <span class="hljs-comment">// this down() migration is auto-generated, please modify it to your needs</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;abortIf(<span class="hljs-keyword">$this</span>-&gt;connection-&gt;getDatabasePlatform()-&gt;getName() != <span class="hljs-string">'mysql'</span>, <span class="hljs-string">'Migration can only be executed safely on \'mysql\'.'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist MODIFY id INT NOT NULL'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA885C4074C'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA8A76ED395'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP PRIMARY KEY'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP id, DROP years_studied'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA885C4074C FOREIGN KEY (genus_id) REFERENCES genus (id) ON DELETE CASCADE'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA8A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD PRIMARY KEY (genus_id, user_id)'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So freakin' cool! Because we already have the <code>genus_scientist</code> join table, the migration
+does <em>not</em> create any new tables. Nope, it simply modifies it: drops a couple of
+foreign keys, adds the <code>id</code> and <code>years_studied</code> columns, and then re-adds the foreign
+keys. Really, the only thing that changed of importance is that we now have an <code>id</code>
+primary key, and a <code>years_studied</code> column. But otherwise, the table is still there,
+just the way it always was.</p>
+<p>If you try to run this migration...it will blow up, with this rude error:</p>
+<blockquote><p>Incorrect table definition; there can be only one auto column...</p>
+</blockquote>
+<p>It turns out, Doctrine has a bug! Gasp! The horror! Yep, a bug in its MySQL
+code generation that affects this <em>exact</em> situation: converting a <code>ManyToMany</code> to
+a join entity. No worries: it's easy to fix... and I can't think of <em>any</em> other
+bug like this in Doctrine... and I use Doctrine <em>a lot</em>.</p>
+<p>Take this last line: with <code>ADD PRIMARY KEY id</code>, copy it, remove that line, and
+then - after the <code>id</code> is added in the previous query - paste it and add a comma:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="afd3aae231">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-47" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            47 lines <span class="meta-divider"></span> <span title="app/DoctrineMigrations/Version20161017160251.php">app/DoctrineMigrations/Version20161017160251.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Version20161017160251</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractMigration</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">up</span><span class="hljs-params">(Schema $schema)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        <span class="hljs-comment">// this up() migration is auto-generated, please modify it to your needs</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;abortIf(<span class="hljs-keyword">$this</span>-&gt;connection-&gt;getDatabasePlatform()-&gt;getName() != <span class="hljs-string">'mysql'</span>, <span class="hljs-string">'Migration can only be executed safely on \'mysql\'.'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA885C4074C'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA8A76ED395'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP PRIMARY KEY'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD id INT AUTO_INCREMENT NOT NULL, ADD PRIMARY KEY (id), ADD years_studied VARCHAR(255) NOT NULL'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA885C4074C FOREIGN KEY (genus_id) REFERENCES genus (id)'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA8A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="28-31" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 28 - 31
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">down</span><span class="hljs-params">(Schema $schema)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">        <span class="hljs-comment">// this down() migration is auto-generated, please modify it to your needs</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;abortIf(<span class="hljs-keyword">$this</span>-&gt;connection-&gt;getDatabasePlatform()-&gt;getName() != <span class="hljs-string">'mysql'</span>, <span class="hljs-string">'Migration can only be executed safely on \'mysql\'.'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist MODIFY id INT NOT NULL'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA885C4074C'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP FOREIGN KEY FK_66CF3FA8A76ED395'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP PRIMARY KEY'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist DROP id, DROP years_studied'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA885C4074C FOREIGN KEY (genus_id) REFERENCES genus (id) ON DELETE CASCADE'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD CONSTRAINT FK_66CF3FA8A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;addSql(<span class="hljs-string">'ALTER TABLE genus_scientist ADD PRIMARY KEY (genus_id, user_id)'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>MySQL needs this to happen all in one statement.</p>
+<p>But now, our migrations are in a <em>crazy</em> weird state, because this one <em>partially</em>
+ran. So let's start from scratch: drop the database fully, create the database,
+and then make sure all of our migrations can run from scratch:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:database:drop --force</div><div class="line">./bin/console doctrine:database:create</div><div class="line">./bin/console doctrine:migrations:migrate</div></code></pre>
+<p>Success!</p>
+<p>Now that we have a different type of relationship, our app is broken! Yay! Let's
+fix it and update our forms to use the <code>CollectionType</code>.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3029092969" id="dsq-comment-3029092969">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_B7LdYoaprn/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20683/1553/avatar92.jpg?1482231107">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3029092969">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-01</span>
+	                            <span class="dsq-commenter-name">Stéphane</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3029092969" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3029092969" class="dsq-comment-text">
+	                                <p>I use MySQL Ver 14.14 Distrib 5.7.16, for Linux (x86_64) using  EditLine wrapper and doctrine/dbal                        v2.5.5.<br>Cheers.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3028182504" id="dsq-comment-3028182504">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3028182504">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-30</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3028182504" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3028182504" class="dsq-comment-text">
+	                                <p>Dang! Then, I wonder if it's a Doctrine or MySQL weird version problem. What version of MySQL do you have? And what version of doctrine/dbal? You can run <code>composer info</code> to find out.</p><p>Thanks for letting me know - hopefully we can find out what the issue is :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3027563267" id="dsq-comment-3027563267">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_b0TdQuuj8X/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9141/9643/avatar92.jpg?1480504413">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3027563267">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-30</span>
+	                            <span class="dsq-commenter-name">Greg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3027563267" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3027563267" class="dsq-comment-text">
+	                                <p>Hey Ryan<br>I will send you my entities this evening for me ( I am french ).<br>Thanks you again for your time.</p><p>Sorry for the delay this is my entities<br><a href="https://disq.us/url?url=https%3A%2F%2Fgist.github.com%2FGregusse%2F52c28d1884bd672e63ee515edc734ac5%3A44m6ZUHyGjqxK8rLgrsIfceoFmE&amp;cuid=1175718" rel="nofollow noopener">https://gist.github.com/Gregus...</a><br>Like Stéphane , doctrine/dbal v2.5.5<br>Cheers.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3027486067" id="dsq-comment-3027486067">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_B7LdYoaprn/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20683/1553/avatar92.jpg?1482231107">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3027486067">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-30</span>
+	                            <span class="dsq-commenter-name">Stéphane</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3027486067" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3027486067" class="dsq-comment-text">
+	                                <p>Hey Ryan,<br>For information, I have the same error than Greg also.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026953489" id="dsq-comment-3026953489">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026953489">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026953489" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026953489" class="dsq-comment-text">
+	                                <p>Hey Greg!</p><p>Ah, it does! Well, sort of :). I was thinking about the problem incorrectly, but your gist cleared it up. Basically, when Doctrine tries to calculate what is different in your <code>genus_scientist</code> table between the database and your annotations metadata, for some reason, it thinks that both the old and new tables have an index on it on the column <code>id</code>. The question is why? It could be a bug in Doctrine, after all, there is the small bug I mention in the screencast, even when the diff works. If that's that case, I'm not sure why you're seeing it and I'm not (I also haven't heard anyone else mention this yet, but this is also a new screencast - so time will tell). Or, there is something very subtly wrong in your code somewhere. If you are willing, I would love to see your GenusScientist, Genus and User entities, to see if I can spot anything.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026547190" id="dsq-comment-3026547190">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_b0TdQuuj8X/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9141/9643/avatar92.jpg?1480504413">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026547190">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">Greg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026547190" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026547190" class="dsq-comment-text">
+	                                <p>Hey Ryan</p><p>This is the result of the command</p><p><a href="https://disq.us/url?url=https%3A%2F%2Fgist.github.com%2FGregusse%2Ff84a4befa8e5526a54c08d9dba67771d%3AwaE1SDU0g0uLul2Yp45FojaBUHc&amp;cuid=1175718" rel="nofollow noopener">https://gist.github.com/Gregus...</a></p><p>I hope that is help you to understand.</p><p>Cheers.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3025353230" id="dsq-comment-3025353230">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3025353230">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3025353230" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3025353230" class="dsq-comment-text">
+	                                <p>Hey Greg!</p><p>I was just looking for a bit more information, because I'm not convinced I've given you enough to solve this yet (and I'm curious about what's going on). As I said earlier, for some reason, Doctrine is looking at your annotation metadata and expecting there to be an "id" column on your genus_scientist table and not finding it. This can happen for a few reasons:</p><p>1) You have an Index above one of your entities referring to this column<br>2) There is a foreign key constraint that references this column (this would be a JoinTable or JoinColumn - did you remove the JoinTable from Genus?)</p><p>If none of the pointers are helping you find a possible cause, re-run the command that causes the error with a -vvv flag (so <code>bin/console doctrine:migrations:diff -vvv</code>) and then paste the output here / take a screenshot. I'm curious to see exactly where the error is coming from.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3024159081" id="dsq-comment-3024159081">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_b0TdQuuj8X/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9141/9643/avatar92.jpg?1480504413">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3024159081">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-28</span>
+	                            <span class="dsq-commenter-name">Greg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3024159081" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3024159081" class="dsq-comment-text">
+	                                <p>Yes I renamed it in sequel pro, but I have a migration with a create table not an alter table.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3024121102" id="dsq-comment-3024121102">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3024121102">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-28</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3024121102" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3024121102" class="dsq-comment-text">
+	                                <p>&gt; but if I rename my old genus_scientist table the migration is ok</p><p>Do you mean that if you manually rename the table in your database, then the migration generates with no errors? If so, that's very interesting - let me know! :)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3023735884" id="dsq-comment-3023735884">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_b0TdQuuj8X/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9141/9643/avatar92.jpg?1480504413">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3023735884">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-28</span>
+	                            <span class="dsq-commenter-name">Greg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3023735884" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3023735884" class="dsq-comment-text">
+	                                <p>Hi Ryan</p><p>Yes I have this error when I run the doctrine command. I use MySQL and I change the relation in Genus and User by the OneToMany.<br>I do exactly the same as the tutorial but if I rename my old genus_scientist table the migration is ok.</p><p>I will check again this evening.<br>Thanks again for your really awesome works.<br>Cheers</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3023450578" id="dsq-comment-3023450578">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3023450578">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-28</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3023450578" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3023450578" class="dsq-comment-text">
+	                                <p>Hey Greg!</p><p>Hmm, when *exactly* do you get this error? Is it when you run <code>doctrine:migrations:diff</code>? And are you using MySQL or something different? Oh, and did you remove the ManyToMany on Genus and User (i.e. change them to OneToMany and give each the mappedBy option instead of inversedBy). And last thing :)... do you definitely have the @ORM\Column annotation above your id property in GenusScientist (with two stars to begin the comments - <code>/**</code>).</p><p>I'm listing a bunch of possible tiny things because this error tells me two things:<br>1) *Something* is *pointing* to an "id" column on <code>genus_scientist</code>. I'm not sure what this is. We added the <code>id</code> column in the screencast... but nothing really depends on it. Your error seems to suggest that there is either a foreign key or some sort of index that's referring to this.</p><p>2) And of course, this error tells me that Doctrine doesn't see the `id` column on `genus_scientist` (you might have it in your database, but Doctrine doesn't see any evidence for it when it reads all of its mapping annotation metadata).</p><p>Let me know if this helps! Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3021281795" id="dsq-comment-3021281795">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_b0TdQuuj8X/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9141/9643/avatar92.jpg?1480504413">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3021281795">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-26</span>
+	                            <span class="dsq-commenter-name">Greg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3021281795" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3021281795" class="dsq-comment-text">
+	                                <p>Hey,</p><p>I have a little error when I want to make my migrations:diff.</p><p>"There is no column with name 'id' on table 'genus_scientist' " <br>But I have this one.</p><p>If I rename my old table the migration is ok and create the new table, how can I have like you an update and not a creation ?<br>Thanks again.</p><p>Greg</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3017867206" id="dsq-comment-3017867206">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3017867206">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3017867206" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3017867206" class="dsq-comment-text">
+	                                <p>Great! Sorry for no code blocks in the recent chapters - I'll add it soon</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3017859701" id="dsq-comment-3017859701">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_0l9dvPeJpD/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21414/7615/avatar92.jpg?1479978628">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3017859701">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">Sergiu Popa</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3017859701" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3017859701" class="dsq-comment-text">
+	                                <p>Thanks. Copy-pasta error</p><p></p><pre><code><br>[Mapping]  OK - The mapping files are correct.<br>[Database] OK - The database schema is in sync with the mapping files.<br></code></pre>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3017854338" id="dsq-comment-3017854338">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3017854338">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3017854338" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3017854338" class="dsq-comment-text">
+	                                <p>Hey Sergiu,</p><p>You should use "ManyToOne" relationships instead of "ManyToMany" in GenusScientist class, since you use "OneToMany" in Genus and User. I bet you have an invalid mapping if you do "bin/console doctrine:schema:validate" - it's a nice tip btw ;)</p><p>So the result GenusScientist entity mapping should be:<br></p><pre><code><br>/**<br>   * @ORM\ ManyToOne(targetEntity="Genus", inversedBy="genusScientists")<br>   * @ORM\JoinColumn(nullable=true)<br>   */<br>private $genus;<br><br>/**<br>   * @ORM\ ManyToOne(targetEntity="User", inversedBy="studiedGenuses")<br>   * @ORM\JoinColumn(nullable=true)<br>   */<br>private $user;<br></code></pre><p></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3017834040" id="dsq-comment-3017834040">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_0l9dvPeJpD/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21414/7615/avatar92.jpg?1479978628">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3017834040">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-24</span>
+	                            <span class="dsq-commenter-name">Sergiu Popa</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3017834040" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3017834040" class="dsq-comment-text">
+	                                <p>Generating the migration creates two new tables: genus_scientist_genus, genus_scientist_user. How can I avoid that?</p><p>GenusScientist.php<br></p><pre><code><br>/**<br>   * @ORM\ManyToMany(targetEntity="Genus", inversedBy="genusScientists")<br>   * @ORM\JoinColumn(nullable=true)<br>   */<br>private $genus;<br><br>/**<br>   * @ORM\ManyToMany(targetEntity="User", inversedBy="studiedGenuses")<br>   * @ORM\JoinColumn(nullable=true)<br>   */<br>private $user;<br></code></pre><p></p><p>Genus.php<br></p><pre><code><br>/**<br>  * @ORM\OneToMany(targetEntity="GenusScientist", mappedBy="genus")<br>  */<br>private $genusScientists;<br></code></pre><p></p><p>User.php<br></p><pre><code><br>/**<br>  * @ORM\OneToMany(targetEntity="GenusScientist", mappedBy="user")<br>  */<br>private $studiedGenuses;<br></code></pre>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_many-to-many-extra-fields';var disqus_url = 'https://knpuniversity.com/screencast/collections/many-to-many-extra-fields';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="join-entity-refactoring#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/collections/many-to-many-extra-fields" addthis:title="Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"collections","courseIsOwned":false,"chapter":"ManyToMany with Extra Fields","chapterNumber":16,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Doctrine Collections: ManyToMany, Forms &amp; other Complex Relations';
+        Core.courseId = 88
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'collections';
+                    Core.chapterTitle = 'ManyToMany with Extra Fields';
+            Core.chapterNumber = 16;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'many-to-many-extra-fields';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

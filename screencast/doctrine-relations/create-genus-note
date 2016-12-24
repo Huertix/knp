@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Create Genus Note > Mastering Doctrine Relationships in Symfony | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 34752
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: The\x20King\x20of\x20Relations\x3A\x20ManyToOne <i class="fa fa-play"></i>',
+            'url': '/screencast/doctrine-relations/many-to-one-relation#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures.
+
+But, we left out *one* big piece: database relations. Once you&#039;ve mastered these,
+you&#039;ll be unstoppable. Unfortunately, a lot of information out there make Doctrine
+relations look over-complicated. Actually, they&#039;re simple and beautiful. Sure,
+they have some pitfalls - but they&#039;ll also help you build a complex data structure
+in no time.
+
+* ManyToOne relationships (associations)
+* The OneToMany side of a relation
+* The downfall of owning versus inverse sides of a relation
+* Doing magic with the ArrayCollection
+* Querying with Joins
+
+... and more - like some magic with the &quot;Param Conversion&quot;.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Create Genus Note">
+<meta property="og:description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures">
+<meta property="og:url" content="http://knpuniversity.com/screencast/doctrine-relations/create-genus-note">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/doctrine-relations:00a4bff155bef69e3d39bd9c91a18e6e37c3bbac/doctrine-relationships.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="create-genus-note#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        1.
+                            Create Genus Note
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Mastering Doctrine Relationships in Symfony</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="create-genus-note" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Create Genus Note
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-one-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The King of Relations: ManyToOne
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Saving a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="join-column-relation-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        JoinColumn &amp; Relations in Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="param-conversion" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Controller Magic: Param Conversion
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        OneToMany: Inverse Side of the Relation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many-order-by" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Order By with a OneToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="array-collection-tricks" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Tricks with ArrayCollection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="relation-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Querying on a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="query-with-join" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Query across a JOIN (and Love it)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/doctrine-relations" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Create Genus Note</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Mastering Doctrine Relationships in Symfony Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered video-js-16x9"
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/562080800_960x540.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/160163498.hd.mp4?s=30aacc652c88d006cc8e98a7dd9e5fe9e9f45802&amp;profile_id=113&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/160163498.sd.mp4?s=cb999d322b7fbd5e165eb141e556e7aaa92c99f1&amp;profile_id=165&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="create-genus-note#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../tag/symfony" class="btn btn-lg btn-success">Back to the <i>Symfony 3</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="create-genus-note#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="many-to-one-relation#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="create-genus-note#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="create-genus-note#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep3b-doctrine-relations/create-genus-note.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>It's you again! Welcome back friend! In this tutorial, we're diving back into
+Doctrine: this time to master database relations. And to have fun of course - databases
+are <em>super</em> fun.</p>
+<p>Like usual, you should code along with me or risk 7 years of bad luck. Sorry.
+To do that, download the code from the course page and use the <code>start</code> directory.
+I already have the code - so I'll startup our fancy, built-in web server:</p>
+<pre><code class="language-bash"><div class="line">./bin/console server:run</div></code></pre>
+<p>You may also need to run <code>composer install</code> and a few other tasks. Check the
+README in the download for those details.</p>
+<p>When you're ready, pull up the genus list page at <code>http://localhost:8000/genus</code>.
+Nice!</p>
+<h2 id="create-the-genusnote-entity">Create the GenusNote Entity <a class="headerlink" href="create-genus-note#create-the-genusnote-entity" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Click to view a specific genus. See these notes down here? These are loaded via
+a ReactJS app that talks to our app like an API. But, the notes themselves are
+still hardcoded right in a controller. Bummer! Time to make them dynamic - time to
+create a second database table to store genus notes.</p>
+<p>To do that, create a new <code>GenusNote</code> class in the <code>Entity</code> directory. Copy the ORM
+<code>use</code> statement from <code>Genus</code> that all entities need and paste it here:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="2a257e7e37">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-80" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            80 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusNote.php">src/AppBundle/Entity/GenusNote.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">Entity</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Doctrine</span>\<span class="hljs-title">ORM</span>\<span class="hljs-title">Mapping</span> <span class="hljs-title">as</span> <span class="hljs-title">ORM</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusNote</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-78" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 78
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>With that, open the "Code"-&gt;"Generate" menu - or <code>Cmd</code> + <code>N</code> on a Mac - and select
+"ORM Class":</p>
+<p><div class="code-block-wrapper" data-code-block-guid="64be433559">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-80" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            80 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusNote.php">src/AppBundle/Entity/GenusNote.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">Entity</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Doctrine</span>\<span class="hljs-title">ORM</span>\<span class="hljs-title">Mapping</span> <span class="hljs-title">as</span> <span class="hljs-title">ORM</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"> * <span class="hljs-doctag">@ORM</span>\Entity</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"> * <span class="hljs-doctag">@ORM</span>\Table(name="genus_note")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"> */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusNote</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-78" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 78
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Bam! This is now an entity!</p>
+<p>Next: add the properties we need. Let's see... we need a <code>username</code>, an <code>userAvatarFilename</code>,
+<code>notes</code> and a <code>createdAt</code> property:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="2193da2bf1">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-80" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            80 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusNote.php">src/AppBundle/Entity/GenusNote.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusNote</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-17" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 17
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $id;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 19 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $username;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-27" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 27
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $userAvatarFilename;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="29-32" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 29 - 32
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $note;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="34-37" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 34 - 37
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $createdAt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="39-78" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 39 - 78
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When we add a user table later - we'll replace <code>username</code> with a relationship to that table.
+But for now, keep it simple.</p>
+<p>Open the "Code"-&gt;"Generate" menu again and select "ORM Annotation". Make sure each
+field <code>type</code> looks right. Hmm, we probably want to change <code>$note</code> to be a <code>text</code>
+type - that type can hold a lot more than the normal 255 characters:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="bf4a5616a8">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-80" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            80 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusNote.php">src/AppBundle/Entity/GenusNote.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusNote</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Id</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\GeneratedValue(strategy="AUTO")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="integer")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $id;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="string")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $username;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="string")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $userAvatarFilename;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="text")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $note;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="datetime")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $createdAt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="39-78" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 39 - 78
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Finally, go back to our best friend - the "Code"-&gt;"Generate" menu - and generate the
+getter and setters for every field - except for <code>id</code>. You don't usually want to
+set the <code>id</code>, but generate a getter for it:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1e81ac012d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-80" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            80 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusNote.php">src/AppBundle/Entity/GenusNote.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusNote</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-39" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 39
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getUsername</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;username;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setUsername</span><span class="hljs-params">($username)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;username = $username;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getUserAvatarFilename</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;userAvatarFilename;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="55"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setUserAvatarFilename</span><span class="hljs-params">($userAvatarFilename)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="56"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="57"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;userAvatarFilename = $userAvatarFilename;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="58"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="60"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getNote</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="61"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="62"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;note;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="63"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="64"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="65"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setNote</span><span class="hljs-params">($note)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="66"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="67"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;note = $note;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="68"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="69"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="70"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getCreatedAt</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="71"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="72"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;createdAt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="73"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="74"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="75"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setCreatedAt</span><span class="hljs-params">($createdAt)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="76"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="77"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;createdAt = $createdAt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="78"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h3 id="generate-migrations">Generate Migrations <a class="headerlink" href="create-genus-note#generate-migrations" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Entity done! Well, <em>almost</em> done - we still need to somehow <em>relate</em> each <code>GenusNote</code>
+to a <code>Genus</code>. We'll handle that in a second.</p>
+<p>But first, don't forget to generate a migration for the new table:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:diff</div></code></pre>
+<p>Open up that file to make sure it looks right - it lives in <code>app/DoctrineMigrations</code>.
+<code>CREATE TABLE genus_note</code> - it looks great! Head back to the console and run the
+migration:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:migrations:migrate</div></code></pre>
+<h2 id="adding-fixtures">Adding Fixtures <a class="headerlink" href="create-genus-note#adding-fixtures" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Man, that was <em>easy</em>. We'll want some good dummy notes too. Open up the <code>fixtures.yml</code>
+file and add a new section for <code>AppBundle\Entity\GenusNote</code>. Start just like before:
+<code>genus.note_</code> and - let's create 100 notes - so use <code>1..100</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1f82953ada">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-15" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            15 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">AppBundle\Entity\GenusNote:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    genus.note_{1..100}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-15" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 15
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, fill in each property using the Faker functions: <code>username: &lt;username()&gt;</code> and
+then <code>userAvatarFilename:</code> Ok, eventually users might upload their <em>own</em> avatars,
+but for now, we have two hardcoded options: <code>leanna.jpeg</code> and <code>ryan.jpeg</code>. Let's select
+one of these randomly with a sweet syntax: <code>50%? leanna.jpeg : ryan.jpeg</code>. That's Alice
+awesomeness:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="78b13d3970">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-15" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            15 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">AppBundle\Entity\GenusNote:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    genus.note_{1..100}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        username:</span> &lt;userName()<span class="hljs-string">&gt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        userAvatarFilename:</span> <span class="hljs-string">'50%? leanna.jpeg : ryan.jpeg'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-15" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 15
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The rest are easy: <code>note: &lt;paragraph()&gt;</code> and <code>createdAt: &lt;dateTimeBetween('-6 months', 'now')&gt;</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="4150db33cf">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-15" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            15 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">AppBundle\Entity\GenusNote:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    genus.note_{1..100}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        username:</span> &lt;userName()<span class="hljs-string">&gt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        userAvatarFilename:</span> <span class="hljs-string">'50%? leanna.jpeg : ryan.jpeg'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-attr">        note:</span> &lt;paragraph()<span class="hljs-string">&gt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span><span class="hljs-attr">        createdAt:</span> &lt;dateTimeBetween(<span class="hljs-string">'-6 months'</span>, <span class="hljs-string">'now'</span>)<span class="hljs-string">&gt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"></span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, run the fixtures!</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:fixtures:load</div></code></pre>
+<p>Double-check them with a query:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:query:sql 'SELECT * FROM genus_note'</div></code></pre>
+<p>So awesome! Ok team, we have two entities: let's add a relationship!</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3001236539" id="dsq-comment-3001236539">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nobuyukifujioka/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20526/1524/avatar92.jpg?1480287706">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3001236539">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-14</span>
+	                            <span class="dsq-commenter-name">Nobuyuki Fujioka</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3001236539" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3001236539" class="dsq-comment-text">
+	                                <p>Hi, Victor<br>Thank you for your reply.  My first try seemed to have worked.  But, will see.<br>I will try your solution as well.</p><p>I have many other questions.  so, will ask you later.</p><p>Cheers,<br>Noby</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3001202848" id="dsq-comment-3001202848">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3001202848">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-14</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3001202848" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3001202848" class="dsq-comment-text">
+	                                <p>Hey Nobuyuki,</p><p>I think you can. Have you tried it? Btw, what about just map $id field to the different column name in database:<br></p><pre><code><br>/**<br>* @ORM\Id<br>* @ORM\GeneratedValue(strategy="AUTO")<br>* @ORM\Column(name="connector_id", type="integer")<br>*/<br>private $id;<br></code></pre><p><br>This should work as well.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2999641147" id="dsq-comment-2999641147">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nobuyukifujioka/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20526/1524/avatar92.jpg?1480287706">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2999641147">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-13</span>
+	                            <span class="dsq-commenter-name">Nobuyuki Fujioka</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2999641147" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2999641147" class="dsq-comment-text">
+	                                <p>Hi,</p><p>When I create an entity class, can I have different names for id like below?<br>(@ORM\Id and private $connectorId)<br>    /**<br>     * @ORM\Id<br>     * @ORM\GeneratedValue(strategy="AUTO")<br>     * @ORM\Column(type="integer")<br>     */<br>    private $connectorId;</p><p>Cheers,<br>Noby</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2996787382" id="dsq-comment-2996787382">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2996787382">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-11</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2996787382" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2996787382" class="dsq-comment-text">
+	                                <p>You're welcome!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2996761155" id="dsq-comment-2996761155">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nobuyukifujioka/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20526/1524/avatar92.jpg?1480287706">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2996761155">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-11</span>
+	                            <span class="dsq-commenter-name">Nobuyuki Fujioka</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2996761155" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2996761155" class="dsq-comment-text">
+	                                <p>Hi, Victor</p><p>Thank you very much.  I understand it better now thanks to your explanation.</p><p>Kind regards,<br>Noby</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2996704449" id="dsq-comment-2996704449">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2996704449">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-11</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2996704449" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2996704449" class="dsq-comment-text">
+	                                <p>Hey Nobuyuki,</p><p>My PhpStorm creates setters and getters with annotation too, so probably Ryan has different settings, or just an older version of PhpStorm, or it just was a bug in PhpStorm :)</p><p>This annotation called PHP DocBlock comments. You can read more about it here: <a href="https://disq.us/url?url=https%3A%2F%2Fphpdoc.org%2Fdocs%2Flatest%2Fguides%2Fdocblocks.html%3AV8Pxjlz0ktblcxaAVyUI74Bd2Ng&amp;cuid=1175718" rel="nofollow noopener">https://phpdoc.org/docs/latest...</a> . Basically, this annotations helps IDEs like PhpStorm to do autocompletion. Usually, it's unnecessary for IDE because it can resolve returned type base on @var property annotation. The  types of method arguments can be resolved base on typehint, but it don't work for scalar type, that's why @param annotation for methods with scalar values would be good here. But nothing critical won't happen without these annotations for getters/setters, you just don't have an autocompletion in some places of your code.</p><p>Actually, here's my recent merged PR to the Symfony Demo project about annotation: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fsymfony-demo%2Fpull%2F394%3A5CSbuQbeHCP4-0j2YjlkIH8x9dM&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/sym...</a> . I think you might be interested in it - there's a small discussion about annotation best practice.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2996682149" id="dsq-comment-2996682149">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nobuyukifujioka/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20526/1524/avatar92.jpg?1480287706">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2996682149">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-11</span>
+	                            <span class="dsq-commenter-name">Nobuyuki Fujioka</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2996682149" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2996682149" class="dsq-comment-text">
+	                                <p>Just a quick question, in your video, when you create getter and setter for a parameter in GenusNote class, phpStorm is creating getter and setter functions without annotations.  But, with my PHPstorm, it is creating annotation for each one.<br>Below is an example:<br>```<br>    /**<br>     * @return mixed<br>     */<br>    public function getUsername()<br>    {<br>        return $this-&gt;username;<br>    }</p><p>    /**<br>     * @param mixed $username<br>     */<br>    public function setUsername($username)<br>    {<br>        $this-&gt;username = $username;<br>    }<br>```<br>What are these<br>    /**<br>     * @return mixed<br>     */<br>and<br>    /**<br>     * @param mixed $username<br>     */<br>?</p><p>Do we need them?</p><p>Cheers,<br>Noby</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922624787" id="dsq-comment-2922624787">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922624787">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922624787" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922624787" class="dsq-comment-text">
+	                                <p>haha, yes, it's :D</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922617191" id="dsq-comment-2922617191">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922617191">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922617191" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922617191" class="dsq-comment-text">
+	                                <p>Ryan would say: "But that's so boooring" :D</p><p>Ok, ok, it's quite suffice for me, thank you! ;)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922614234" id="dsq-comment-2922614234">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922614234">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922614234" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922614234" class="dsq-comment-text">
+	                                <p>Yes, agree, but I think that's the simplest solution. BTW, I just use <code>username: user&lt;current()&gt;</code>.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922604695" id="dsq-comment-2922604695">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922604695">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922604695" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922604695" class="dsq-comment-text">
+	                                <p>Do you mean like this, for example?<br>username: &lt;username()&gt;_&lt;current()&gt;</p><p>Well, not the most elegant solution, but... it works. :) I guess it's quite ok for development purposes.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922598610" id="dsq-comment-2922598610">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922598610">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922598610" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922598610" class="dsq-comment-text">
+	                                <p>Yo Maksym,</p><p>The <code>&lt;current()&gt;</code> function return a current index of each iteration. Combine it with username to make it 100% unique.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2922550878" id="dsq-comment-2922550878">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2922550878">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-28</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2922550878" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2922550878" class="dsq-comment-text">
+	                                <p>Out of 100 usernames three are exactly the same. Is there an easy way to make them unique?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2830077283" id="dsq-comment-2830077283">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2830077283">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-10</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2830077283" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2830077283" class="dsq-comment-text">
+	                                <p>Hey Henry,</p><p>In Symfony project: just change "database_driver" to "pdo_sqlsrv" instead of "pdo_mysql" in your "app/config/parameters.yml". For custom project based on Doctrine - find a place where configuration parameters are setting according to the <a href="http://disq.us/url?url=http%3A%2F%2Fdocs.doctrine-project.org%2Fprojects%2Fdoctrine-dbal%2Fen%2Flatest%2Freference%2Fconfiguration.html%3AyxAgYvfyN-6a8oeYhl8MN-6pg3w&amp;cuid=1175718" rel="nofollow noopener">Doctrine configuration</a>.</p><p>P.S. And also don't forget to tweak other DB credentials as host, port, username and password.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2828389175" id="dsq-comment-2828389175">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="create-genus-note">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2828389175">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-09</span>
+	                            <span class="dsq-commenter-name">Henry</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2828389175" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2828389175" class="dsq-comment-text">
+	                                <p>Hi how can I connect to a MSSQL database with doctrine please?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2766217943" id="dsq-comment-2766217943">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2766217943">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-05</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2766217943" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2766217943" class="dsq-comment-text">
+	                                <p>Hey Ilya,</p><p>Great! I think the problem was that you used `createAt` instead of `createdAt`, right? It should be `createdAt`. Your explanation could help other devs with similar problem.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2766151569" id="dsq-comment-2766151569">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_dbfOG6SoEq/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2766151569">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-05</span>
+	                            <span class="dsq-commenter-name">Ilya</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2766151569" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2766151569" class="dsq-comment-text">
+	                                <p>It's ok evrything is workin</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2766134990" id="dsq-comment-2766134990">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_dbfOG6SoEq/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2766134990">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-05</span>
+	                            <span class="dsq-commenter-name">Ilya</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2766134990" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2766134990" class="dsq-comment-text">
+	                                <p>Hi,guys<br>after load bin/console doctrine:fixtures:load<br>unexpectedvalueexception could not determine how to assign createAt to a AppBundle\Entity\GenusNote object</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730710745" id="dsq-comment-2730710745">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730710745">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730710745" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730710745" class="dsq-comment-text">
+	                                <p>I like this stuff - good tips!</p><p>And no reason about server:start versus server:run. I feel like new people may have less trouble with server:run, as they may accidentally keep server:start running in the background, then come back later, try to start it again, and get an error.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730677189" id="dsq-comment-2730677189">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730677189">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730677189" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730677189" class="dsq-comment-text">
+	                                <p><a data-dsq-mention="weaverryan:disqus" href="https://disqus.com/by/weaverryan/" rel="nofollow noopener">weaverryan</a></p><p>I just noticed, I have a couple of little things that you could integrate into your files to help the viewers in the long run.</p><p>create a symlink for bin/console<br>ln -s bin/console console<br>add an alias for the console command<br>(be it on .aliases or your .bash_rc file)<br>alias console="php console"</p><p>type "console"</p><p>See the results here <a href="http://disq.us/url?url=http%3A%2F%2Fgoo.gl%2Fn1P4CU%3A9nZ4p0a9znqyX7ZAnKmVhsXcdgg&amp;cuid=1175718" rel="nofollow noopener">http://goo.gl/n1P4CU</a></p><p>oh my terminal? well thats powerline-shell -&gt; <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fmilkbikis%2Fpowerline-shell%3AbiaEdApVX7sRPrqMV65Ue50Lchw&amp;cuid=1175718" rel="nofollow noopener">https://github.com/milkbikis/p...</a> &lt;- at work (linux here, works in the mac too for those interested)</p><p>also I notice you use php bin/console server:run and not server:start ? any particular reason for it?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2670746441" id="dsq-comment-2670746441">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_BjwOszs9fu/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11758/3765/avatar92.jpg?1472495598">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2670746441">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-11</span>
+	                            <span class="dsq-commenter-name">Ленур</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2670746441" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2670746441" class="dsq-comment-text">
+	                                <p>thanks, problem solved :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2670622355" id="dsq-comment-2670622355">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2670622355">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-11</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2670622355" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2670622355" class="dsq-comment-text">
+	                                <p>Ah, make sure you have the PHP Annotations plugin installed for PhpStorm. In the first course, I did *not* mention this - we're making an edit to the video to add this missing item!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2664580515" id="dsq-comment-2664580515">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_BjwOszs9fu/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11758/3765/avatar92.jpg?1472495598">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2664580515">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-08</span>
+	                            <span class="dsq-commenter-name">Ленур</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2664580515" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2664580515" class="dsq-comment-text">
+	                                <p>I do you *not* see the option at all. </p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2664074159" id="dsq-comment-2664074159">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2664074159">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-07</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2664074159" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2664074159" class="dsq-comment-text">
+	                                <p>Hi again!</p><p>Hmm, is it inactive, or do you *not* see the option at all? Make sure your cursor is *inside* your entity class when you use the Code-&gt;Generate menu.</p><p>Let me know what you find out :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2663938884" id="dsq-comment-2663938884">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_BjwOszs9fu/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11758/3765/avatar92.jpg?1472495598">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2663938884">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-07</span>
+	                            <span class="dsq-commenter-name">Ленур</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2663938884" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2663938884" class="dsq-comment-text">
+	                                <p>Hello Ryan.</p><p>How to enable ORM Annotation on code generate menu? In my menu this option inactive.</p><p>Thanks.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_create-genus-note';var disqus_url = 'https://knpuniversity.com/screencast/doctrine-relations/create-genus-note';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="many-to-one-relation#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/doctrine-relations/create-genus-note" addthis:title="Mastering Doctrine Relationships in Symfony">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"doctrine-relations","courseIsOwned":false,"chapter":"Create Genus Note","chapterNumber":1,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Mastering Doctrine Relationships in Symfony';
+        Core.courseId = 81
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'doctrine-relations';
+                    Core.chapterTitle = 'Create Genus Note';
+            Core.chapterNumber = 1;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'create-genus-note';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

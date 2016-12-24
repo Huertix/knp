@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>The Mysterious &quot;User Provider&quot; > Symfony Security: Beautiful Authentication, Powerful Authorization | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 38363
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Logging\x20out\x20\x26\x20Pre\x2Dfilling\x20the\x20Email\x20on\x20Failure <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-security/logout-and-last-username#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Ah, security! Quick run!
+
+Wait, come back! Security in Symfony is *awesome*! Seriously,
+between things called &quot;voters&quot; and the Guard authentication
+system, you can do anything you want inside of Symfony, and
+the code to do it is simple and expressive.
+
+Security has two sides: authentication (who are you?) and
+authorization (do you have access to do X). We&#039;ll talk about
+each of these, creating an traditional form login system
+*and* and API token authentication system using Json web tokens
+(not as scary as they sound!). Then, we&#039;ll turn to authorization,
+with roles, voters and other good stuff:
+
+* Security &amp; Firewall Fundamentals
+* Creating a custom login form
+* Making a User (ooOOOoo)
+* User Providers (why you need them, but don&#039;t care)
+* Password Encryption
+* Logging out!
+* Protecting entire URLs with access_control(s)
+* IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED
+* Checking access with roles! ROLE_USER
+* Denying access in a controller
+* What are voters?
+* Role hierarchies
+* Impersonation (`switch_user`)
+* Registration Form
+* Manual authentication
+
+... and how to create a back door into your site. Just kidding!
+Let&#039;s make some secure sites!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="The Mysterious &quot;User Provider&quot;">
+<meta property="og:description" content="Ah, security! Quick run!
+
+Wait, come back! Security in Symfony is *awesome*! Seriously,
+between things called &amp;quot;voters&amp;quot; and the Guard authentication
+system, you can do anything you want inside of Symfony, and
+the code to do it is simple and expressive.
+
+Security has two sides: authentication (who are you?) and
+authorization (do you have access to do X)">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-security/user-provider">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-security:cfae786aa1f6535885fa8d5d09e578870082c672/sf-ep6.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="user-provider#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        7.
+                            The Mysterious &quot;User Provider&quot;
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony Security: Beautiful Authentication, Powerful Authorization</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-class" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        The All-Important User Class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-interface-methods" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The UserInterface Methods (Keep some Blank!)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:19</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="rendering-login-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Rendering that Login Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:32</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="all-about-firewalls" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        All About Firewalls
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="login-form-authenticator" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        The LoginFormAuthenticator
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authenticator-get-user-check-credentials" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Authenticator: getUser, checkCredentials &amp; Success/Failure
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:31</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="user-provider" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        The Mysterious &quot;User Provider&quot;
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="logout-and-last-username" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Logging out &amp; Pre-filling the Email on Failure
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:21</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-plain-password" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Users Need Passwords (plainPassword)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:32</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="encoding-user-password" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Doctrine Listener: Encode the User&#039;s Password
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-encoder-configuration" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Configuring the Encoder in security.yml
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authorization-roles" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Authorization: access_control and Roles
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:17</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="deny-access-inside-controller" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Denying Access in a Controller
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:38</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dynamic-roles" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Dynamic Roles
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="the-user-object" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Fetch me a User Object!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:33</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="role-hierarchy" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        Role Hierarchy
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="impersonation-switch-user" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        Impersonation (Login as Someone Else)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-registration-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Registration Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="validation-unique-entity" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Validation with the UniqueEntity Constraint
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="conditional-validation-groups" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        Validation Groups: Conditional Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:00</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="automatic-login-handling" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                21.
+                        Automatically Login after Registration!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-security" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">The Mysterious &quot;User Provider&quot;</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony Security: Beautiful Authentication, Powerful Authorization Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="logout-and-last-username#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="user-provider#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="user-provider#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (21)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep6-security/user-provider.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Let's see that error again: change <code>intercept_redirects</code> back to <code>false</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="4aeecb0c07">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-49" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            49 lines <span class="meta-divider"></span> <span title="app/config/config_dev.yml">app/config/config_dev.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-attr">web_profiler:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-14" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 14
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code"><span class="hljs-attr">    intercept_redirects:</span> <span class="hljs-literal">false</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="16-49" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 16 - 49
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Refresh and re-post the form. Oof, there it is again:</p>
+<blockquote><p>There is no user provider for user <code>AppBundle\Entity\User</code>.</p>
+</blockquote>
+<p>What the heck is a user provider and why do we need one?</p>
+<h2 id="what-is-a-user-provider">What is a User Provider? <a class="headerlink" href="user-provider#what-is-a-user-provider" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>A user provider is one of the most misunderstood parts of Symfony's security. It's
+an object that does just a <em>few</em> small jobs for you. For example, the user provider
+is responsible for loading the <code>User</code> from the session and making sure that it's
+up to date. In Doctrine, we'll want our's to re-query for a fresh <code>User</code> object to
+make sure all the data is still up-to-date.</p>
+<p>The user provider is also responsible for a few other minor things, like handling
+"remember me" functionality and a really cool feature we'll talk about later called
+"impersonation".</p>
+<p>Long story short: you need a user provider, but it's not all that important. And
+if you're using Doctrine, it's super easy to setup.</p>
+<h2 id="setting-up-the-entity-user-provider">Setting up the Entity User Provider <a class="headerlink" href="user-provider#setting-up-the-entity-user-provider" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>In <code>security.yml</code>, you already have a <code>providers</code> section - as in "user providers".
+Delete the <code>in_memory</code> stuff and replace it with <code>our_users</code>: that's a totally meaningless
+machine name - it could be anything. But below that, say <code>entity</code> and set it to
+<code>{ class: AppBundle\Entity\User, property: email }</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1c9f908790">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-28" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            28 lines <span class="meta-divider"></span> <span title="app/config/security.yml">app/config/security.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">security:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">    <span class="hljs-comment"># http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">    providers:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">        our_users:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-attr">            entity:</span> { class: AppBundle\Entity\User, property: email }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="9-28" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 9 - 28
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The <code>property</code> part is <em>not</em> something we care about right now, but we will use
+and talk about it later.</p>
+<p>But yea, that's it! Go back to <code>/login</code>. Right now, I am <em>not</em> logged in. But try
+logging in again.</p>
+<p>It's alive!!! We can finally surf around the site and stay logged in. Cool.</p>
+<h2 id="custom-user-provider">Custom User Provider <a class="headerlink" href="user-provider#custom-user-provider" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>In your app, if you're <em>not</em> loading users from the database, then you'll need to
+create a custom user provider class that implements <code>UserProviderInterface</code>. Check
+out the <a href="http://symfony.com/doc/current/cookbook/security/custom_provider.html">official docs</a> in this case. But if you have any questions, let me know.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3063300503" id="dsq-comment-3063300503">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3063300503">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-21</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3063300503" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3063300503" class="dsq-comment-text">
+	                                <p>Woohoo! You just tackled what I think is the hardest part of Symfony's security component (and maybe the most confusing part of Symfony in general). Congrats - and thanks for following up :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3062399593" id="dsq-comment-3062399593">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/paulandrduchesne/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21487/4264/avatar92.jpg?1482319493">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3062399593">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-21</span>
+	                            <span class="dsq-commenter-name">Paul-André Duchesne</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3062399593" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3062399593" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>First, sorry for my late answer.<br>A great thanks for what you suggested, it's working fine...</p><p>After having tried what you suggested, I've just chosen, at least, to keep the injection of the <i>LdapUserProvider</i> in my constructor to be able to use it in the instanciation of a <i>new LdapBindAuthentication</i> in the constructor self (used later on for <i>ldapBindAuth-&gt;verifyAuthentication()</i>). That facilitates also the call later on to the loadByUsername method (instead of copying it inside the authenticator and trying to get the necessary parameters used inside that method).</p><p>I understand now correctly the distingo between the role of the "User Provider" for refreshing and passing the user at the beginning of each request and the effective injection of an other "ldap user provider" used for convenience later on...<br>Without the ChainProvider existence, the things are cleaner and more understandable.</p><p>Thanks again a lot, your courses and explanations are awesome !</p><p>Kind regards,</p><p>Paul-André</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3051695534" id="dsq-comment-3051695534">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3051695534">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-14</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3051695534" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3051695534" class="dsq-comment-text">
+	                                <p>Hey Paul-André!</p><p>Awesome! This is exactly the deep description I wanted! So, let me repeat your setup, in a slightly different way. No matter *how* the user is found or their password is checked, ultimately, all users are stored in the database. This means that you only have one User class (this is good) and that User class is an entity. This also means that, once a user is logged in, I can say with 100% certainty that I can find this user in our database, by using their username.</p><p>So, this makes life GREAT for your UserProvider. Here's what I'd like you to do:</p><p>A) Read / watch this page again (<a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony-security%2Fuser-provider%29%3AriV_mE-ZgD97g3e07BTRS_fIvMw&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a> just to really focus on the job of these user providers.</p><p>B) Delete the <code>ldap_users</code> user provider and corresponding service entirely. I know you're injecting the LdapUserProvider into your authenticator to help with your work there, but to simplify things, stop doing that. Instead, implement the LDAP lookup logic yourself in the authenticator. This could mean copying this method into your authenticator: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fsymfony%2Fblob%2Fmaster%2Fsrc%2FSymfony%2FComponent%2FSecurity%2FCore%2FUser%2FLdapUserProvider.php%23L61%3AcysuydLTC-_g__GZzEx2tAqtp18&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/sym...</a>. So, you'll now inject the Ldap class/service into your authenticator instead. Technically, you *could* still use the LdapUserProvider once we're done... but stop using it for now - I want to simplify what these "user provider" things are and aren't for.</p><p>C) At this point, you will not be using *any* user provider inside of your authenticator. You'll simply be using the Ldap and EntityManager objects directly. Nice and simple.</p><p>D) You will now only want *one* user provider in security.yml, and it will be your entity user provider. So, keep only that - and remove all the chain stuff.<br>That should do it. Summary of this is:</p><p>1) In your authenticator, forget that these "user provider" things exist. Just use Ldap and EntityManager to do your job. I can tell by your comments that you already understand the logic that should live in this class well.</p><p>2) The *only* purpose of the "user provider" will be to "refresh" the user at the beginning of each request. Your User object is stored in the session. Then, on the next page, it's deserialized. The "entity" user provider will then use the primary key that User to re-query for a fresh one (to make sure its data is not stale). Since all our users are stored in the database, that's perfect! Ldap will not be involved in this part of the process at all.</p><p>Let me know how it goes!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3050372455" id="dsq-comment-3050372455">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/paulandrduchesne/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21487/4264/avatar92.jpg?1482319493">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3050372455">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-13</span>
+	                            <span class="dsq-commenter-name">Paul-André Duchesne</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3050372455" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3050372455" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>First, Great, Great thanks for having me lead in the right direction... with the <i>LdapBindAuthenticationProvider</i>. I've extended that class in one of my own and adapted the things a bit to mimic the <i>checkAuthentication</i> method.<br>The main difficulties I encountered were at last with our AD authentication itself ;)</p><p>So, to help you helping me with the chain provider, here are answers to the list of questions:<br>* All the users of the application are stored in the database - our AD has got only the people who are still considered <i>in activity</i> in our institution - the AD has got thus only a subset of what is stored in the database. So, in the <i>getUser</i> method of my authenticator, I used only the <i>EntityManager</i> to get the corresponding user out of database.<br>* As the AD is responsible of authenticating the "<i>active</i>" users and as the users can modify their password through their windows desktop, my intention (and what I've done) was:<br>  * if a user is authenticated against the AD, that meant his/her password was recognized... and that's ok... so in the <i>checkCredentials</i> method of my authenticator, I putted the call to the adapted <i>checkAuthentication</i> method in a try (as you suggested), and if it succeed, I return true.<br>  * if a user is not authenticated against the AD, I try to find him/her in the AD with the <i>loadUserByUsername</i> method of the ldap client. If (s)he's found, I return false meaning the username was right but password not and if (s)he's not found, I check if password is valid against the database. If yes, the user is logged in, otherwise, it sends back false (and thus invalid credentials)</p><p>Concerning the update of password in the database, if the user succeed to login against the AD, I update (and encrypt) the password field of the user in the database.</p><p>So the moment I'm extending the <i>LdapBindAuthenticatorProvider</i> who needs a <i>UserProviderInterface</i> and the moment I'm playing with a user coming from database, I guess I need both of them in a <i>ChainProvider</i>... Am I right ?</p><p>Thanks again a hundred time for the help provided Ryan,</p><p>Kind regards,</p><p>Paul-André</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3046086653" id="dsq-comment-3046086653">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3046086653">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-10</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3046086653" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3046086653" class="dsq-comment-text">
+	                                <p>Hi Paul-André!</p><p>Unfortunately, I don't know a lot personally about LDAP. But, I do know a lot about Guard, so I'll do my best to help :).</p><p>1) Since you're using Guard, obviously you need to do a little bit more work yourself in the authenticator (which is ok, because you also get a lot more flexibility). But, we can use the built-in LDAP authentication classes as inspiration for what we do. For example, the <code>form_login_ldap</code> authentication listener, is actually this class: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fsymfony%2Fblob%2Fmaster%2Fsrc%2FSymfony%2FComponent%2FSecurity%2FCore%2FAuthentication%2FProvider%2FLdapBindAuthenticationProvider.php%3ADRF_48E-veMmGCnKWzXwO33OogE&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/sym...</a>. So, how should you check the users password? Mimic was it's doing here: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fsymfony%2Fblob%2Fmaster%2Fsrc%2FSymfony%2FComponent%2FSecurity%2FCore%2FAuthentication%2FProvider%2FLdapBindAuthenticationProvider.php%23L71%3ApRTvFoyUY78tJ7RcR8rjoXkF-zA&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/sym...</a>. Specifically, the <code>$this-&gt;ldap</code> library is your <code>app.security.ldap</code> service. So this is what you should inject into your authenticator.</p><p>2) And yes, I noticed your "chain" user provider. User providers can be complex to understand, and we definitely have a problem here. First, make sure you review this: <a href="http://disq.us/url?url=http%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony-security%2Fuser-provider%3AA7CN8Ni4C9WHZrLba8is5NtDdzQ&amp;cuid=1175718" rel="nofollow noopener">http://knpuniversity.com/scree...</a> - it tries to explain the purpose of the user provider. Your exact correct setup depends on your needs. So, I'm going to ask a *bunch* of questions:</p><p>As I understand it, your users should be able to login via their LDAP credentials or by logging in with their username/password that is stored in the database. Is this correct? Do you also have 2 different user classes? And, will you need to store application information about all users, or is the purpose for the users ONLY to be able to login? Will some users *only* exist in the database, but not in LDAP? And will some where *only* exist in LDAP and not in our local database? If a user exists in the database, but not in LDAP, will they thus manage their password in your system (instead of LDAP)? And if they exist in LDAP and not in your local database, I assume they will thus manage their password in LDAP and not your system? Or asked differently, is it true that some users will be logging in with their password in LDAP and other users will be logging in with their password that's manage by your system?</p><p>Pass me some more information and I should be able to help your get your providers worked out correctly! But remember this point about providers:</p><p>A) The point of a user provider is *only* to reload the user (e.g. from the database) at the beginning of each request. So, if ultimately - once the user has logged in - you have a local "user" record in your database for every user, then you *only* need the entity provider. Otherwise, yes, you'll need a chain provider like you have.</p><p>B) When the user is originally logging in, you are in 100% full control of how that works - via your <code>getUser()</code> method. You could absolutely first look for the user in LDAP (you'll need a try-catch around <code>loadUserByUsername</code>, since this throws a <code>UsernameNotFoundException</code>) and if it's not found, look for it in your database.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3044303933" id="dsq-comment-3044303933">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/paulandrduchesne/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21487/4264/avatar92.jpg?1482319493">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3044303933">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-09</span>
+	                            <span class="dsq-commenter-name">Paul-André Duchesne</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3044303933" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3044303933" class="dsq-comment-text">
+	                                <p>Hello Ryan,</p><p>I come towards you because I'm stuck with the implementation of authenticating against an ldap server with guard.<br>I've followed a bit of this: <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fsecurity%2Fldap.html%3AXrn-wRn7clFOMpz9ryvCxJ6pStI&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a> - adapted a bit due to a bit outdated version of the documentation and I've got this:<br>In services.yml:<br></p><pre>app.security.ldap.adapter:<br>    class: Symfony\Component\Ldap\Adapter\ExtLdap\Adapter<br>    arguments:<br>        - host: "%ldap_server%"<br>    autowire: true<br>app.security.ldap:<br>    class: Symfony\Component\Ldap\Ldap<br>    arguments: [ "@app.security.ldap.adapter" ]<br>    autowire: true<br>app.security.login_form_ldap_authenticator:<br>    class: AppBundle\Security\LoginFormLdapAuthenticator<br>    autowire: true<br></pre><p><br>In security.yml:<br></p><pre>security:<br><br>    encoders:<br>        AppBundle\Entity\Person: bcrypt<br><br>    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers<br>    providers:<br>        chain_provider:<br>            chain:<br>                providers:<br>                    - ldap_users<br>                    - db_users<br>        db_users:<br>            entity: { class: AppBundle\Entity\Person, property: uid }<br>        ldap_users:<br>            ldap:<br>                service: app.security.ldap<br>                base_dn: cn=Users,dc=rbins,dc=be<br>                search_dn: "cn=%ldap_user%,ou=%ldap_ou%,dc=rbins,dc=be"<br>                search_password: "%ldap_pwd%"<br>                default_roles: [ROLE_USER]<br>                filter: (&amp;(ObjectClass=Person)({uid_key}={username}))<br>    firewalls:<br>        # disables authentication for assets and the profiler, adapt it according to your needs<br>        dev:<br>            pattern: ^/(_(profiler|wdt)|css|images|js)/<br>               security: false<br><br>        rest:<br>            pattern: ^/rest/<br>                anonymous: true<br>                stateless: true<br>                security: false<br><br>        main:<br>            anonymous: ~<br>              guard:<br>                authenticators:<br>                    - app.security.login_form_ldap_authenticator<br>                    - app.security.login_form_authenticator<br>                entry_point: app.security.login_form_ldap_authenticator<br></pre><p><br> In the AppBundle\Security\LoginFormLdapAuthenticator in the constructor, I've been well defined a Symfony\Component\Security\Core\User\LdapUserProvider that I set in a $this-&gt;ldapUser variable that I use in the getUser method to check existence of the username in the Ldap...<br>'Till that point everything's fine...<br>But in the checkCredentials, I don't know what (and how) to call (and to inject in my constructor) to authenticate the user against the ldap server...</p><p>Could you suggest me any direction that could help me going further ?</p><p>Kind regards,</p><p>Paul-André</p><p>PS.: You've certainly seen that I've defined a chain provider and two authenticators. My expectations were that if the first fails, it tries to fallback on the second one... But it didn't appeared to act so. For instance, if the user wasn't found in the ldap, it stopped and I got back to the login screen with the corresponding 'user unknown' exception displayed... and I've seen that the UserProvider parameter in the getUser was a ChainProvider containing the two others... What could I do to expect fall back on the second provider ? Should I only make one authenticator and handle the fallback in each methods ?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2844860864" id="dsq-comment-2844860864">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2844860864">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2844860864" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2844860864" class="dsq-comment-text">
+	                                <p>Sweet! Catching your own errors? No better way to learn something :). Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2844230460" id="dsq-comment-2844230460">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2fipiFRJYw/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2844230460">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-18</span>
+	                            <span class="dsq-commenter-name">james</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2844230460" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2844230460" class="dsq-comment-text">
+	                                <p>Yes found it just a few minutes ago, I forgot some private fields in LoginFormAuthenticator... My bad!</p><p>Thanks anyway for the lightning fast answer!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2844220886" id="dsq-comment-2844220886">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2844220886">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2844220886" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2844220886" class="dsq-comment-text">
+	                                <p>Hi James!</p><p>That's really interesting! It *appears* that you logged in... but somehow are missing your User class. There's probably some tiny issue somewhere. Let's check out a few things:</p><p>1) What does the getUsername() method look like in your User class? If there is some bug in this, and it's returning a blank string, then I *think* it might cause this problem :).</p><p>2) If you hover over the icon in the web debug toolbar, what does it say for "Token class"? What about "Logged in as" - is that just blank?</p><p>3) If you turn intercept_redirects temporarily back to *true* and login, does the web debug toolbar look any different before you actually redirect?</p><p>4) After logging in, go into your favorite controller and run this code:</p><p></p><pre><code><br>dump($this-&gt;get('security.token_storage')-&gt;getToken());die;<br></code></pre><p></p><p>Basically, you're getting logged in, but *something* is wrong with the User class, which is inside of this "Token" class. The above dump would tell us more info about what's going on.</p><p>Let me know what you find out!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2843906529" id="dsq-comment-2843906529">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2fipiFRJYw/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2843906529">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-18</span>
+	                            <span class="dsq-commenter-name">james</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2843906529" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2843906529" class="dsq-comment-text">
+	                                <p>Following everything and I have just something different as a result, the user username does not appear in the dev bar like you. It is just n/a; the authentification went through and I am logged in. What could be the cause?</p><p>Thanks</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2757361476" id="dsq-comment-2757361476">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2757361476">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2757361476" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2757361476" class="dsq-comment-text">
+	                                <p>Nice job! It's actually quite different than the *old* "User Provider" chapter we had for Symfony2. Not a lot of has technically changed, but the way I like to explain it has :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2756949495" id="dsq-comment-2756949495">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2756949495">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-29</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2756949495" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2756949495" class="dsq-comment-text">
+	                                <p>isnt this a recycled vid!! lol well i caught up! hope the next batch of vids comes soon</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2607563429" id="dsq-comment-2607563429">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/MolloKhan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9429/4645/avatar92.jpg?1475260109">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2607563429">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-05</span>
+	                            <span class="dsq-commenter-name">Diego Aguiar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2607563429" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2607563429" class="dsq-comment-text">
+	                                <p>No problem, I hope someone find this useful</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2601131069" id="dsq-comment-2601131069">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2601131069">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-01</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2601131069" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2601131069" class="dsq-comment-text">
+	                                <p>Yes, good find! We changed that in Symfony 2.8 - the new interface is a little bit easier than the old one. DX improvement... as long as you know it exists :). Thanks for posting your solution!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2599575036" id="dsq-comment-2599575036">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/MolloKhan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9429/4645/avatar92.jpg?1475260109">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2599575036">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-31</span>
+	                            <span class="dsq-commenter-name">Diego Aguiar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2599575036" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2599575036" class="dsq-comment-text">
+	                                <p>I found it, in symfony3 no longer requires to implement "UserProviderInterface" instead it needs to implement "UserLoaderInterface"</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2597750024" id="dsq-comment-2597750024">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/MolloKhan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9429/4645/avatar92.jpg?1475260109">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2597750024">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-30</span>
+	                            <span class="dsq-commenter-name">Diego Aguiar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2597750024" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2597750024" class="dsq-comment-text">
+	                                <p>Hi Ryan, <br>looks like something has changed in symfony3, I've done everything thru this course and I'm always getting this error **Authentication request could not be processed due to a system problem.** when I try to login after doing the user provider change<br>I just can't figure it out how to fix it, any help would be very appreciated</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2340433873" id="dsq-comment-2340433873">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/medoune/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/7445/2990/avatar92.jpg?1379940023">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2340433873">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-03</span>
+	                            <span class="dsq-commenter-name">Medoune</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2340433873" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2340433873" class="dsq-comment-text">
+	                                <p>Hello, I works! It was due to the isAccountNonLocked() which was set to false!</p><p>Thanks</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2339573514" id="dsq-comment-2339573514">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2339573514">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-02</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2339573514" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2339573514" class="dsq-comment-text">
+	                                <p>Hi there!</p><p>This message can only be displayed because of 1 reason: your User class implements AdvancedUserInterface and the isAccountNonLocked() method returns false. Make sure this returns *true* for the User. I know, it has a confusing name "non-locked" is kind of a double negative. Anyways, here's the spot in the core that calls this method and gives you that error: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fsymfony%2Fblob%2F2.8%2Fsrc%2FSymfony%2FComponent%2FSecurity%2FCore%2FUser%2FUserChecker.php%23L35%3AM-evuT3CUyBViq-45FSiWjIKMTM&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/sym...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2337657872" id="dsq-comment-2337657872">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/medoune/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/7445/2990/avatar92.jpg?1379940023">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2337657872">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-11-01</span>
+	                            <span class="dsq-commenter-name">Medoune</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2337657872" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2337657872" class="dsq-comment-text">
+	                                <p>Hello,<br>I have done everything for this lesson, and everything works well but when I try to log in with a username who is active, I get "Account is locked"! And I can't found what that issues is from?</p><p>Sorry for my bad English</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2303204586" id="dsq-comment-2303204586">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2303204586">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-10-12</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2303204586" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2303204586" class="dsq-comment-text">
+	                                <p>Hey Léo!</p><p>Ah, I missed this message! And it's a really good question. The reason is because of this "hide_user_not_found" option under security: <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Freference%2Fconfiguration%2Fsecurity.html%3A6HmbNw0H_IVyx9DhdMj310nrLSM&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a>. This makes it so that when we throw a UsernameNotFoundException, it turns it into a different exception. Here's the code for that: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fsymfony%2Fblob%2F2.8%2Fsrc%2FSymfony%2FComponent%2FSecurity%2FCore%2FAuthentication%2FProvider%2FUserAuthenticationProvider.php%23L72%3ApbOoCjDuB1cy2Dk9X6y5hs01DsY&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/sym...</a></p><p>There's a bit more behind the scenes to controlling the exception messages in Symfony, and it's something that's been improved in Symfony 2.8 so that you have more control via a class called CustomUserMessageAuthenticationException: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fsymfony%2Fpull%2F15882%3AEQZRiBBkidt2fblQ_LIbR6Aaa-k&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/sym...</a>.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2257610601" id="dsq-comment-2257610601">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/leo__li/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/5562/5330/avatar92.jpg?1481145468">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2257610601">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-09-16</span>
+	                            <span class="dsq-commenter-name">Léo Li</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2257610601" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2257610601" class="dsq-comment-text">
+	                                <p>Hello again,</p><p>For this lesson, I've done everything, and it works well for login by username or by email. But, when I enter a username that doesn't exist, I still get an error "Wrong password bro!". But I think it should be "No user found for XXXX", right?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_user-provider';var disqus_url = 'https://knpuniversity.com/screencast/symfony-security/user-provider';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="logout-and-last-username#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-security/user-provider" addthis:title="Symfony Security: Beautiful Authentication, Powerful Authorization">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-security","courseIsOwned":false,"chapter":"The Mysterious \"User Provider\"","chapterNumber":7,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony Security: Beautiful Authentication, Powerful Authorization';
+        Core.courseId = 78
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-security';
+                    Core.chapterTitle = 'The Mysterious &quot;User Provider&quot;';
+            Core.chapterNumber = 7;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'user-provider';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

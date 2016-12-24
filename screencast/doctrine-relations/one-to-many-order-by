@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Order By with a OneToMany > Mastering Doctrine Relationships in Symfony | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 34758
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Tricks\x20with\x20ArrayCollection <i class="fa fa-play"></i>',
+            'url': '/screencast/doctrine-relations/array-collection-tricks#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures.
+
+But, we left out *one* big piece: database relations. Once you&#039;ve mastered these,
+you&#039;ll be unstoppable. Unfortunately, a lot of information out there make Doctrine
+relations look over-complicated. Actually, they&#039;re simple and beautiful. Sure,
+they have some pitfalls - but they&#039;ll also help you build a complex data structure
+in no time.
+
+* ManyToOne relationships (associations)
+* The OneToMany side of a relation
+* The downfall of owning versus inverse sides of a relation
+* Doing magic with the ArrayCollection
+* Querying with Joins
+
+... and more - like some magic with the &quot;Param Conversion&quot;.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Order By with a OneToMany">
+<meta property="og:description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures">
+<meta property="og:url" content="http://knpuniversity.com/screencast/doctrine-relations/one-to-many-order-by">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/doctrine-relations:00a4bff155bef69e3d39bd9c91a18e6e37c3bbac/doctrine-relationships.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="one-to-many-order-by#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        7.
+                            Order By with a OneToMany
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Mastering Doctrine Relationships in Symfony</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="create-genus-note" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Create Genus Note
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="many-to-one-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The King of Relations: ManyToOne
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Saving a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="join-column-relation-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        JoinColumn &amp; Relations in Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="param-conversion" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Controller Magic: Param Conversion
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        OneToMany: Inverse Side of the Relation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="one-to-many-order-by" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Order By with a OneToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="array-collection-tricks" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Tricks with ArrayCollection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="relation-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Querying on a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="query-with-join" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Query across a JOIN (and Love it)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/doctrine-relations" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Order By with a OneToMany</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Mastering Doctrine Relationships in Symfony Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="array-collection-tricks#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="one-to-many-order-by#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="one-to-many-order-by#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (24)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep3b-doctrine-relations/one-to-many-order-by.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Let's finish this! Ultimately, we need to create the same <code>$notes</code> structure, but
+with the <em>real</em> data. Above the <code>foreach</code> add a new <code>$notes</code> variable. Inside, add
+a new entry to that and start populating it with <code>id =&gt; $note-&gt;getId()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="e4fff8d718">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-117" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            117 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-94" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 94
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="95"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getNotesAction</span><span class="hljs-params">(Genus $genus)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="96"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="97"></td>
+            <td class="blob-code">        $notes = [];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="98"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="99"></td>
+            <td class="blob-code">        <span class="hljs-keyword">foreach</span> ($genus-&gt;getNotes() <span class="hljs-keyword">as</span> $note) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="100"></td>
+            <td class="blob-code">            $notes[] = [</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="101"></td>
+            <td class="blob-code">                <span class="hljs-string">'id'</span> =&gt; $note-&gt;getId(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="102"></td>
+            <td class="blob-code">            ];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="103"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="104-114" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 104 - 114
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="115"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="116"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Hey! Where's my autocompletion on that method!? Check out the <code>getNotes()</code> method in
+<code>Genus</code>. Ah, there's no <code>@return</code> - so PhpStorm has no idea what that returns. Sorry
+PhpStorm - my bad. Add some PhpDoc with <code>@return ArrayCollection|GenusNote[]</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="cdeb3602ff">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-114" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            114 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-105" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 105
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="106"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="107"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@return</span> ArrayCollection|GenusNote[]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="108"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="109"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getNotes</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="110"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="111"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;notes;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="112"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="113"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This will autocomplete any methods from <code>ArrayCollection</code> <em>and</em> auto-complete
+from <code>GenusNote</code> if we loop over these results.</p>
+<p><em>Now</em> we get autocompletion for <code>getId()</code>. Next, add <code>username =&gt; $note-&gt;getUsername()</code>
+and I'll paste in the other fields: <code>avatarUri</code>, <code>note</code> and <code>createdAt</code>. Ok, delete
+that hardcoded stuff!</p>
+<p><div class="code-block-wrapper" data-code-block-guid="e4fb324f79">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-116" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            116 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/GenusController.php">src/AppBundle/Controller/GenusController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-94" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 94
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="95"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getNotesAction</span><span class="hljs-params">(Genus $genus)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="96"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="97"></td>
+            <td class="blob-code">        $notes = [];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="98"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="99"></td>
+            <td class="blob-code">        <span class="hljs-keyword">foreach</span> ($genus-&gt;getNotes() <span class="hljs-keyword">as</span> $note) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="100"></td>
+            <td class="blob-code">            $notes[] = [</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="101"></td>
+            <td class="blob-code">                <span class="hljs-string">'id'</span> =&gt; $note-&gt;getId(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="102"></td>
+            <td class="blob-code">                <span class="hljs-string">'username'</span> =&gt; $note-&gt;getUsername(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="103"></td>
+            <td class="blob-code">                <span class="hljs-string">'avatarUri'</span> =&gt; <span class="hljs-string">'/images/'</span>.$note-&gt;getUserAvatarFilename(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="104"></td>
+            <td class="blob-code">                <span class="hljs-string">'note'</span> =&gt; $note-&gt;getNote(),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="105"></td>
+            <td class="blob-code">                <span class="hljs-string">'date'</span> =&gt; $note-&gt;getCreatedAt()-&gt;format(<span class="hljs-string">'M d, Y'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="106"></td>
+            <td class="blob-code">            ];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="107"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="108"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="109"></td>
+            <td class="blob-code">        $data = [</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="110"></td>
+            <td class="blob-code">            <span class="hljs-string">'notes'</span> =&gt; $notes</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="111"></td>
+            <td class="blob-code">        ];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="112"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="113"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> JsonResponse($data);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="114"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="115"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Deep breath: moment of truth. Refresh! Ha! There are the 15 beautiful, random notes,
+courtesy of the AJAX request, Alice and Faker.</p>
+<h2 id="ordering-the-onetomany">Ordering the OneToMany <a class="headerlink" href="one-to-many-order-by#ordering-the-onetomany" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>But wait - the order of the notes is weird: these should really be ordered from newest
+to oldest. That's the <em>downside</em> of using the <code>$genus-&gt;getNotes()</code> shortcut: you
+can't customize the query - it just happens magically in the background.</p>
+<p>Well ok, I'm lying a <em>little</em> bit: you <em>can</em> control the order. Open up <code>Genus</code>
+and find the <code>$notes</code> property. Add another annotation: <code>@ORM\OrderBy</code> with
+<code>{"createdAt"="DESC"}</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="4c34a9eb92">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-115" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            115 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-45" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 45
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\OneToMany(targetEntity="GenusNote", mappedBy="genus")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\OrderBy({"createdAt" = "DESC"})</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $notes;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="51-113" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 51 - 113
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="114"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>I know, the curly-braces and quotes look a little crazy here: just Google this
+if you can't remember the syntax. I do!</p>
+<p>Ok, refresh! Hey! Newest ones on top, oldest ones on the bottom. So we do have <em>some</em>
+control. But if you need to go further - like only returning the GenusNotes that
+are less than 30 days old - you'll need to do a little bit more work.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3016218518" id="dsq-comment-3016218518">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3016218518">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-23</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3016218518" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3016218518" class="dsq-comment-text">
+	                                <p>Great! Actually, it's not necessary to clear the dev cache manually in most cases, but looks like it was an exclusion. Sometimes it happens even with dev environment. I always try to clear cache first in any unexpected behavior - it's the first-aid :)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3016211508" id="dsq-comment-3016211508">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ziedhajsalah/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23095/2133/avatar92.jpg?1480071086">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3016211508">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-23</span>
+	                            <span class="dsq-commenter-name">zied haj salah</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3016211508" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3016211508" class="dsq-comment-text">
+	                                <p>Thank you Victor,<br>It worked for me after clearing the cache for dev env.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3016129892" id="dsq-comment-3016129892">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3016129892">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-23</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3016129892" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3016129892" class="dsq-comment-text">
+	                                <p>Hey Zied,</p><p>Please, double check you have "@ORM\" prefix for this annotation, it should be "@ORM\OrderBy({"createdAt" = "DESC"})". Then ensure you has exactly "createdAt" property on GenusNote class. You also need to clear cache for prod environment, please, clear it with "./bin/console cache:clear --env=prod" and just in case do it for dev env too. Note that ordering works only for that entities which you get with "$genus-&gt;getNotes()". If you load notes from repository - you should manually order them because they won't be ordered by default.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3015039575" id="dsq-comment-3015039575">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ziedhajsalah/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23095/2133/avatar92.jpg?1480071086">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3015039575">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-22</span>
+	                            <span class="dsq-commenter-name">zied haj salah</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3015039575" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3015039575" class="dsq-comment-text">
+	                                <p>Hi every one, it seems that the notes are not ordered by date even after i applied the orderBy annotation.<br>how can i fix this issue?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3008060037" id="dsq-comment-3008060037">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3008060037">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-18</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3008060037" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3008060037" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="somecallmetim27:disqus" href="https://disqus.com/by/somecallmetim27/" rel="nofollow noopener">somecallmetim27</a> ,</p><p>Thank you for sharing your case! I think it will help someone. Simple errors are always the most dangerous ones ;)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3007160590" id="dsq-comment-3007160590">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3007160590">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-17</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3007160590" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3007160590" class="dsq-comment-text">
+	                                <p>I ran into this same issue and ended up discovering that I had .jpg instead of .jpeg. I had to fix the typo AND reload the fixtures not to mention make sure I had a genus url that actually still existed to fix it.</p><p>Sounds simple, and it is, but it took me a little tinkering to figure out and then fix the problem.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2990025059" id="dsq-comment-2990025059">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2990025059">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-07</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2990025059" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2990025059" class="dsq-comment-text">
+	                                <p>Hey Terry!</p><p>You're definitely diving into a deep area here with all the cloning. I *believe* you would need to refresh each child entity, but I'm actually not sure.... and it only really matters in these cases where you have a "dangling" object reference like ArrayCollection. Specifically, if you *don't* refresh the GenusNote, I can't think of what problem that would be caused: you're already explicitly setting its genus property to the new Genus. If *it* were *also* related to some other entity (e.g. GenusNote is OneToMany with GenusNotePhoto or something), then you would have the situation again (i.e. cloning would actually mean that the new GenusNote would be related to the same GenusNotePhoto objects).</p><p>So, just try it out and see what works / doesn't work. In the collection tutorial we're about to release, we spell out really clearly the importance (or non-importance) of the owning and inverse sides of a relationship... which might at least clear your thinking on this :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2989483413" id="dsq-comment-2989483413">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/TerryCaliendo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3040/380/avatar92.jpg?1359392966">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2989483413">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-07</span>
+	                            <span class="dsq-commenter-name">Terry Caliendo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2989483413" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2989483413" class="dsq-comment-text">
+	                                <p>Thanks for the detailed answer.  I enjoy learning all the details so your answer is highly appreciated!</p><p>So I'm concluding from your response that *instead* of setting an Empty ArrayCollection on each Entity and also setting the subsequent inverse side of the relation, I could have waited until the end and called the refresh on the Entity:</p><p><code><pre>private function Clone($Genus){<br>  $em = $this-&gt;getDoctrine()-&gt;getManager();<br>  $Genus = $em-&gt;getRepository('AppBundle:Genus')-&gt;findOne(...);<br><br>  $NewGenus = clone $Genus;<br>  $em-&gt;persist($NewGenus);<br>  $em-&gt;flush();<br><br>  foreach ($Genus-&gt;getGenusNotes() as $GenusNote) {<br>      $NewGenusNote = clone $GenusNote;<br>      $NewGenusNote-&gt;setGenus($NewGenus);<br>      $em-&gt;persist($NewGenusNote);<br>      $em-&gt;flush();<br>  }<br><br>  $this-&gt;em-&gt;flush();<br>  // ** Refresh instead of rebuilding ArrayCollections **<br>  $em-&gt;refresh($NewGenus);<br>  return $NewGenus-&gt;getId();<br>}<br></pre></code></p><p>This actually works better for me, as in my case I have a chain of sub entities (ie. for comparison $GenusNotes would have a child Entity, maybe $GenusRatings, with ManyToOne relation on each $GenusNote. And in my actual code that child $GenusRatings also has children).  So it would simplify my cloning code to just call a refresh at the end.</p><p>Granted that brings up the question as to whether or not I need to refresh each child Entity.  Or if just refreshing the top level will clear all the saved lookups on the descendant Entities all the way down the chain (I'm guessing not).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2986010857" id="dsq-comment-2986010857">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2986010857">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-05</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2986010857" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2986010857" class="dsq-comment-text">
+	                                <p>Hey Terry!</p><p>I can answer this one as well :). Doctrine internally has something called an "identity map". Basically, it keeps track of all of the entities that were either queried for or persisted during this request. In fact, when you call persist() and flush() on an entity, *this* is how it knows whether or not to execute an INSERT or UPDATE: it asks "Is this object in my identity map because I queried for it? Or is it not in my identity map, so it must be new and i should insert?". It doesn't, as you might expect, check if the "id" is blank to determine and INSERT/UPDATE.</p><p>Anyways, this is at the core of Doctrine and by design. If I remember correctly, the identity map is mapped by id/primary key, which means that if you try to query for a Genus with id 5 times in one request, it will query for it just once. The other 4 times, it'll say "Terry! Man, we *already* queried for the Genus - so I'll just give that object back to you to save time, and also to make sure we don't have 5 duplicate objects flying around". So, *that*s the reason :). Before my "fix", you persisted a <code>$NewGenus</code> that had the <code>ArrayCollection</code> problem that we talked about. When you re-queried for it, Doctrine just gave you the same object back that you just gave to it :).</p><p>In rare cases, this can be a problem - e.g. you query for a Genus, but then later (on the same request) you know that something else has likely changed that data directly in the database (maybe a direct SQL query) and you need to "refresh" the entity. You *can* do this:</p><p></p><pre><code><br>$em-&gt;refresh($NewGenus);<br></code></pre><p></p><p>Honestly, this only ever happens when I'm writing functional tests (e.g. I create a Genus in PHP, save it, make an HTTP request to my app, which changed that data, then I refresh() so I can make sure that the data *did* in fact change). This is way deeper in Doctrine than most people ever need to get, but, since you're asking and curious, awesome! More power to you to know this stuff :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2985583656" id="dsq-comment-2985583656">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/TerryCaliendo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3040/380/avatar92.jpg?1359392966">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2985583656">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-05</span>
+	                            <span class="dsq-commenter-name">Terry Caliendo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2985583656" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2985583656" class="dsq-comment-text">
+	                                <p>I did what you said and it works.  Thanks much!</p><p>However, what's really interesting to  me is that I'm not passing the $NewGenus back.  I'm doing the cloning process in a "Clone" function and returning the "id" of the $NewGenus after the flush() call.</p><p><code><pre>private function Clone($Genus){<br>                 .... cloning process...<br>                 $this-&gt;em-&gt;flush();<br>                  return $NewGenus-&gt;getId();<br>}<br></pre></code></p><p>Then, in the function that called "Clone", I take the returned "id" and do a database query for the Entity:<br><code><pre>$ReturnedGenusID = $this-&gt;Clone($NewGenus);<br>$NewGenus = $this-&gt;em-&gt;getRepository('AppBundle:Genus')-&gt;findOneBy([<br>            'id' =&gt; $ReturnedGenusID<br>   ]);<br><br>foreach ($NewGenus-&gt;getNotes() as $GenusNote){<br>   dump($GenusNote); // referred to the wrong $Genus before doing your recommendations above<br>}<br></pre></code></p><p>So the getRepository was somehow cheating when it came to getting the ArrayCollection Entities attached to $Genus when I went to retrieve them.  Your fix did fix this issue... but I really don't understand why in this case (If I passed back the $NewGenus object created in "Clone", I would understand why.  But this was a brand new query outside the creating function, you'd think doctrine would start the process from scratch).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2984638594" id="dsq-comment-2984638594">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2984638594">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-04</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2984638594" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2984638594" class="dsq-comment-text">
+	                                <p>Hey Terry!</p><p>Hmm. So, the genusNotes property on Genus is an ArrayCollection object. In the code above, you're cloning the Genus and then cloning the GenusNote objects and setting the Genus on them. This is perfect to have Doctrine save everything correctly. But, <code>$newGenus</code> will still have a reference to the *original* ArrayCollection: when you clone, embedded objects aren't cloned, the new object just points to the original reference.</p><p>No biggie! Try this:</p><p>1) After you clone <code>$newGenus</code>, set a fresh ArrayCollection onto it:</p><p></p><pre><code><br>$newGenus-&gt;setGenusNotes(new ArrayCollection());<br></code></pre><p></p><p>2) After cloning each note, set it onto the genusNotes property, so that this inverse side of the relation is also set:</p><p></p><pre><code><br>$newGenus-&gt;getGenusNotes()-&gt;add($newGenusNote);<br></code></pre><p></p><p>In our upcoming (like next week) tutorial about Doctrine collections (<a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fcollections%29%3A-P11elezPC61ZBjHeYs44S_zChY&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a> we talk a lot about the two sides of each relationship and how you can add some cool code to keep them in "sync". And that's what you're doing here: making sure that when you call <code>$newGenusNote-&gt;setGenus($newGenus)</code>, that you also make sure that the <code>$newGenus</code> knows that this now belongs to it. That second part isn't needed for Doctrine persistence, it's only needed if you expect to access the $genusNotes property later in this request and expect it to have your new stuff.</p><p>Let me know if that puts you in a good spot!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2984059716" id="dsq-comment-2984059716">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/TerryCaliendo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3040/380/avatar92.jpg?1359392966">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2984059716">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-04</span>
+	                            <span class="dsq-commenter-name">Terry Caliendo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2984059716" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2984059716" class="dsq-comment-text">
+	                                <p>Does Doctrine do any caching of ArrayCollections by default?  I'm having some issues after doing my clone process above.</p><p>After doing the clone above, I return the "id" of the $NewGenus.  When I later call the Entity Manager to retrieve that new Genus by the "id", I get the correct Genus.  But when I do a foreach loop on that objects children, I get the GenusNotes that are attached to the original Genus not the new one.</p><p>Thus, I'm guessing Doctrine is somehow caching that lookup of the ArrayCollection that gets the GenusNotes when I make that 2nd call.</p><p>If I do the clone process, end the script, and then start the script again by calling the URL another time with a parameter to skip the cloning process and use that id created by the cloning process, the correct GenusNotes are returned. So there's got to be a caching issue.</p><p>Is there any way to force Doctrine to clear its cache from within the script?  (I know I can do /bin/console stuff but that's not possible at runtime and probably not part of this script-side caching issue).</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977045391" id="dsq-comment-2977045391">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/TerryCaliendo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3040/380/avatar92.jpg?1359392966">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977045391">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Terry Caliendo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977045391" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977045391" class="dsq-comment-text">
+	                                <p>Thanks.  I found that too but saw some comments that it was buggy.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2975965027" id="dsq-comment-2975965027">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2975965027">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-30</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2975965027" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2975965027" class="dsq-comment-text">
+	                                <p>Hey Terry!</p><p>There's not a good way that I know of to do this :/. Your method is probably about the right approach. Btw, it does touch on something cool about Doctrine: when you clone the Genus object, the new Genus object has the same idea. But when you save the new Genus object, Doctrine is smart enough to realize that this is *not* the same Genus object, and so does an INSERT, instead of confusing it with the original Genus. Total side thing, but it's cool :).</p><p>Oh, also, while Symfony doesn't have anything for this "deep cloning", I wondered if there was a random PHP library that might do this. And, I found this <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fmyclabs%2FDeepCopy%3AMhHTf_UgcUb3HRfg69wra_pek3I&amp;cuid=1175718" rel="nofollow noopener">https://github.com/myclabs/Dee...</a>. I've never used it, but it has decent stars on GitHub and the docs look great. If you're doing a lot of this, give it a shot and let me know!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2974240122" id="dsq-comment-2974240122">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/TerryCaliendo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/3040/380/avatar92.jpg?1359392966">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2974240122">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-29</span>
+	                            <span class="dsq-commenter-name">Terry Caliendo</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2974240122" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2974240122" class="dsq-comment-text">
+	                                <p>Say you wanted to copy a Genus and all its GenusNotes to a new set of rows in the tables.  Is there an easy way to do it?</p><p>This code only copies Genus and doesn't make copies of all the subsequent GenusNotes<br><code><pre>$NewGenus = clone $Genus;<br>$em-&gt;persist($NewGenus);<br>$em-&gt;flush();<br></pre></code></p><p>I had to do a foreach similar to below, but was hoping Symfony would have something built-in that's quicker/easier:</p><p><code><pre>        $em = $this-&gt;getDoctrine()-&gt;getManager();<br>        $Genus = $em-&gt;getRepository('AppBundle:Genus')-&gt;findOne(...);<br><br>        $NewGenus = clone $Genus;<br>        $em-&gt;persist($NewGenus);<br>        $em-&gt;flush();<br><br>        foreach ($Genus-&gt;getGenusNotes() as $GenusNote) {<br>            $NewGenusNote = clone $GenusNote;<br>            $NewGenusNote-&gt;setGenus($NewGenus);<br>            $em-&gt;persist($NewGenusNote);<br>            $em-&gt;flush();<br>        }<br><br>        $em-&gt;persist($NewGenus);<br>        $em-&gt;flush();<br></pre></code></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2802514952" id="dsq-comment-2802514952">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2802514952">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2802514952" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2802514952" class="dsq-comment-text">
+	                                <p>Interesting! This shouldn't be the problem - I intentionally *only* store the filename in the database. Then, in getNotesAction(), when we return the avatarUri there, we prefix the filename with '/images/' (check the code-blocks on this page). Both are valid ways to handle this - you just need to make sure you have the "/images" part either in the database or somewhere else :).</p><p>Unless there was some other issue that I'm not seeing! Let me know :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2801815059" id="dsq-comment-2801815059">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="one-to-many-order-by">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2801815059">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-25</span>
+	                            <span class="dsq-commenter-name">Aistis</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2801815059" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2801815059" class="dsq-comment-text">
+	                                <p>Hey, the problem was with links. In fixtures.yml you set :<br>userAvatarFilename: '50%? leanna.jpeg : ryan.jpeg'<br>But you need to set images folder.<br>So it should be like this:<br>userAvatarFilename: '50%? /images/leanna.jpeg : /images/ryan.jpeg'</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2786614676" id="dsq-comment-2786614676">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2786614676">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2786614676" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2786614676" class="dsq-comment-text">
+	                                <p>Hey Neal!</p><p>Hmm - I have a few ideas, but let's see :). If you open your network tools in your browser and then fresh to trigger the note loading, you should see the 404 links showing up there. What do the URL's look like? It's definitely interesting that it was working with the hardcoded notes, but not with the new dynamic ones. I'm curious what the difference is between the image paths in both situations (they should be the same, but apparently not!)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2785115170" id="dsq-comment-2785115170">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nealostrander/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13913/4197/avatar92.jpg?1435781304">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2785115170">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-15</span>
+	                            <span class="dsq-commenter-name">Neal Ostrander</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2785115170" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2785115170" class="dsq-comment-text">
+	                                <p>When I switch from the hard codes notes to using the getNotes the images no longer load. Inspecting shows the same path. I have tried clearing the cache but still not images. Inspecting the images show a resource not found error in the console any idea as to why the switch causes the images to not display?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2674645203" id="dsq-comment-2674645203">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ingalexvitari/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/15879/55/avatar92.jpg?1463184186">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2674645203">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-14</span>
+	                            <span class="dsq-commenter-name">Ing Alex Vitari</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2674645203" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2674645203" class="dsq-comment-text">
+	                                <p>Maybe because i'm using intelliJ and not PHPStorm.</p><p>/** @var Genus $genus */</p><p>Works Great! <br>Many Thanks</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2673896407" id="dsq-comment-2673896407">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2673896407">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-13</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2673896407" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2673896407" class="dsq-comment-text">
+	                                <p>Hey there!</p><p>Good question - because I'm obsessed with auto-completion! A few answers for you:</p><p>1) In *theory*, the Symfony plugin should detect that this should return a Genus object, since you're going to the GenusRepository. But, I can't actually remember if it works that way :).</p><p>2) In this situation, because you don't *own* the findOneBy method, you can't add phpdoc to it. But, you can add inline docs:</p><p></p><pre><code><br>/** @var Genus $genus */<br>$genus = // ...<br></code></pre><p></p><p>3) What I often do is actually create a custom method in my repository - eg. findOneByName($genusName). I do this in part to keep even *more* of my query logic in the repository... but also because then I can add phpdoc :).</p><p>Hope that helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2672675551" id="dsq-comment-2672675551">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/ingalexvitari/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/15879/55/avatar92.jpg?1463184186">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2672675551">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-12</span>
+	                            <span class="dsq-commenter-name">Ing Alex Vitari</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2672675551" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2672675551" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>as you do for the ArrayCollection in the function getNotes(), there is a way to do it with variables?</p><p>for example:</p><p>$genus = $em-&gt;getRepository('AppBundle:Genus')-&gt;findOneBy(['name' =&gt; $genusName]);</p><p>how can i say that the variable $genus is a Genus?</p><p>(just for autocompletion)</p><p>Many Thanks</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2595250575" id="dsq-comment-2595250575">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2595250575">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2595250575" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2595250575" class="dsq-comment-text">
+	                                <p>Hey Andrew!</p><p>Ah, cool! And yea, you're 100% right, this comes from JsonResponse. But more specifically, all JsonResponse does internally is call json_encode() on the `$data` variable that you pass it. And it turns out, if you json_encode() a DateTime object, it uses this representation. You can see it with this code:</p><p></p><pre><code><br>$data = [<br>    'data' =&gt; new \DateTime()<br>];<br>echo json_encode($data);<br>// prints {"data":{"date":"2016-03-29 13:49:24.000000","timezone_type":3,"timezone":"America\/Detroit"}}<br></code></pre><p></p><p>To fix that, I manually format this string before returning it in the controller - check out the 3rd code-block on this page - it sets the 'date' key in the array to `$note-&gt;getCreatedAt()-&gt;format('M d, Y') - this makes it return a string instead of a DateTime object.</p><p>I hope that helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2588699812" id="dsq-comment-2588699812">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/andrewgrudin/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2588699812">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-25</span>
+	                            <span class="dsq-commenter-name">Andrew Grudin</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2588699812" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2588699812" class="dsq-comment-text">
+	                                <p>/**<br>     * @ORM\Column(type="date")<br> */<br>private $createdAt;   in my table  genus_note. created_at after alice\faker looks just like:</p><p>2015-11-13</p><p>if i code:<br>'date' =&gt; $note -&gt; getCreatedAt()</p><p>and go, let's say, to   http://localhost:8000/genus/Balaena/notes , i get json  on date like this:</p><p>-date: {date: "2016-03-08 00:00:00.000000",<br>           timezone_type: 3,<br>           timezone: "Mariana Trench/Challenger Deep"<br>}</p><p>Could you tell me, please , who adds this  'timezone_type' and  'timezone' ?<br>May be  'Return new JsonResponse($data)' does?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_one-to-many-order-by';var disqus_url = 'https://knpuniversity.com/screencast/doctrine-relations/one-to-many-order-by';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="array-collection-tricks#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/doctrine-relations/one-to-many-order-by" addthis:title="Mastering Doctrine Relationships in Symfony">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"doctrine-relations","courseIsOwned":false,"chapter":"Order By with a OneToMany","chapterNumber":7,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Mastering Doctrine Relationships in Symfony';
+        Core.courseId = 81
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'doctrine-relations';
+                    Core.chapterTitle = 'Order By with a OneToMany';
+            Core.chapterNumber = 7;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'one-to-many-order-by';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

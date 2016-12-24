@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Dependency Injection Container > Dependency Injection and the art of services and containers | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 22117
+        };
+
+                        window.video.nextDetails = {
+            'type': 'activity',
+            'title': 'Let\'s go to the Challenge!',
+            'url': '/screencast/dependency-injection/container/activity/317'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Get your object-oriented skills sharp by exploring the ideas and reasons
+behind dependency injection. This simple principle separates developers
+who write functional code from those that are able to build great, and
+maintanable applications. In this tutorial, we&#039;ll see dependency injection
+in action, why it&#039;s important, and how it relates to services and service-oriented
+architecture. We&#039;ll also refactor our application to use a dependency
+injection container, using a fantastic - but simple - container called
+Pimple.
+
+If you&#039;re ready to take your object-oriented code to the next level, AND
+actually be excited about doing it, this tutorial is for you!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Dependency Injection Container">
+<meta property="og:description" content="Get your object-oriented skills sharp by exploring the ideas and reasons
+behind dependency injection. This simple principle separates developers
+who write functional code from those that are able to build great, and
+maintanable applications">
+<meta property="og:url" content="http://knpuniversity.com/screencast/dependency-injection/container">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/dependency-injection:dfd9f72026f340fcc92d35de987ac0640ab79b68/di.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="container#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        4.
+                            Dependency Injection Container
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Dependency Injection and the art of services and containers</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="intro" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Dependency Injection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:36</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="services" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Services and Dependency Injection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:19</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/services/activity/312" title="Challenge 2.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/services/activity/313" title="Challenge 2.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="injection-interfaces" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Injecting Config &amp; Services and using Interfaces
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:28</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/injection-interfaces/activity/314" title="Challenge 3.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/injection-interfaces/activity/315" title="Challenge 3.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/injection-interfaces/activity/316" title="Challenge 3.3: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">3 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="container" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Dependency Injection Container
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 10:23</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                                                                                                                
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/container/activity/317" title="Challenge 4.1: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                                                                            
+                            <a class="challenge-square inline-link js-tooltip" href="http://knpuniversity.com/screencast/dependency-injection/container/activity/318" title="Challenge 4.2: unanswered"><span class="coding-icon coding-icon-unanswered"><i class="fa fa-code"></i></span></a>                                                <span class="challenge-count">2 challenges</span>
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="container-in-your-project" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        A Container in your Project
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <div class="dropdown download-buy-buttons">
+              <button class="btn btn-success dropdown-toggle" type="button" id="downloadDropdown" data-toggle="dropdown" aria-expanded="true">
+                  <span><i class="fa fa-download"></i></span>
+                  <span class="hidden-xs">Download</span>
+                  <span class="caret"></span>
+              </button>
+              <ul class="list-unstyled dropdown-menu pull-right" role="menu" aria-labelledby="downloadDropdown">
+                  
+                  <li><a href="../get/dependency-injection/code/dfd9f72026f340fcc92d35de987ac0640ab79b68" class="js-analytics-download" data-download-type="code"><i class="fa fa-code"></i> Course Code</a></li>
+
+                                        <li><a href="http://knpuniversity.com/screencast/dependency-injection/container/download/video" class="js-analytics-download" data-download-type="video"><i class="fa fa-video-camera"></i> This Video</a></li>
+                                        <li><a href="../get/dependency-injection/script/dfd9f72026f340fcc92d35de987ac0640ab79b68" class="js-analytics-download" data-download-type="script"><i class="fa fa-book"></i> Course Script</a></li>              </ul>
+          </div>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Dependency Injection Container</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Dependency Injection and the art of services and containers Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered "
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/536614757_960x600.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/140212064.hd.mp4?s=ab6c551194884b592157502dae58d10f1a0a8e64&amp;profile_id=113&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/140212064.sd.mp4?s=b9fe93df31e9f81ef4c68db2a6fc4399d057b641&amp;profile_id=112&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="container#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../../tracks/oo" class="btn btn-lg btn-success">Back to the <i>OO</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="container#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="http://knpuniversity.com/screencast/dependency-injection/container/activity/317">
+            Next Challenge <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="container#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="container#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (4)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/dependency-injection/edit/master/knpu/container.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Our project now has services, an interface, and is fully using dependency
+injection. Nice work! One of the downsides of DI is that all the complexity
+of creating and configuring objects is now your job. This isn't so bad since
+it all happens in one place and gives you so much control, but it is something
+we can improve!</p>
+<p>If you want to make this easier, the tool you need is called a dependency injection
+container. A lot of DI containers exist in PHP, but let's use Composer to grab the
+simplest one of all, called <a href="http://pimple.sensiolabs.org/">Pimple</a>. Add a <code>require</code> key to <code>composer.json</code> to
+include the library:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="002395a9a7">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-12" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            12 lines <span class="meta-divider"></span> <span title="composer.json">composer.json</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code">{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="2-3" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 2 - 3
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">    <span class="hljs-attr">"require"</span>: {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="5-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">        <span class="hljs-attr">"pimple/pimple"</span>: <span class="hljs-string">"1.0.*"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">    },</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Make sure you've <a href="http://getcomposer.org/download/">downloaded Composer</a>, and then run <code>php composer.phar install</code>
+to download Pimple.</p>
+<div class="admonition seealso"><p class="admonition-title"><span class="fa fa-book"></span> Go Deeper!</p><p>If you're new to Composer, check out our free <a href="../composer/resume">The Wonderful World of Composer Tutorial</a>.</p>
+</div><p>Pimple is both powerful, and tiny. Kind of like having one on prom night. 
+It is just a single file taking up around 200 lines. That's one reason I love it!</p>
+<p>Create a new Pimple container. This is an object of course, but it looks
+and acts like an array that we store all of our service objects on:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d7531b4518">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">$container = <span class="hljs-keyword">new</span> Pimple();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="9-24" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 9 - 24
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Start by adding the <code>SmtpMailer</code> object under a key called <code>mailer</code>. Instead
+of setting it directly, wrap it in a call to <code>share()</code> and in an anonymous
+function. We'll talk more about this in a second, but just return the mailer
+object from the function for now:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="bc06a6f9b3">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-9" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 9
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'mailer'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> SmtpMailer(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">        <span class="hljs-string">'smtp.SendMoneyToStrangers.com'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">        <span class="hljs-string">'smtpuser'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">        <span class="hljs-string">'smtppass'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        <span class="hljs-string">'465'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="18-24" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 18 - 24
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>To access the <code>SmtpMailer</code> object, use the array syntax again:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a2f009ed4c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">$friendHarvester = <span class="hljs-keyword">new</span> FriendHarvester($pdo, $container[<span class="hljs-string">'mailer'</span>]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="23-24" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 23 - 24
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>It's that simple! Run the application to spam... I mean send great opportunities
+to our friends!</p>
+<pre><code class="language-bash"><div class="line">php app.php</div></code></pre>
+<h2 id="shared-and-lazy-services">Shared and Lazy Services <a class="headerlink" href="container#shared-and-lazy-services" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>We haven't fully seen the awesomeness of the container yet, but there are
+already some cool things happening. First, wrapping the instantiation of
+the <code>mailer</code> service in an anonymous function makes its creation "lazy":</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1f1a463998">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-24" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            24 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-9" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 9
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'mailer'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="18-24" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 18 - 24
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This means that the object isn't created until much later when we reference
+the <code>mailer</code> service and ask the container to give it to us. And if we
+never reference <code>mailer</code>, it's never created at all - saving us time and
+memory.</p>
+<p>Second, using the <code>share()</code> method means that no matter how many times we
+ask for the <code>mailer</code> service, it only creates it once. Each call returns 
+the original object:</p>
+<pre><code class="language-php">$mailer1 = $container['mailer'];
+$mailer2 = $container['mailer'];
+
+// there is only 1 mailer, the 2 variables hold the same one
+$willBeTrue = $mailer1 === $mailer2;</code></pre>
+<p>This is a very common property of a service: you only ever need just one.
+If we need to send many emails, we don't need many mailers, we just need
+the one and then we'll call <code>send()</code> on it many times. This also makes our code
+faster and less memory intensive, since the container guarantees that we
+only have one mailer. This is another detail that we don't need to worry
+about.</p>
+<h1 id="now-witness-the-geek-awesomeness-of-this-fully-armed-and-operational-container">Now witness the Geek-Awesomeness of this fully armed and operational Container! <a class="headerlink" href="container#now-witness-the-geek-awesomeness-of-this-fully-armed-and-operational-container" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h1>
+<p>Let's keep going and add our other services to the container. But first,
+I'll add some comments to separate which part of our code is building the
+container, and which part is our actual application code:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="f90c30ed46">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-28" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            28 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-comment">/* START BUILDING CONTAINER */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">$container = <span class="hljs-keyword">new</span> Pimple();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'mailer'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> SmtpMailer(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">        <span class="hljs-string">'smtp.SendMoneyToStrangers.com'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        <span class="hljs-string">'smtpuser'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        <span class="hljs-string">'smtppass'</span>,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">        <span class="hljs-string">'465'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">$dsn = <span class="hljs-string">'sqlite:'</span>.<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/data/database.sqlite'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">$pdo = <span class="hljs-keyword">new</span> PDO($dsn);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code"><span class="hljs-comment">/* END CONTAINER BUILDING */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-28" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 28
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's add <code>FriendHarvester</code> to the container next:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="cbe1965d92">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-32" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            32 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-20" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 20
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'friend_harvester'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FriendHarvester($pdo, $container[<span class="hljs-string">'mailer'</span>]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-32" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 32
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That's easy, except that we somehow need access to the <code>PDO</code> object and
+the container itself so we can get two required dependencies. Fortunately,
+the anonymous function is passed an argument, which is the Pimple container
+itself:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a655050f3d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-20" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 20
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'friend_harvester'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Pimple $container)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FriendHarvester($container[<span class="hljs-string">'pdo'</span>], $container[<span class="hljs-string">'mailer'</span>]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-35" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 35
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>To fix the missing <code>PDO</code> object, just make it a service as well:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="7b7932edcf">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-24" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 24
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'pdo'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">    $dsn = <span class="hljs-string">'sqlite:'</span>.<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/data/database.sqlite'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> PDO($dsn);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-35" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 30 - 35
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Now we can easily update the <code>friend_harvester</code> service configuration to
+use it:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="907375af7c">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-20" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 20
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'friend_harvester'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Pimple $container)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FriendHarvester($container[<span class="hljs-string">'pdo'</span>], $container[<span class="hljs-string">'mailer'</span>]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-35" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 35
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>With the new <code>friend_harvester</code> service, update the application code to
+just grab it out of the container:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a21c689103">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-32" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 32
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">$friendHarvester = $container[<span class="hljs-string">'friend_harvester'</span>];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">$friendHarvester-&gt;emailFriends();</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Now that all three of our services are in the container, you can start to
+see the power that this gives us. All of the logic of exactly which objects
+depend on which other object is abstracted away into the container itself.
+Whenever we need to use a service, we just reference it: we don't care how
+it's created or what dependencies <em>it</em> may have, it's all handled elsewhere.
+And if the constructor arguments for a service like the <code>mailer</code> change later,
+we only need to update one spot in our code. Nobody else knows or cares about
+this change.</p>
+<p>Remember also that the services are constructed lazily. When we ask for the
+<code>friend_harvester</code>, the <code>pdo</code> and <code>mailer</code> services haven't been instantiated
+yet. Fortunately, the container is smart enough to create them first, and
+then pass them into the <code>FriendHarvester</code> constructor. All of that happens
+automatically, behind the scenes.</p>
+<h2 id="configuration">Configuration <a class="headerlink" href="container#configuration" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>But a container can hold more than just services, it can house our configuration
+as well. Create a new key on the container called <code>database.dsn</code>, set it to
+our configuration, and then use it when we're creating the PDO object:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6d3167d1b3">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-35" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            35 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'database.dsn'</span>] = <span class="hljs-string">'sqlite:'</span>.<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/data/database.sqlite'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-26" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 26
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'pdo'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Pimple $container)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> PDO($container[<span class="hljs-string">'database.dsn'</span>]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-35" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 30 - 35
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>We're not using the <code>share()</code> method or the anonymous function because this
+is just a scalar value, and we don't need to worry about that lazy-loading
+stuff.</p>
+<p>We can do the same thing with the SMTP configuration parameters. Notice that
+the name I'm giving to each of these parameters isn't important at all, I'm
+just inventing a sane pattern and using the name where I need it:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="73a5e2469d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-39" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            39 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'database.dsn'</span>] = <span class="hljs-string">'sqlite:'</span>.<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/data/database.sqlite'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.server'</span>] = <span class="hljs-string">'smtp.SendMoneyToStrangers.com'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.user'</span>] = <span class="hljs-string">'smtpuser'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.password'</span>] = <span class="hljs-string">'smtp'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.port'</span>] = <span class="hljs-number">465</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'mailer'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Pimple $container)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> SmtpMailer(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.server'</span>],</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.user'</span>],</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.password'</span>],</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.port'</span>]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="26-39" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 26 - 39
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>When we're all done, the application works exactly as before. What we've
+gained is the ability to keep all our configuration together. This would
+make it very easy to change our database to use MySQL or change the
+SMTP password.</p>
+<h2 id="move-configuration-into-a-separate-file">Move Configuration into a Separate File <a class="headerlink" href="container#move-configuration-into-a-separate-file" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Now that we have this flexibility, let's move the configuration and service
+building into separate files altogether. Create a new <code>app/</code> directory and 
+<code>config.php</code> and <code>services.php</code> files. Require each of these from the <code>app.php</code> 
+script right after creating the container:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="196678e491">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-16" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            16 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-comment">/* START BUILDING CONTAINER */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">$container = <span class="hljs-keyword">new</span> Pimple();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-keyword">require</span> <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/app/config.php'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"><span class="hljs-keyword">require</span> <span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/app/services.php'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-comment">/* END CONTAINER BUILDING */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-16" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 16
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Next, move the configuration logic into <code>config.php</code> and all the services into 
+<code>services.php</code>. Be sure to update the SQLite database path in <code>config.php</code>
+since we just moved this file:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="8368c9b994">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-7" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            7 lines <span class="meta-divider"></span> <span title="app/config.php">app/config.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'database.dsn'</span>] = <span class="hljs-string">'sqlite:'</span>.<span class="hljs-keyword">__DIR__</span>.<span class="hljs-string">'/../data/database.sqlite'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.server'</span>] = <span class="hljs-string">'smtp.SendMoneyToStrangers.com'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.user'</span>] = <span class="hljs-string">'smtpuser'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.password'</span>] = <span class="hljs-string">'smtp'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'smtp.port'</span>] = <span class="hljs-number">465</span>;</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a671bee050">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-21" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            21 lines <span class="meta-divider"></span> <span title="app/services.php">app/services.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">DiDemo</span>\<span class="hljs-title">Mailer</span>\<span class="hljs-title">SmtpMailer</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">DiDemo</span>\<span class="hljs-title">FriendHarvester</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'mailer'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Pimple $container)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> SmtpMailer(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.server'</span>],</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.user'</span>],</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.password'</span>],</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">        $container[<span class="hljs-string">'smtp.port'</span>]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'friend_harvester'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Pimple $container)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FriendHarvester($container[<span class="hljs-string">'pdo'</span>], $container[<span class="hljs-string">'mailer'</span>]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">});</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">$container[<span class="hljs-string">'pdo'</span>] = $container-&gt;share(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Pimple $container)</span> </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> PDO($container[<span class="hljs-string">'database.dsn'</span>]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">});</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<h2 id="skinny-controllers-and-service-oriented-architecture">Skinny Controllers and Service-Oriented Architecture <a class="headerlink" href="container#skinny-controllers-and-service-oriented-architecture" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Awesome! We now have configuration, service-building and our actual application
+code all separated into different files. Notice how clear our actual app
+code is now - it's just one line to get out a service and another to use
+it.</p>
+<p>If this were a web application, this would live in a controller. You'll
+often hear that you should have "skinny controllers" and a "fat model". And
+whether you realize it or not, we've just seen that in practice! When we
+started, <code>app.php</code> held all of our logic. After refactoring into services
+and using a service container, <code>app.php</code> is skinny. The "fat model" refers
+to moving all of your logic into separate, single-purpose classes, which
+are sometimes referred to collectively as "the model". Another term for this
+is service-oriented architecture.</p>
+<p>In the real world, you may not always have skinny controllers, but always
+keep this philosophy in your mind. The skinnier your controllers, the more
+readable, reusable, testable and maintainable that code will be. What's better,
+a 300 line long chunk of code or 5 lines that use a few well-named and small
+service objects?</p>
+<h2 id="auto-completion-with-a-container">Auto-completion with a Container <a class="headerlink" href="container#auto-completion-with-a-container" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>One of the downsides to using a container is that your IDE and other developers
+don't exactly know what type of object a service may be. There's no perfect
+answer to this, since a container is very dynamic by nature. But what you
+<em>can</em> do is use PHP documentation whenever possible to explicitly say what
+type of object something is.</p>
+<p>For example, after fetching the <code>friend_harvester</code> service, you can use
+a single-line comment to tell your IDE and other developers exactly what
+type of object we're getting back:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="915c75cbb0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-19" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            19 lines <span class="meta-divider"></span> <span title="app.php">app.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"><span class="hljs-comment">/** <span class="hljs-doctag">@var</span> FriendHarvester $friendHarvester */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">$friendHarvester = $container[<span class="hljs-string">'friend_harvester'</span>];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">$friendHarvester-&gt;emailFriends();</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>This gives us IDE auto-complete on the <code>$friendHarvester</code> variable. 
+Another common tactic is to create an object or sub-class the container
+and add specific methods that return different services and have proper
+PHPDoc on them. I won't show it here, but imagine we've sub-classed
+the <code>Pimple</code> class and added a <code>getFriendHarvester()</code> method which has
+a proper <code>@return</code> PHPDoc on it.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2904362068" id="dsq-comment-2904362068">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2904362068">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-19</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2904362068" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2904362068" class="dsq-comment-text">
+	                                <p>Hey Maksym,</p><p>When you call your service for the first time and service declared as a callback (e.g. as an anonymous function) then Pimple call this callback and inject itself to it, and then the value that returns called callback stores under the same service key, i.e. your anonymous function overwrites with a real object it returns. You can see it <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsilexphp%2FPimple%2Fblob%2F44515c40a4c4effc53c1e6c0e7158f711473dc98%2Fsrc%2FPimple%2FContainer.php%23L112-L113%3AigKbFwNgNAMX8B27cfHOSG2Z12o&amp;cuid=1175718" rel="nofollow noopener">here</a>. So Pimple always injects itself into the callback, but you can miss this first argument in callback if you don't need it.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2904196258" id="dsq-comment-2904196258">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2904196258">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-19</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2904196258" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2904196258" class="dsq-comment-text">
+	                                <p>Hi, Ryan!</p><p>Thank you very much for replying!</p><p>Why does the Container pass itself as the first argument? I mean, how does it know that it's supposed to? Or are you trying to say that the creators of Pimple made it do so?<br>Ok, I feel like I'm getting closer now. :)<br>Could you pinpoint exactly where (like which files in the vendor folder) does this magic happen?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2903998432" id="dsq-comment-2903998432">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2903998432">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-19</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2903998432" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2903998432" class="dsq-comment-text">
+	                                <p>Hey Maksym!</p><p>It's a *great* question :). Notice, that when you set $di['db'], you are not setting this *directly* to the PDO object, you are setting it to a callback function. To say it differently, after the code you have posted has executed (but before anything else has happened), the PDO instance has *not* been created yet: we've simply configured a Pimple\Container() object with a bunch of configuration and callback functions.</p><p>Later in your code, you will eventually want to *reference* your "db" service (e.g. $di['db']-&gt;someFunction()). At the *moment* that you do this, the Pimple\Container object will execute your callback function and pass itself (the container) as the first argument to that function. This whole setup is designed this way so that you can have a nice container full of objects, but can delay actually creating those object (for performance purposes) until (and unless) you actually need them.</p><p>Let me know if that helps!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2903092240" id="dsq-comment-2903092240">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2903092240">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-18</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2903092240" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2903092240" class="dsq-comment-text">
+	                                <pre><code><br>$di = new Pimple\Container();<br>$di['db.dsn'] = '...';<br><br>$di['db'] = function ($c) {<br>    return new \PDO($c['db.dsn']);<br>};<br></code></pre><p></p><p>How on earth does this $c variable receive the container instance?? :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_container';var disqus_url = 'https://knpuniversity.com/screencast/dependency-injection/container';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="http://knpuniversity.com/screencast/dependency-injection/container/activity/317">
+            Next Challenge <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/dependency-injection/container" addthis:title="Dependency Injection and the art of services and containers">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"dependency-injection","courseIsOwned":true,"chapter":"Dependency Injection Container","chapterNumber":4,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Dependency Injection and the art of services and containers';
+        Core.courseId = 34
+        Core.courseIsOwned = true;
+        Core.courseSlug = 'dependency-injection';
+                    Core.chapterTitle = 'Dependency Injection Container';
+            Core.chapterNumber = 4;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'container';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

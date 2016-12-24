@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Database Config and Automatic Table Creation > Symfony: Doctrine &amp; the Database | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 34685
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Inserting\x20new\x20Objects <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-doctrine/insert-object#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="With already *two* courses checked off, you are *primed* and ready to put
+Symfony to work! And that&#039;s what this course is all about: making things more
+interesting by talking to the database with Doctrine.
+
+Doctrine has a reputation for being tough to learn, and that&#039;s
+unfortunate, because it&#039;s an amazing tool. In this tutorial, we&#039;ll
+get you rolling with Doctrine: learn how to use it, how to get
+hard work done easily and how to avoid the common pitfalls that
+*can* make Doctrine hard:
+
+* Creating entity classes
+* Managing migrations
+* Saving new data
+* Querying for data
+* Custom repositories
+* Custom queries and the query builder
+* Fixtures (Dummy data) using Faker
+
+... and (like always) a lot more goodies are mixed in.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Database Config and Automatic Table Creation">
+<meta property="og:description" content="With already *two* courses checked off, you are *primed* and ready to put
+Symfony to work! And that&amp;#039;s what this course is all about: making things more
+interesting by talking to the database with Doctrine.
+
+Doctrine has a reputation for being tough to learn, and that&amp;#039;s
+unfortunate, because it&amp;#039;s an amazing tool">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-doctrine/db-config">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-doctrine:00a4bff155bef69e3d39bd9c91a18e6e37c3bbac/sf-ep3.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="db-config#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        2.
+                            Database Config and Automatic Ta...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony: Doctrine &amp; the Database</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="entity-class" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Creating an Entity Class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="db-config" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Database Config and Automatic Table Creation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="insert-object" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Inserting new Objects
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="adding-more-columns" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Adding More Columns
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="migrations" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Database Migrations
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:12</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="query-list" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Query for a List of Genuses
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="twig-dot-syntax" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Entities, Twig and the Magic dot Syntax
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="show-404" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Show them a Genus, and the 404
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dummy-data" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Fixtures: Dummy Data Rocks
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:45</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="fixtures-alice" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Delightful Dummy Data with Alice
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:12</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="alice-faker-function" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Custom Alice Faker Function
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:33</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="custom-queries" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Custom Queries
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-doctrine" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Database Config and Automatic Table Creation</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony: Doctrine &amp; the Database Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered video-js-16x9"
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/560021169_960x540.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/158505230.hd.mp4?s=149ebf996edc08b726a11271312db842e7ff88ca&amp;profile_id=119&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/158505230.sd.mp4?s=a4d35e97ad81568d06c5f493cc2647896bc5b002&amp;profile_id=164&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="db-config#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../tag/symfony" class="btn btn-lg btn-success">Back to the <i>Symfony 3</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="db-config#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="insert-object#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="db-config#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="db-config#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep3-doctrine/db-config.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>We <em>described</em> the <code>genus</code> table to Doctrine via annotations, but this table doesn't
+exist yet. No worries - Doctrine can create it for us!</p>
+<p>And actually, we don't even have a database yet. Doctrine can also handle this. Head
+to the terminal use the console to run:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:database:create</div></code></pre>
+<p>But wait! Can Doctrine do this yet? We haven't told it <em>anything</em> about the database:
+not the name we want, the user or the password.</p>
+<h2 id="configuring-the-database">Configuring the Database <a class="headerlink" href="db-config#configuring-the-database" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Where do we do that? The same place that <em>everything</em>, meaning all <em>services</em> are
+configured: <code>app/config/config.yml</code>. Scroll down to the <code>doctrine</code> key:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="930c80e88e">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-72" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            72 lines <span class="meta-divider"></span> <span title="app/config/config.yml">app/config/config.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-43" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 43
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="44"></td>
+            <td class="blob-code"><span class="hljs-comment"># Doctrine Configuration</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="45"></td>
+            <td class="blob-code"><span class="hljs-attr">doctrine:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="46"></td>
+            <td class="blob-code"><span class="hljs-attr">    dbal:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code"><span class="hljs-attr">        driver:</span>   pdo_mysql</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code"><span class="hljs-attr">        host:</span>     <span class="hljs-string">"%database_host%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code"><span class="hljs-attr">        port:</span>     <span class="hljs-string">"%database_port%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code"><span class="hljs-attr">        dbname:</span>   <span class="hljs-string">"%database_name%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="51"></td>
+            <td class="blob-code"><span class="hljs-attr">        user:</span>     <span class="hljs-string">"%database_user%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="52"></td>
+            <td class="blob-code"><span class="hljs-attr">        password:</span> <span class="hljs-string">"%database_password%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="53"></td>
+            <td class="blob-code"><span class="hljs-attr">        charset:</span>  UTF8</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="54"></td>
+            <td class="blob-code">        <span class="hljs-comment"># if using pdo_sqlite as your database driver:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="55"></td>
+            <td class="blob-code">        <span class="hljs-comment">#   1. add the path in parameters.yml</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="56"></td>
+            <td class="blob-code">        <span class="hljs-comment">#     e.g. database_path: "%kernel.root_dir%/data/data.db3"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="57"></td>
+            <td class="blob-code">        <span class="hljs-comment">#   2. Uncomment database_path in parameters.yml.dist</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="58"></td>
+            <td class="blob-code">        <span class="hljs-comment">#   3. Uncomment next line:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code">        <span class="hljs-comment">#     path:     "%database_path%"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="60-72" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 60 - 72
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ah, <em>this</em> is what tells Doctrine all about your database connection.</p>
+<p>But, the information is not hardcoded here - these are references to parameters
+that are defined in <code>parameters.yml</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="278568f4c3">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-15" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            15 lines <span class="meta-divider"></span> <span title="app/config/parameters.yml.dist">app/config/parameters.yml.dist</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-3" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 3
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">parameters:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-attr">    database_host:</span>     <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">    database_port:</span>     ~</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">    database_name:</span>     symfony</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-attr">    database_user:</span>     root</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-attr">    database_password:</span> ~</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    <span class="hljs-comment"># You should uncomment this if you want use pdo_sqlite</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">    <span class="hljs-comment"># database_path: "%kernel.root_dir%/data.db3"</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="12-15" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 12 - 15
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Update the <code>database_name</code> to <code>aqua_note</code> and on my super-secure local machine,
+the database user is <code>root</code> with no password.</p>
+<div class="admonition seealso"><p class="admonition-title"><span class="fa fa-book"></span> Go Deeper!</p><p>Find out more about these parameters in our <a href="../symfony-fundamentals/config-parameters">Symfony Fundamentals Series</a>.</p>
+</div><p>Back to the terminal! <em>Now</em> hit enter on the command:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:database:create</div></code></pre>
+<p>Database created. To create the table, run:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:schema:update --dump-sql</div></code></pre>
+<p>This looks great - <code>CREATE TABLE genus</code> with the two columns. But this didn't <em>execute</em>
+the query yet - the <code>--dump-sql</code> option is used to preview the query if you're curious.
+Replace it with <code>--force</code>.</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:schema:update --force</div></code></pre>
+<p>So hey guys, this is really cool - we can be totally lazy and let Doctrine do all
+the heavy database-lifting for us. This <code>doctrine:schema:update</code> command is actually
+more powerful than it looks - it's going to "wow" us in a few minutes.</p>
+<p>But first, let's learn how to insert data into the new table.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3040304508" id="dsq-comment-3040304508">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3040304508">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-07</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3040304508" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3040304508" class="dsq-comment-text">
+	                                <p>Hi again Boran!</p><p>Hmm, let's try clearing out your database entirely and starting from scratch:</p><p><code><pre>bin/console doctrine:database:drop --force<br>bin/console doctrine:database:create<br>bin/console doctrine:migrations:migrate<br></pre></code></p><p>Let me know if that works! This error can happen if somehow the <code>genus</code> table (or any other tables) were added to your database via some method *other* than running your migrations, e.g. by running <code>doctrine:schema:update</code>. When this happens, it looks like you have *not* run any of your migrations (because you haven't), so it tries to run all of your migrations, but has an error when the <code>genus</code> table already exists. The trick is to keep a good workflow where you never run <code>doctrine:schema:update</code> and always use <code>doctrine:migrations:migrate</code> to keep your database structure updated.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3038576260" id="dsq-comment-3038576260">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/boranalsaleh/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23012/267/avatar92.jpg?1482538468">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3038576260">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">Boran Alsaleh</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3038576260" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3038576260" class="dsq-comment-text">
+	                                <p>hi weaverry ,</p><p>could you please help me in this issue , when i try to make  doctrine:migration:migrate<br> i get the below error :</p><p>Error An exception occurred while executing 'CREATE TABLE genus (id INT AUTO_INCREMENT NOT NULL, sub_family_id INT NOT NULL, name VARCHAR(255) NOT NULL, species_count INT NOT NULL, fun_fact VARCHAR(255) DEFAULT NULL, is_published TINYINT(1) NOT NULL, first_discovered_at DATE NOT NULL, INDEX IDX_38C5106ED15310D4 (sub_family_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB':</p><p>SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'genus' already exists</p><p>thanks ,</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3004710364" id="dsq-comment-3004710364">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3004710364">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3004710364" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3004710364" class="dsq-comment-text">
+	                                <p>Yo Boran!</p><p>If that doesn't work, it could also be a "mysql.sock" problem, which is where your php.ini setting of "pdo_mysql.default_socket" points to a socket location (e.g. /tmp/mysql.sock), but your MySQL server creates the socket file somewhere else. This is kind of annoying, because different installations of MySQL put the mysql.sock file in different places, so you need to do some digging to find it, and then update your php.ini file (you can find its location by running <code>php --ini</code> from the command line and look for "Loaded Configuration File").</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3004510444" id="dsq-comment-3004510444">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3004510444">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-16</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3004510444" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3004510444" class="dsq-comment-text">
+	                                <p>Hey Boran,</p><p>Try to change your `database_host` in parameters.yml to the "127.0.0.1" instead of "localhost" which is by default, it should help. Let me know if it still doesn't work.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3004060088" id="dsq-comment-3004060088">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/boranalsaleh/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23012/267/avatar92.jpg?1482538468">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3004060088">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-15</span>
+	                            <span class="dsq-commenter-name">Boran Alsaleh</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3004060088" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3004060088" class="dsq-comment-text">
+	                                <p>hey guys ,,</p><p>I am getting this error every time I run $ ./bin/console doctrine:database:create</p><p>./bin/console doctrine:database:create</p><p>  [Doctrine\DBAL\Exception\ConnectionException]                                <br>  An exception occured in driver: SQLSTATE[HY000] [2002] No such file or dire  <br>  ctory</p><p>  [Doctrine\DBAL\Driver\PDOException]               <br>  SQLSTATE[HY000] [2002] No such file or directory</p><p>  [PDOException]                                    <br>  SQLSTATE[HY000] [2002] No such file or directory</p><p>doctrine:database:create [--shard SHARD] [--connection [CONNECTION]] [--if-not-exists] [-h|--help] [-q|--quiet] [-v|vv|vvv|--verbose] [-V|--version] [--ansi] [--no-ansi] [-n|--no-interaction] [-e|--env ENV] [--no-debug] [--] &lt;command&gt;</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2972909078" id="dsq-comment-2972909078">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2972909078">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-28</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2972909078" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2972909078" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="fmm8:disqus" href="https://disqus.com/by/fmm8/" rel="nofollow noopener">fmm8</a> ,</p><p>There're could be a few reasons, but the all of them are related to invalid DB credentials. Please, double check your MySQL credentials like port, login, password, etc. Is your MySQL server running? Have you tried successfully to connect to the MySQL database in other project? Or probably connection to a DB with PhpMyAdmin, MySQL Workbench or similar utility? Which credentials do you use there?</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2971605996" id="dsq-comment-2971605996">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/fmm8/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2971605996">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-27</span>
+	                            <span class="dsq-commenter-name">fmm8</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2971605996" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2971605996" class="dsq-comment-text">
+	                                <p>btw the yml files are properly indented.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2971603767" id="dsq-comment-2971603767">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/fmm8/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2971603767">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-27</span>
+	                            <span class="dsq-commenter-name">fmm8</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2971603767" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2971603767" class="dsq-comment-text">
+	                                <p>Hi there,</p><p>I am getting this error every time I run $ ./bin/console doctrine:database:create</p><p>  [Doctrine\DBAL\Exception\ConnectionException]                              <br>  An exception occured in driver: SQLSTATE[HY000] [2002] Connection refused</p><p>  [Doctrine\DBAL\Driver\PDOException]        <br>  SQLSTATE[HY000] [2002] Connection refused</p><p>  [PDOException]                             <br>  SQLSTATE[HY000] [2002] Connection refused</p><p>doctrine:database:create [--shard SHARD] [--connection [CONNECTION]] [--if-not-exists] [-h|--help] [-q|--quiet] [-v|vv|vvv|--verbose] [-V|--version] [--ansi] [--no-ansi] [-n|--no-interaction] [-e|--env ENV] [--no-debug] [--] &lt;command&gt;</p><p>However, my configurations are  as follow below;</p><p>config.yml</p><p># Doctrine Configuration<br>doctrine:<br>    dbal:<br>        default_connection: default<br>        connections:<br>            default:<br>                driver:   pdo_mysql<br>                dbname:   "%database_name%"<br>                user:     "%database_user%"<br>                host:     "%database_host%"<br>                password: "%database_password%"<br>                unix_socket: /tmp/mysql.sock<br>                charset: UTF8</p><p>parameters.yml</p><p>parameters:<br>    database_host: 127.0.0.1<br>    database_port: null<br>    database_name: aqua_note<br>    database_user: root<br>    database_password: null<br>    secret: 0b719bbdb89bd1ce9774b1069c9696d8ce3f1b08</p><p>    mailer_transport:  smtp<br>    mailer_host:       127.0.0.1<br>    mailer_user:       ~<br>    mailer_password:   ~</p><p>Can someone please help? I will really appreciate it.</p><p>Thanks!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2858924501" id="dsq-comment-2858924501">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2858924501">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-25</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2858924501" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2858924501" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="disqus_6nvmegiuiq:disqus" href="https://disqus.com/by/disqus_6nvMEGIUiq/" rel="nofollow noopener">Kaiser</a>!</p><p>Ok, let's get you fixed up :). My guess is that you had one error, and may have caused other little errors while debugging the first. If we straighten everything out, we should be good! So let's look at each thing, one-by-one.</p><p>First, about the database password. Obviously, it turns out that you don't have a password, which is why null worked. But, I agree that it's a little weird that when you *did* add a password, it still said password NO, instead of password YES. But honestly, I would just ignore that if it's working, because I'm guessing there was some small misconfiguration causing this confusion. I just tried locally - if I set my password to something, I get an access denied password YES.</p><p>Second, about the database name. This seems similar to the database password! It seems that we're having some configuration confusion somewhere, but I'm not sure where. As you already know (based on your comment), when you set database_name in parameters.yml, this only works because that parameter is referenced in config.yml, under the doctrine.dbal.dbname key. So, if you are setting that key directly - which I know you tried - then there's other magic happening: this *should* set the database name. The fact that you're having this problem and the password problem makes me wonder if there isn't - somehow - some other database configuration somewhere else. Look in all of the files in app/config for a "doctrine" root key. In short: your configuration is not behaving as it should. And although you should not need to ever do this, you should try clearing your cache (bin/console cache:clear) just in case. Also, are you using a VM? I'm trying to think if it's possible that you're editing the files, but they're not actually updating on your VM (or something). It just doesn't make sense!</p><p>Finally, about the "No Metadata Classes to Process". Assuming you have normal, default doctrine configuration (which, we're not sure is true at this point!) then this only happens if your entity class has a bug in it. Things to check:</p><p>A) That your class matches your filename (so, Post.php)<br>B) That the file lives in the Entity directory and the namespace is correct (your namespace IS correct)<br>C) That there is an &lt;?php tag on top (this happens more often than you would think!)<br>D) That your annotations have /** (with two stars) - you're good here too!</p><p>But also, remove the "mappings" config key you added. I'm guessing you did this while trying to debug, but it's not necessary: the auto_mapping: true above tells Doctrine to look in the Entity/ directory of all of your bundles :).</p><p>Phew! Ok, let me know what you find out!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2855706256" id="dsq-comment-2855706256">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_6nvMEGIUiq/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2855706256">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-23</span>
+	                            <span class="dsq-commenter-name">Kaiser</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2855706256" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2855706256" class="dsq-comment-text">
+	                                <p>Hi.</p><p>I've been struggling with this part for a few days now and I've reached a point where i simply cant figure it out on my own.<br>I changed the settings for my local connection in parameter.yml, but i kept getting an error saying access denied to root@localhost password: no. No matter what I put in parameter.yml this was my response. <br>I changed my root password to null and boom. It worked. i could run doctrine:database:create however... It creates a DB called 'symfony' even though I changed the db_name first in parameter.yml and then hardcoded in config.yml.</p><p>When i then try to run doctrine:schema:update --dump-sql it results in an error saying "No Metadata Classes to process."</p><p>My EntityClass looks like this:</p><p></p><pre><code><br>namespace AppBundle\Entity;<br><br><br>use Doctrine\ORM\Mapping as ORM;<br><br>/**<br> * @ORM\Entity<br> * @ORM\Table(name="blog_posts")<br> */<br>class Post<br>{<br>    /**<br>     * @ORM\Id<br>     * @ORM\GeneratedValue(strategy="AUTO")<br>     * @ORM\Column(type="integer")<br>     */<br>    private $id;<br><br>    /**<br>     * @ORM\Column(type="string", length=100)<br>     */<br>    private $title;<br><br>    /**<br>     * @ORM\Column(type="text")<br>     */<br>    private $description;<br><br>    /**<br>     * @ORM\Column(type="text")<br>     */<br>    private $content;<br><br>    /**<br>     * @ORM\Column(type="date")<br>     */<br>    private $date;<br><br>}<br></code></pre><p></p><p>And I've trying to change the config.yml to contain this under orm:</p><p></p><pre><code><br>orm:<br>        auto_generate_proxy_classes: "%kernel.debug%"<br>        naming_strategy: doctrine.orm.naming_strategy.underscore<br>        auto_mapping: true<br>        mappings:<br>                AppBundle:<br>                    type: annotation<br>                    is_bundle: false<br>                    dir: %kernel.root_dir%/../src/AppBundle/Entity/<br>                    prefix: AppBundle\Entity<br>                    alias: AppBundle<br></code></pre><p></p><p>The directory structure is as shown throughout these great tutorials :) <br>I hope you can help me resolve this, or clearify the error for me. Which seems to me like the changes made in/for config.yml ain't being saved for some reason.?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2832369458" id="dsq-comment-2832369458">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2832369458">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-11</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2832369458" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2832369458" class="dsq-comment-text">
+	                                <p>Hi Claire!</p><p>Welcome to Symfony! :) You did a great job creating the database in sqlite. In fact, in the future, you might even be able to do a little less work - you shouldn't need to create the aqua_note_database file - Doctrine should even create that when you run doctrine:database:create :).</p><p>But anyways, one tricky thing with sqlite is that it doesn't have a fancy "mysql" command line tool. There a few GUI tools for visualizing an SQLite database (just google for them - I don't have a favorite, and they're dependent on your OS). OR, there is a better idea :). Symfony has an bin/console command that will make a raw SQL query for you. Try this:</p><p></p><pre><code><br>bin/console doctrine:query:sql 'DESCRIBE genus'<br></code></pre><p></p><p>It's not quite as convenient as the "mysql" utility, since you need to prefix everything with the "bin/console doctrine:query:sql", but it works awesome!</p><p>Let me know if it helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2831948272" id="dsq-comment-2831948272">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_7JHbmPt1qr/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2831948272">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-11</span>
+	                            <span class="dsq-commenter-name">claire</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2831948272" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2831948272" class="dsq-comment-text">
+	                                <p>Hi, <br>I'm really new to Symfony and have been really enjoying these tutorials. I have come across a problem and was wondering if you can point me in the right direction. I am using Sqlite and had to do do a few things differently to create a table. Under app, resources, I created a database directory and within that a 'aqua_note_database' as a datasource. Ran the ./bin/console doctrine:database:create and yay it created a database. But when you did 'mysql -u root ...', i tried to compensate with 'sqlite -u root...' and it is not recognizing the command.</p><p>my question is, having to use sqlite, is the way I created a database ok? and what is the command for '-u root..'?</p><p>Thank you :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2823292099" id="dsq-comment-2823292099">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2823292099">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-06</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2823292099" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2823292099" class="dsq-comment-text">
+	                                <p>Great tip - I use it too and love it!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2822976288" id="dsq-comment-2822976288">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/3amprogrammer/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/18706/694/avatar92.jpg?1470710433">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2822976288">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-05</span>
+	                            <span class="dsq-commenter-name">3amprogrammer</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2822976288" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2822976288" class="dsq-comment-text">
+	                                <p>I find it very usefull to use <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fbamarni%2Fsymfony-console-autocomplete%3AQyIwDnreBB8vVlzxsxFgDVgihpQ&amp;cuid=1175718" rel="nofollow noopener">https://github.com/bamarni/sym...</a>. This way you dont have to look at some reference all the time when dealing with ./bin/console :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2772944243" id="dsq-comment-2772944243">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2772944243">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-08</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2772944243" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2772944243" class="dsq-comment-text">
+	                                <p>Oh man, lame! I didn't realize my message got cut off! I just updated it above - my &lt;php killed the message at first :).</p><p>Glad you got it working - and good working using PhpStorm :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2772418959" id="dsq-comment-2772418959">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/mclimey/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21436/4443/avatar92.jpg?1467956954">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2772418959">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-08</span>
+	                            <span class="dsq-commenter-name">McLimey</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2772418959" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2772418959" class="dsq-comment-text">
+	                                <p>Don't worry. What ever I did fixed  it. I think it helps that I'm using PHPstorm now, too =p</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2771695300" id="dsq-comment-2771695300">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/mclimey/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21436/4443/avatar92.jpg?1467956954">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2771695300">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-08</span>
+	                            <span class="dsq-commenter-name">McLimey</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2771695300" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2771695300" class="dsq-comment-text">
+	                                <p>Ah, man! A cliff hanger!! Any chance I can get the rest of your thoughts on this? :p Glad to see I was on the right path, anyway ^_^</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2770263028" id="dsq-comment-2770263028">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2770263028">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-07</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2770263028" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2770263028" class="dsq-comment-text">
+	                                <p>Yo!</p><p>Yep, you're thinking about it correctly. I'm guessing you get this error if you run the doctrine:schema:update command, or generally try to do anything related to Doctrine? Here's how it works:</p><p>1) When the system loads, Doctrine needs to know about *all* of the entities in the system.<br>2) By default, it looks in the Entity directory of all of your bundles and looks inside any classes there for the annotations</p><p>So, the error you're getting is basically Doctrine saying "Hi! I don't see any annotated classes in your Entity directory".</p><p>So, a few things to check for:</p><p>1) Make sure you have the &lt;?php tag in your Entity class. This sounds silly - but it's actually the most common thing to forget :)</p><p>2) Make sure your directory is called Entity exactly</p><p>3) Though I would have expected a different error, you do have a typo in your namespace - you have Entiry - change that to Entity :).</p><p>Let me know how it goes!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2768975096" id="dsq-comment-2768975096">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="db-config">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2768975096">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-06</span>
+	                            <span class="dsq-commenter-name">dev_lime</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2768975096" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2768975096" class="dsq-comment-text">
+	                                <p>I'm guessing it can't spot my variables... but I have no idea how to resolve this &gt;.&gt;</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2768973182" id="dsq-comment-2768973182">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="db-config">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2768973182">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-06</span>
+	                            <span class="dsq-commenter-name">dev_lime</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2768973182" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2768973182" class="dsq-comment-text">
+	                                <p>namespace AppBundle\Entiry;</p><p>use Doctrine\ORM\Mapping as ORM;</p><p>/**<br> * @ORM\Entity<br> * @ORM\Table(name="posts")<br> */<br>class Posts {</p><p>    /**<br>     * @ORM\Id<br>     * @ORM\GeneratedValue(stratergy="AUTO")<br>     * @ORM\Column(type="interger")<br>     */<br>    private $id;</p><p>    /**<br>     * @ORM\Column(type="string")<br>     */<br>    private $name;</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2768972477" id="dsq-comment-2768972477">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="db-config">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2768972477">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-06</span>
+	                            <span class="dsq-commenter-name">dev_lime</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2768972477" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2768972477" class="dsq-comment-text">
+	                                
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2768971751" id="dsq-comment-2768971751">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="db-config">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2768971751">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-06</span>
+	                            <span class="dsq-commenter-name">dev_lime</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2768971751" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2768971751" class="dsq-comment-text">
+	                                <p>I've wandered off the beaten path a little and managed to get...not an error as such (Techincally) But I am getting this "No Metadata Classes to process."... any ideas? This is my PHP</p><p></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2695934454" id="dsq-comment-2695934454">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/Shiweur/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/4540/8919/avatar92.jpg?1362997203">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2695934454">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-26</span>
+	                            <span class="dsq-commenter-name">Marcolic</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2695934454" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2695934454" class="dsq-comment-text">
+	                                <p>ok. I found what was my problem. The thing is I'm using cmder and I thought it was able to read path variables, which is not true. I just add to create aliases. Anayway thanks for your answer Ryan.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2689717040" id="dsq-comment-2689717040">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2689717040">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-22</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2689717040" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2689717040" class="dsq-comment-text">
+	                                <p>Hi there!</p><p>I'm not *too* good with Windows, unfortunately :). But, I can tell you that you should be able to execute the mysql command using the *long* version, even if your path isn't setup correclty:</p><p>C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql</p><p>Also, you can cheat! Symfony has a console command that allows you to run queries through it:</p><p>php bin/console doctrine:query:sql "DESCRIBE genus"</p><p>I hope that helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2687830231" id="dsq-comment-2687830231">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/Shiweur/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/4540/8919/avatar92.jpg?1362997203">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2687830231">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-21</span>
+	                            <span class="dsq-commenter-name">Marcolic</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2687830231" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2687830231" class="dsq-comment-text">
+	                                <p>Hello everyone. I used to use wamp for development, everything I know is self learning and I only dev for my pleasure.</p><p>I'm using the server that symfony provides. I installed MySql, the database have been created and it seem to be working. The only thing is that I can't use 'mysql' as a command line so I tried to add that path:"C:\Program Files\MySQL\MySQL Server 5.7\bin" to my environnement variables but it still doesn't work. Any idea ? Btw I'm on Windows 8.1.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2658025782" id="dsq-comment-2658025782">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2658025782">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-04</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2658025782" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2658025782" class="dsq-comment-text">
+	                                <p>Hi Yoni!</p><p>I don't see any problem with this. In fact, it's important to make sure that your tables use utf8 in the beginning (changing them later is a pain!). I usually create my database with a utf8 charset, and then let my tables inherit that from the database. However, if you do what you have here, then you will definitely not have any problems.</p><p>But actually, you can also set this globally. See the "Setting up the Database to be UTF8" title under this section: <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fbook%2Fdoctrine.html%23configuring-the-database%3AC4Q_tYWO7D5xrBYG8lholGkRd00&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a></p><p>That's the way to go :)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2657865319" id="dsq-comment-2657865319">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/yoni_l/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/16463/5953/avatar92.jpg?1436348623">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2657865319">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-04</span>
+	                            <span class="dsq-commenter-name">Yoni L.</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2657865319" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2657865319" class="dsq-comment-text">
+	                                <p>Hi thank you for this, is there any problem to use utf8mb4 charset, in annotation i found that you can add collation info in table annotation like this: <br>@ORM\Table(name="genus", options={"collate"="utf8mb4_general_ci", "charset"="utf8mb4"})<br>is it a good practice or some kind of black magic?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2570784297" id="dsq-comment-2570784297">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2570784297">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-15</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2570784297" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2570784297" class="dsq-comment-text">
+	                                <p>Hey Marco!</p><p>Ah, this is a good step forward! The database is now running, and you're using the user "root", but the password is incorrect. The correct password depends on how you installed mysql - a common option is either a blank password (that's the default in parameters.yml) *or* "root" also for the password. Check the documentation for how you installed it and then update parameters.yml and try again.</p><p>You're close!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2570419941" id="dsq-comment-2570419941">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/marcolacugurra/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20016/3299/avatar92.jpg?1473157912">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2570419941">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-15</span>
+	                            <span class="dsq-commenter-name">Marco La Cugurra</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2570419941" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2570419941" class="dsq-comment-text">
+	                                <p>Hello, <br>I guess I installed mySQL now I'm getting a different error</p><p>[Doctrine\DBAL\Exception\ConnectionException]</p><p>  An exception occured in driver: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: NO)</p><p>some help anyone please :)<br>thank you</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2568800469" id="dsq-comment-2568800469">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2568800469">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-14</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2568800469" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2568800469" class="dsq-comment-text">
+	                                <p>Hey Marco!</p><p>Hmm, connection refused us when there is no database running on the server. Do you have MySQL installed? Alternatively, you could use Sqlite, which doesn't require to have a database running. There are instructions in the config.yml file for how to use Sqlite, but here is a gist if it helps: <a href="https://disq.us/url?url=https%3A%2F%2Fgist.github.com%2Fweaverryan%2Fbc71c280140dacd494db%3AcyuH25vVWBZ4FnKisejIfOHEDsk&amp;cuid=1175718" rel="nofollow noopener">https://gist.github.com/weaver...</a>. But, installing/starting MySQL is also a good idea :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2568476178" id="dsq-comment-2568476178">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/marcolacugurra/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/20016/3299/avatar92.jpg?1473157912">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2568476178">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-14</span>
+	                            <span class="dsq-commenter-name">Marco La Cugurra</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2568476178" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2568476178" class="dsq-comment-text">
+	                                <p>Hello as I launch the ./bin/console doctrine:database:create I get this error :"[Doctrine\DBAL\Exception\ConnectionException]</p><p>  An exception occured in driver: SQLSTATE[HY000] [2002] Connection refused</p><p>  [Doctrine\DBAL\Driver\PDOException]</p><p>  SQLSTATE[HY000] [2002] Connection refused</p><p>  [PDOException]</p><p>  SQLSTATE[HY000] [2002] Connection refused</p><p>"<br>Can someone help me out with that? I guess there are probably some problems with my parameters. I'm not using MAMP by the way. <br>this are my parameters:</p><p>parameters:<br>    database_host: 127.0.0.1<br>    database_port:  ~<br>    database_name: aqua_note<br>    database_user: root<br>    database_password: null<br>    mailer_transport: smtp<br>    mailer_host: 127.0.0.1<br>    mailer_user: null<br>    mailer_password: null<br>    secret: 03b3f955112e8fd6629f3379f556cd72c9008251</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_db-config';var disqus_url = 'https://knpuniversity.com/screencast/symfony-doctrine/db-config';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="insert-object#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-doctrine/db-config" addthis:title="Symfony: Doctrine &amp; the Database">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-doctrine","courseIsOwned":false,"chapter":"Database Config and Automatic Table Creation","chapterNumber":2,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony: Doctrine &amp; the Database';
+        Core.courseId = 75
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-doctrine';
+                    Core.chapterTitle = 'Database Config and Automatic Table Creation';
+            Core.chapterNumber = 2;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'db-config';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

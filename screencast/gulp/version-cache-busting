@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Versioning to Bust Cache > Gulp! Refreshment for Your Frontend Assets | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 33709
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: JavaScript\x20Versioning\x20and\x20Cleanup <i class="fa fa-play"></i>',
+            'url': '/screencast/gulp/javascript-versioning-and-cleanup#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="
+We all need to minify and combine our CSS and JS files. And with Gulp,
+this is not only easy, but it&#039;s actually *fun to do*!
+
+In this tutorial, I&#039;ll show you how to setup Gulp in your PHP or Symfony
+project to do a bunch of things:
+    
+* Minify CSS and JS files
+* Watch files for changes
+* Combine files
+* Use sourcemaps
+* Publish Font files
+* Have page-specific CSS/JS files
+* Cache-bust with versioning
+
+We&#039;ll actually use Laravel&#039;s Elixir as a guide, but make things work
+for any PHP project and learn how we can make Gulp do whatever we need.
+
+Yay!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Versioning to Bust Cache">
+<meta property="og:description" content="
+We all need to minify and combine our CSS and JS files. And with Gulp,
+this is not only easy, but it&amp;#039;s actually *fun to do*!
+
+In this tutorial, I&amp;#039;ll show you how to setup Gulp in your PHP or Symfony
+project to do a bunch of things:
+    
+* Minify CSS and JS files
+* Watch files for changes
+* Combine files
+* Use sourcemaps
+* Publish Font files
+* Have page-specific CSS/JS files
+* Cache-bust with versioning
+
+We&amp;#039;ll actually use Laravel&amp;#039;s Elixir as a guide, but make things work
+for any PHP project and learn how we can make Gulp do whatever we need">
+<meta property="og:url" content="http://knpuniversity.com/screencast/gulp/version-cache-busting">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/gulp:d3894eab428324765b9c23048b5e27fdf19745da/gulp.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="version-cache-busting#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        15.
+                            Versioning to Bust Cache
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="../gulp.1">Gulp! Refreshment for Your Frontend Assets</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="first-gulp" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Your First Gulp
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:31</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="sass" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Sass to CSS
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="sourcemaps" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Sourcemaps
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="watch" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Watch for Changes
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:57</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="concat" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Combining (concat) Files
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:57</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="minify" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Minify
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:29</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="minify-only-production" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Minify only in Production
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="sourcemaps-only-dev" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Sourcemaps only in Development
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:04</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="load-plugins" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        gulp-load-plugins
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:11</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="errors-call-the-plumber" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Errors: Call the Plumber
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 1:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="page-specific-css" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Page Specific CSS
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="bower-into-vendor" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Bower Components out of web
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:47</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="javascript" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Minify and Combine JavaScript
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:17</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="publishing-fonts" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Publish Fonts to web
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="version-cache-busting" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Versioning to Bust Cache
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 9:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="javascript-versioning-and-cleanup" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        JavaScript Versioning and Cleanup
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="on-end-async-and-listeners" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        on(&#039;end&#039;): Async and Listeners
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="task-ordering" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Task Order
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:45</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/gulp" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Versioning to Bust Cache</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="../gulp.1"><em>Gulp! Refreshment for Your Frontend Assets Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $6.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="javascript-versioning-and-cleanup#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="version-cache-busting#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="version-cache-busting#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (15)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/gulp/edit/master/knpu/version-cache-busting.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>We've got a real nice setup here! With <code>gulp</code> running, if we update any Sass
+files, this <code>main.css</code> gets regenerated. But there's just one problem: when
+we deploy an updated <code>main.css</code>, how can we bust browser cache so our visitors
+see the new stuff?</p>
+<p>To solve this easily, we could go into the template, add a <code>?v=</code> to the end,
+then manually update this on each deploy. Of course, I'll <em>definitely</em>
+forget to do this, so let's find a better way with Gulp.</p>
+<h2 id="introducing-gulp-rev">Introducing gulp-rev <a class="headerlink" href="version-cache-busting#introducing-gulp-rev" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Search for the plugin <code>gulp-rev</code>, as in "revision". Open up its docs. This
+plugin does one thing: you point it at a file - like <code>unicorn.css</code> - and
+it changes the name, adding a hash on the end. That hash is based on the
+contents, so it'll change whenever the file changes. </p>
+<p>So let's think about this: if we can <em>somehow</em> make our template <em>automatically</em>
+point to whatever the latest hashed filename is, we've got instant cache-busting.
+Every time we deploy with an update, your CSS file will have a new name.</p>
+<p>I want to do that, so copy the install line and get that downloading:</p>
+<pre><code class="language-bash"><div class="line">npm install --save-dev gulp-rev</div></code></pre>
+<p>Now, head to <code>gulpfile.js</code>. Remember, we're using <code>gulp-load-plugins</code>, so
+we don't need the <code>require</code> line. In <code>addStyle</code>, add the new <code>pipe()</code> right
+<em>before</em> the sourcemaps are dumped so that both the CSS file <em>and</em> its map
+are renamed. Inside, use <code>plugins.rev()</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="db0ff93f61">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-73" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            73 lines <span class="meta-divider"></span> <span title="gulpfile.js">gulpfile.js</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    gulp.src(paths)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        .pipe(plugins.rev())</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="21-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 21 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">};</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-73" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 73
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, let's see what this does. I'll clean out <code>web/css</code>:</p>
+<pre><code class="language-bash"><div class="line">rm -rf web/css/*</div></code></pre>
+<p>Now run <code>gulp</code>:</p>
+<pre><code class="language-bash"><div class="line">gulp</div></code></pre>
+<p>Go check out that directory. Instead of <code>main.css</code> and <code>dinosaur.css</code>, we
+have <code>main-50d83f6c.css</code> and <code>dinosaur-32046959.css</code> And the maps also got
+renamed - so our browser will still find them.</p>
+<p>But you probably also see the problem: the site is broken! We're still including
+the old <code>main.css</code> file in our layout.</p>
+<h2 id="dumping-the-rev-manifest-json-file">Dumping the rev-manifest.json File <a class="headerlink" href="version-cache-busting#dumping-the-rev-manifest-json-file" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>We can't just update <code>base.html.twig</code> to use the new hashed name because
+it would re-break every time we changed the file. What we need is a map that
+says: "Hey, <code>main.css</code> is actually called <code>main-50d83f6c.css</code>." If we had
+that, we could use it inside our PHP code to rewrite the <code>main.css</code> in the
+base template to hashed version automatically. When the hashed name updates,
+the map would update, and so would our code.</p>
+<p>And of course, the <code>gulp-rev</code> people thought of this! They call that map
+a "manifest". To get <code>gulp-rev</code> to create that for us, we need to ask it
+<em>really</em> nicely. At the end, add another <code>pipe()</code> to <code>plugins.rev.manifest()</code>
+and tell that <em>where</em> we want the manifest. Let's put it next to our assets
+at <code>app/Resources/assets/rev-manifest.json</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6259490c4f">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-76" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            76 lines <span class="meta-divider"></span> <span title="gulpfile.js">gulpfile.js</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">app.addStyle = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">paths, outputFilename</span>) </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    gulp.src(paths)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-comment">// write the rev-manifest.json file for gulp-rev</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        .pipe(plugins.rev.manifest(<span class="hljs-string">'app/Resources/assets/rev-manifest.json'</span>))</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">};</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="27-76" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 27 - 76
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>As you'll see, this file doesn't need to be publicly accessible - our PHP
+code just needs to be able to read it.</p>
+<p>There's one more interesting step: <code>pipe()</code> this into <code>gulp.dest('.')</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="35c35846eb">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-76" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            76 lines <span class="meta-divider"></span> <span title="gulpfile.js">gulpfile.js</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    gulp.src(paths)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-comment">// write the rev-manifest.json file for gulp-rev</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        .pipe(plugins.rev.manifest(<span class="hljs-string">'app/Resources/assets/rev-manifest.json'</span>))</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">        .pipe(gulp.dest(<span class="hljs-string">'.'</span>));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="26-76" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 26 - 76
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>What?</p>
+<h3 id="what-do-multiple-dest-s-mean">What do Multiple dest()'s mean? <a class="headerlink" href="version-cache-busting#what-do-multiple-dest-s-mean" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>So far, we've always had one <code>gulp.src()</code> at the top and one <code>gulp.dest()</code>
+at the bottom, but you can have more. Our first <code>gulp.dest()</code> writes the
+CSS file. But once we pipe to <code>plugins.rev.manifest()</code>, the Gulp stream changes.
+Instead of being the CSS file, the <em>manifest</em> is now being passed through the
+pipes. So the last <code>gulp.dest()</code> just writes that file relative to the root
+directory.</p>
+<p>Let me show you. Stop gulp and restart:</p>
+<pre><code class="language-bash"><div class="line">gulp</div></code></pre>
+<p>And there's our <code>rev-manifest.json</code> file:</p>
+<pre><code class="language-json">{
+    "main.css": "main-50d83f6c.css"
+}</code></pre>
+<p>It holds the map from <code>main.css</code> to its actual filename right now. It <em>is</em>
+missing <code>dinosaur.css</code>, but we'll fix that in a second.</p>
+<h3 id="fixing-the-manifest-base-directory">Fixing the manifest base directory <a class="headerlink" href="version-cache-busting#fixing-the-manifest-base-directory" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>But there's another problem I want to tackle first. In a second, we're going
+to put JavaScript paths into the manifest too. So I <em>really</em> need this to
+have the full public path - <code>css/main.css</code> - instead of just the filename.</p>
+<p>So why does it <em>just</em> say <code>main.css</code>? Because when we call <code>addStyle()</code>,
+we pass in <em>only</em> <code>main.css</code>. This is passed to <code>concat()</code> and that becomes
+the path that's used by <code>gulp-rev</code>.</p>
+<p>The fix is easy! Inside <code>concat()</code>, update it to <code>css/</code> then the filename.
+That changes the filename that's inside the Gulp stream. To keep the file
+in the same spot, just take the <code>css/</code> out of the <code>gulp.dest()</code> call:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="88d10de9d4">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-76" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            76 lines <span class="meta-divider"></span> <span title="gulpfile.js">gulpfile.js</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-12" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 12
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">app.addStyle = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">paths, outputFilename</span>) </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    gulp.src(paths)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-17" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 17
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        .pipe(plugins.concat(<span class="hljs-string">'css/'</span>+outputFilename))</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="19-21" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 19 - 21
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        .pipe(gulp.dest(<span class="hljs-string">'web'</span>))</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="23-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 23 - 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">};</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="27-76" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 27 - 76
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So nice: those two pipes work together to put the file in the same spot.
+Run <code>gulp</code> again:</p>
+<pre><code class="language-bash"><div class="line">gulp</div></code></pre>
+<p>Now, <code>rev-manifest.json</code> has the <code>css/</code> prefix we need:</p>
+<pre><code class="language-json">{
+    "css/main.css": "css/main-50d83f6c.css"
+}</code></pre>
+<h3 id="merging-manifests">Merging Manifests <a class="headerlink" href="version-cache-busting#merging-manifests" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>So why the heck doesn't my <code>dinosaur.css</code> show up here? The <code>addStyle()</code>
+function is called twice: once for <code>main.css</code> and once for <code>dinosaur.css</code>.
+But the second time, since the manifest file is already there, it does nothing.
+<em>Unless</em>, you pass an option called <code>merge</code> and set it to <code>true</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="5386f63141">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-78" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            78 lines <span class="meta-divider"></span> <span title="gulpfile.js">gulpfile.js</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    gulp.src(paths)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="15-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 15 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-comment">// write the rev-manifest.json file for gulp-rev</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        .pipe(plugins.rev.manifest(<span class="hljs-string">'app/Resources/assets/rev-manifest.json'</span>, {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">            <span class="hljs-attr">merge</span>: <span class="hljs-literal">true</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        }))</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="27-78" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 27 - 78
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's see if this fixed it! Re-run <code>gulp</code>:</p>
+<pre><code class="language-bash"><div class="line">gulp</div></code></pre>
+<p>Yes! The hard part is done - this is a perfect manifest file:</p>
+<pre><code class="language-json">{
+    "css/main.css": "css/main-50d83f6c.css",
+    "css/dinosaur.css": "css/dinosaur-32046959.css"
+}</code></pre>
+<h3 id="making-the-link-href-dynamic">Making the link href Dynamic <a class="headerlink" href="version-cache-busting#making-the-link-href-dynamic" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>Phew! We're in the homestretch - the Gulp stuff is done. The only thing left
+is to make our PHP use the manifest file.</p>
+<p>Since I'm in Twig, I'm going to invent a new filter called <code>asset_version</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fa008b040d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-48" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            48 lines <span class="meta-divider"></span> <span title="app/Resources/views/base.html.twig">app/Resources/views/base.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-9" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 9
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{ asset('css/main.css'|asset_version) }}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>/&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="11-48" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 11 - 48
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's make it do something! I already created an empty Twig extension
+file to get us started:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="a47d88902f">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            26 lines <span class="meta-divider"></span> <span title="src/AppBundle/Twig/AssetVersionExtension.php">src/AppBundle/Twig/AssetVersionExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-meta">&lt;?php</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">Twig</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AssetVersionExtension</span> <span class="hljs-keyword">extends</span> \<span class="hljs-title">Twig_Extension</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $appDir;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">($appDir)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;appDir = $appDir;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getFilters</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getName</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-string">'asset_version'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And I told Twig about this in my <code>app/config/services.yml</code> file:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="90ee7e9309">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-12" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            12 lines <span class="meta-divider"></span> <span title="app/config/services.yml">app/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">    twig_asset_version_extension:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-attr">        class:</span> AppBundle\Twig\AssetVersionExtension</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-attr">        arguments:</span> [<span class="hljs-string">"%kernel.root_dir%"</span>]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"><span class="hljs-attr">        tags:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> { name: twig.extension }</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So, this Twig extension is ready to go! All we need to do is register this
+<code>asset_version</code> filter, which I'll do inside <code>getFilters()</code> with
+<code>new \Twig_SimpleFilter('asset_version', ...)</code> and we'll have it call a method
+in this class called <code>getAssetVersion</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="00c8816e08">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-41" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            41 lines <span class="meta-divider"></span> <span title="src/AppBundle/Twig/AssetVersionExtension.php">src/AppBundle/Twig/AssetVersionExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getFilters</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">            <span class="hljs-keyword">new</span> \Twig_SimpleFilter(<span class="hljs-string">'asset_version'</span>, <span class="hljs-keyword">array</span>(<span class="hljs-keyword">$this</span>, <span class="hljs-string">'getAssetVersion'</span>)),</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="20-41" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 20 - 41
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Below, I'll add that function. It'll be passed the <code>$filename</code> that we're
+trying to version. So for us, <code>css/main.css</code>.</p>
+<p>Ok, our job is simple: open up <code>rev-manifest.json</code>, find the path, then return
+its versioned filename value. The path to that file is <code>$this-&gt;appDir</code> - I've
+already setup that property to point to the <code>app/</code> directory - then
+<code>/Resources/assets/rev-manifest.json</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6d1ad6320f">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-41" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            41 lines <span class="meta-divider"></span> <span title="src/AppBundle/Twig/AssetVersionExtension.php">src/AppBundle/Twig/AssetVersionExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-20" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 20
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getAssetVersion</span><span class="hljs-params">($filename)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        $manifestPath = <span class="hljs-keyword">$this</span>-&gt;appDir.<span class="hljs-string">'/Resources/assets/rev-manifest.json'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-33" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 33
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="35-41" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 35 - 41
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>With the power of TV, I'll magically add the next few lines. First, throw
+a clear exception if the file is missing. Next, open it up, decode the
+JSON, and set the map to an <code>$assets</code> variable. Since the manifest file has
+the original filename as the key, let's throw one more exception if the file
+isn't in the map. I want to know when I mess up. And finally, return that
+mapped value!</p>
+<p><div class="code-block-wrapper" data-code-block-guid="d362df0433">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-41" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            41 lines <span class="meta-divider"></span> <span title="src/AppBundle/Twig/AssetVersionExtension.php">src/AppBundle/Twig/AssetVersionExtension.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-20" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 20
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getAssetVersion</span><span class="hljs-params">($filename)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        $manifestPath = <span class="hljs-keyword">$this</span>-&gt;appDir.<span class="hljs-string">'/Resources/assets/rev-manifest.json'</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!file_exists($manifestPath)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(sprintf(<span class="hljs-string">'Cannot find manifest file: "%s"'</span>, $manifestPath));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">        $paths = json_decode(file_get_contents($manifestPath), <span class="hljs-keyword">true</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">isset</span>($paths[$filename])) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(sprintf(<span class="hljs-string">'There is no file "%s" in the version manifest!'</span>, $filename));</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> $paths[$filename];</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="35-41" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 35 - 41
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So we give it <code>css/main.css</code> and it gives us the hashed filename.</p>
+<p>Let's give it a shot! Take a deep breath and refresh. Victory! Our beautiful
+site is back - the hashed filename shows up in the source.</p>
+<p>Ok ok, let's play with it. Open <code>layout.scss</code> and give everything a red background.
+The Gulp watch robots are working, so I immediately see
+a brand new hashed <code>main.css</code> file in <code>web/css</code>. But will our layout automatically
+update to the new filename? Refresh to find out. Yes! The new CSS filename
+pops up and the site has this subtle red background. </p>
+<p>Go back and undo that change. Things go right back to green. Oh, and we do
+have one other CSS file on the dino show page. It <em>should</em> be giving us a
+little more space below the T-Rex, but it's 404'ing. We need to make it
+use the versioned filename.</p>
+<p>So, open up <code>show.html.twig</code> and give it the <code>asset_version</code> filter:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3800968093">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-23" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            23 lines <span class="meta-divider"></span> <span title="app/Resources/views/dinosaurs/show.html.twig">app/Resources/views/dinosaurs/show.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"</span></span></span><span class="hljs-template-variable">{{ asset('css/dinosaur.css'|asset_version) }}</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">"</span>/&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="7-23" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 7 - 23
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Refresh - perfect! No 404 error, and our button can get a little breathing
+room from the T-Rex. It took a little setup, but congrats - you've got automatic
+cache-busting.</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>You can make the <code>getAssetVersion()</code> function more efficient by following the advice in 
+<a href="https://knpuniversity.com/screencast/gulp/version-cache-busting#comment-2884388919">this</a> comment.</p>
+</div><div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>In Symfony, it's <em>also</em> possible to <em>avoid</em> needing to use the filter by
+leveraging a cool thing called "version strategies". Check out the details
+posted by a helpful user <a href="https://knpuniversity.com/screencast/gulp/version-cache-busting#comment-2886834003">here</a>.</p>
+</div><h2 id="don-t-commit-the-manifest">Don't commit the manifest <a class="headerlink" href="version-cache-busting#don-t-commit-the-manifest" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>But should we commit the <code>rev-manifest.json</code> file to source control? I'd
+say no: it's generated automatically by Gulp. So, finish things off by adding
+it to your <code>.gitignore</code> file:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="5d7070fcf7">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-18" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            18 lines <span class="meta-divider"></span> <span title=".gitignore">.gitignore</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">/app/Resources/assets/rev-manifest.json</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2891692999" id="dsq-comment-2891692999">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/irozgar/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/22153/7174/avatar92.jpg?1473788813">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2891692999">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-13</span>
+	                            <span class="dsq-commenter-name">irozgar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2891692999" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2891692999" class="dsq-comment-text">
+	                                <p>I made a PR</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2889910290" id="dsq-comment-2889910290">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2889910290">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-12</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2889910290" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2889910290" class="dsq-comment-text">
+	                                <p>Ahhh, this is awesome! What a cool way to handle this - you're absolutely right that the VersionStrategyInterface is *meant* for this kind of stuff :). Thanks for sharing! If you want, you could also add a tip in the script about this here <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fknpuniversity%2Fgulp%2Fblob%2Fmaster%2Fknpu%2Fversion-cache-busting.md%3AljlrGtXKeHZ9LTJcC3a0lWSgaxA&amp;cuid=1175718" rel="nofollow noopener">https://github.com/knpuniversi...</a> (there's already an example of a tip). I think this would be a cool thing to point out.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2886834003" id="dsq-comment-2886834003">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/irozgar/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/22153/7174/avatar92.jpg?1473788813">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2886834003">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-11</span>
+	                            <span class="dsq-commenter-name">irozgar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2886834003" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2886834003" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>Thanks for your great tutorials. When I ended this video I asked myself if there was a better way than adding the asset_version filter in every versioned asset (I know that I'd forget writting it more than once) so I started looking of other ways of doing it and I learned<br> about the VersionStrategyInterface from the Asset Component. After a few hours I've made a simple VersionStrategy to use with assets <br>versioned with gulp-rev. With it the filter is no needed anymore.</p><p>Here is a gist  with the code <br><a href="https://disq.us/url?url=https%3A%2F%2Fgist.github.com%2Firozgar%2Fe8bbae42d0c72268966d052dbfde1177%3A5ZLKzocUGh8BHXUqLgK8HyxptI8&amp;cuid=1175718" rel="nofollow noopener">https://gist.github.com/irozga...</a></p><p>And a Symfony Bundle for Symfony &gt;= 2.7 based on the gist<br><a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Firozgar%2Fgulp-rev-versions-bundle%3Akx7ni20LzyYdkYHv1LRNh-mG7BM&amp;cuid=1175718" rel="nofollow noopener">https://github.com/irozgar/gul...</a><br></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2884465692" id="dsq-comment-2884465692">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/elHornair/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10433/1440/avatar92.jpg?1473435196">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2884465692">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-09</span>
+	                            <span class="dsq-commenter-name">ElHornair</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2884465692" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2884465692" class="dsq-comment-text">
+	                                <p>Alright, PR is ready: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fknpuniversity%2Fgulp%2Fpull%2F7%3ANSyD0P36FCPJr0B5eQheCajfBfY&amp;cuid=1175718" rel="nofollow noopener">https://github.com/knpuniversi...</a></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2884462846" id="dsq-comment-2884462846">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2884462846">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-09</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2884462846" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2884462846" class="dsq-comment-text">
+	                                <p>My pleasure - it ends up looking nice in Disqus, but it's got a weird, hidden syntax!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2884436311" id="dsq-comment-2884436311">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/elHornair/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10433/1440/avatar92.jpg?1473435196">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2884436311">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-09</span>
+	                            <span class="dsq-commenter-name">ElHornair</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2884436311" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2884436311" class="dsq-comment-text">
+	                                <p>Alright, will try to do that.<br>Thanks for wrapping my code btw, didn't know you can do that in Disqus ;)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2884419906" id="dsq-comment-2884419906">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2884419906">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-09</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2884419906" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2884419906" class="dsq-comment-text">
+	                                <p>Yo <a data-dsq-mention="elhornair:disqus" href="https://disqus.com/by/elHornair/" rel="nofollow noopener">ElHornair</a>!</p><p>Yea, you're totally right - my algorithm could easily be made more efficient :). This *is* on GitHub (<a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fknpuniversity%2Fgulp%2Fblob%2Fmaster%2Fsrc%2FAppBundle%2FTwig%2FAssetVersionExtension.php%29%3A7Vmkr_gKMRLnHO9ztfX3xFoRcDM&amp;cuid=1175718" rel="nofollow noopener">https://github.com/knpuniversi...</a>, but to actually update it is a little complex - we use a proprietary "diff" system to manage changes that happen *during* the tutorial. BUT, actually, I think we shouldn't change the file anyways - I like to have the code blocks and code download match the video. But, what we *could* do is add a note to the script in *just* the right spot that points over here to your comment. Best of both worlds :). If you agree and want to get your proper props on the GitHub repo, you could edit the script here: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fknpuniversity%2Fgulp%2Fblob%2Fmaster%2Fknpu%2Fversion-cache-busting.md%3AljlrGtXKeHZ9LTJcC3a0lWSgaxA&amp;cuid=1175718" rel="nofollow noopener">https://github.com/knpuniversi...</a>. We have a special ***TIP syntax you can see - an example is in this script: <a href="https://disq.us/url?url=https%3A%2F%2Fraw.githubusercontent.com%2Fknpuniversity%2Fgulp%2Fmaster%2Fknpu%2Ferrors-call-the-plumber.md%3A0SDGCyuWhnWch7CgBvdwMwQPRAQ&amp;cuid=1175718" rel="nofollow noopener">https://raw.githubusercontent....</a></p><p>Thanks for the comment!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2884388919" id="dsq-comment-2884388919">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/elHornair/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10433/1440/avatar92.jpg?1473435196">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2884388919">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-09</span>
+	                            <span class="dsq-commenter-name">ElHornair</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2884388919" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2884388919" class="dsq-comment-text">
+	                                <p>Hi Ryan</p><p>If you have a couple of files in the rev-manifest, you will be doing unnecessary file system reads. Because the Twig extension is a singleton, you can load the paths once and save them in a class variable. Here is the adapted code:</p><p></p><pre><code><br>    private $paths = [];<br><br>    public function getAssetVersion($filename)<br>    {<br>        if (count($this-&gt;paths) === 0) {<br>            $manifestPath = $this-&gt;appDir.'/Resources/assets/rev-manifest.json';<br><br>            if (!file_exists($manifestPath)) {<br>                throw new \Exception(sprintf('Cannot find manifest file: "%s"', $manifestPath));<br>            }<br><br>            $this-&gt;paths = json_decode(file_get_contents($manifestPath), true);<br>        }<br><br>        if (!isset($this-&gt;paths[$filename])) {<br>            throw new \Exception(sprintf('There is no file "%s" in the version manifest!', $filename));<br>        }<br><br>        return $this-&gt;paths[$filename];<br>    }<br></code></pre><p></p><p>PS: I'd be happy to add this as a PR to the above tutorial (which is great btw, thanks a lot!) but I couldn't find this on Github. Any hints?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2147090055" id="dsq-comment-2147090055">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2147090055">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-20</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2147090055" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2147090055" class="dsq-comment-text">
+	                                <p>Hey Marcus!</p><p>Hmm - could you throw up a simple example repository on GitHub? Perhaps something changed with some version of these libraries that's causing the problems. This was indeed the trickiest part of this whole tutorial :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2147026574" id="dsq-comment-2147026574">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/mstoehr/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/7035/9174/avatar92.jpg?1473710654">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2147026574">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-20</span>
+	                            <span class="dsq-commenter-name">Marcus Stöhr</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2147026574" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2147026574" class="dsq-comment-text">
+	                                <p>Hi Ryan.</p><p>I just checked, double-checked, and in fact triple-checked the chapter you mentioned and my gulpfile.js contains all of this. However, it doesn't work and this is driving me nuts.</p><p>Any hint what else I can do?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2146740876" id="dsq-comment-2146740876">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2146740876">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-20</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2146740876" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2146740876" class="dsq-comment-text">
+	                                <p>Hey Marcus!</p><p>Yes, I know the problem well! Have you gone through the last 2 chapters in this tutorial (especially <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fgulp%2Fon-end-async-and-listeners%29%3A4OAAg7QrVbZN_FjRUVv_AtLqtAs&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a>. We talk about this exact issue. When recording this chapter - the manifest issue hadn't reared it's head - so we had to fix it in a later chapter.</p><p>Let me know if that helps - and happy you're enjoying things (you'll enjoy them more when cache busting works)!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2145456298" id="dsq-comment-2145456298">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/mstoehr/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/7035/9174/avatar92.jpg?1473710654">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2145456298">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-19</span>
+	                            <span class="dsq-commenter-name">Marcus Stöhr</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2145456298" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2145456298" class="dsq-comment-text">
+	                                <p>Hey Ryan,</p><p>thank you for this great tutorial. The version busting strategy is really cool but I have a really hard time to get it working for all my styles and scripts.<br>I have set it up like you showed in the upcoming chapters using the pipeline. However, the manifest-file doesn't contain all my files but either only one or two of them. It also mixes styles and scripts.</p><p>Whats going on here?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1952150955" id="dsq-comment-1952150955">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/scamo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/864/1883/avatar92.jpg?1406484380">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1952150955">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-04-08</span>
+	                            <span class="dsq-commenter-name">s.molinari</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1952150955" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1952150955" class="dsq-comment-text">
+	                                <p>I am playing with a JS framework called Aurelia (the one I mentioned in my other post)</p><p><a href="http://disq.us/url?url=http%3A%2F%2Faurelia.io%2F%3A92bvvWPr9JY9_JY1dZdUvetKUmM&amp;cuid=1175718" rel="nofollow noopener">http://aurelia.io/</a></p><p>and I noticed it wouldn't "correct" when changing files, because of the cache in my browser. Obviously I could have the browser load every file again on every call to develop, but cache busting as described here is the better answer. We'll need it anyway to fix bugs in production later, right? So I actually built in the steps you explained in this tutorial into the Aurelia demo app under "Get Started". However, because Aurelia (similar to Angular?) uses data binding with custom tag attributes as built in directives like &lt;body aurelia-app=""&gt;, which also formulates the name of the file, cache busting busts the application too. :-(</p><p>I found another cache busting module, which partially does something like what is needed I believe.</p><p><a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fhollandben%2Fgrunt-cache-bust%23optionsenableurlfragmenthint%3Atw6230k3ns3vG3Ey66td5_UulpA&amp;cuid=1175718" rel="nofollow noopener">https://github.com/hollandben/...</a></p><p>However, in Aurelia, it doesn't use complete file names in the router.</p><p>        { route: ['','welcome'],  moduleId: './welcome',      nav: true, title:'Welcome' },<br>        { route: 'flickr',        moduleId: './flickr',       nav: true },<br>        { route: 'child-router',  moduleId: './child-router', nav: true, title:'Child Router' }</p><p>I highly doubt this would work.</p><p>        { route: ['','welcome'],  moduleId: './welcome#grunt-cache-bust',      nav: true, title:'Welcome' },<br>        { route: 'flickr',        moduleId: './flickr#grunt-cache-bust',       nav: true },<br>        { route: 'child-router',  moduleId: './child-router#grunt-cache-bust', nav: true, title:'Child Router' }</p><p>However, as I said "partially does what is needed", the initial call for app.js through the custom tag attribute is still not resolved.</p><p>Scott</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1951964511" id="dsq-comment-1951964511">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1951964511">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-04-08</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1951964511" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1951964511" class="dsq-comment-text">
+	                                <p>Hey again Scott!</p><p>Hmm, what's your use-case? There is a plugin I *almost* talked about, which is useful if you're moving files from one directory to another: <a href="https://disq.us/url?url=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fgulp-replace%3AtWbMmHK2VEQA31NFcfY_YbJmvks&amp;cuid=1175718" rel="nofollow noopener">https://www.npmjs.com/package/...</a>. And one exists for this and gulp-rev (<a href="https://disq.us/url?url=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fgulp-rev-replace%29%3AbtdyS_woq8M2hrOtQ0G_J6xlcVg&amp;cuid=1175718" rel="nofollow noopener">https://www.npmjs.com/package/...</a> but I haven't tried it yet! Let me know if it fits for you (and what you're use-case in - I'm curious).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="1951129168" id="dsq-comment-1951129168">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/scamo/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/864/1883/avatar92.jpg?1406484380">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-1951129168">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-04-07</span>
+	                            <span class="dsq-commenter-name">s.molinari</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-1951129168" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-1951129168" class="dsq-comment-text">
+	                                <p>Hey Ryan,</p><p>What if the names of files are important to the actual execution of the JS app? Cache busting would break the app. Is there a way to "insert" the new versions smartly within the code too?</p><p>Scott</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_version-cache-busting';var disqus_url = 'https://knpuniversity.com/screencast/gulp/version-cache-busting';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="javascript-versioning-and-cleanup#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/gulp/version-cache-busting" addthis:title="Gulp! Refreshment for Your Frontend Assets">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"gulp","courseIsOwned":false,"chapter":"Versioning to Bust Cache","chapterNumber":15,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Gulp! Refreshment for Your Frontend Assets';
+        Core.courseId = 57
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'gulp';
+                    Core.chapterTitle = 'Versioning to Bust Cache';
+            Core.chapterNumber = 15;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'version-cache-busting';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

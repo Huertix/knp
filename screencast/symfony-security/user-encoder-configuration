@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Configuring the Encoder in security.yml > Symfony Security: Beautiful Authentication, Powerful Authorization | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 38367
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Authorization\x3A\x20access_control\x20and\x20Roles <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-security/authorization-roles#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Ah, security! Quick run!
+
+Wait, come back! Security in Symfony is *awesome*! Seriously,
+between things called &quot;voters&quot; and the Guard authentication
+system, you can do anything you want inside of Symfony, and
+the code to do it is simple and expressive.
+
+Security has two sides: authentication (who are you?) and
+authorization (do you have access to do X). We&#039;ll talk about
+each of these, creating an traditional form login system
+*and* and API token authentication system using Json web tokens
+(not as scary as they sound!). Then, we&#039;ll turn to authorization,
+with roles, voters and other good stuff:
+
+* Security &amp; Firewall Fundamentals
+* Creating a custom login form
+* Making a User (ooOOOoo)
+* User Providers (why you need them, but don&#039;t care)
+* Password Encryption
+* Logging out!
+* Protecting entire URLs with access_control(s)
+* IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED
+* Checking access with roles! ROLE_USER
+* Denying access in a controller
+* What are voters?
+* Role hierarchies
+* Impersonation (`switch_user`)
+* Registration Form
+* Manual authentication
+
+... and how to create a back door into your site. Just kidding!
+Let&#039;s make some secure sites!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Configuring the Encoder in security.yml">
+<meta property="og:description" content="Ah, security! Quick run!
+
+Wait, come back! Security in Symfony is *awesome*! Seriously,
+between things called &amp;quot;voters&amp;quot; and the Guard authentication
+system, you can do anything you want inside of Symfony, and
+the code to do it is simple and expressive.
+
+Security has two sides: authentication (who are you?) and
+authorization (do you have access to do X)">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-security/user-encoder-configuration">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-security:cfae786aa1f6535885fa8d5d09e578870082c672/sf-ep6.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="user-encoder-configuration#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        11.
+                            Configuring the Encoder in secur...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony Security: Beautiful Authentication, Powerful Authorization</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-class" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        The All-Important User Class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-interface-methods" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The UserInterface Methods (Keep some Blank!)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:19</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="rendering-login-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Rendering that Login Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:32</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="all-about-firewalls" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        All About Firewalls
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="login-form-authenticator" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        The LoginFormAuthenticator
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authenticator-get-user-check-credentials" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Authenticator: getUser, checkCredentials &amp; Success/Failure
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:31</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-provider" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        The Mysterious &quot;User Provider&quot;
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="logout-and-last-username" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Logging out &amp; Pre-filling the Email on Failure
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:21</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-plain-password" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Users Need Passwords (plainPassword)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:32</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="encoding-user-password" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Doctrine Listener: Encode the User&#039;s Password
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:39</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="user-encoder-configuration" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Configuring the Encoder in security.yml
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:07</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="authorization-roles" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Authorization: access_control and Roles
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:17</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="deny-access-inside-controller" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Denying Access in a Controller
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:38</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="dynamic-roles" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Dynamic Roles
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="the-user-object" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Fetch me a User Object!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:33</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="role-hierarchy" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                16.
+                        Role Hierarchy
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="impersonation-switch-user" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                17.
+                        Impersonation (Login as Someone Else)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="user-registration-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                18.
+                        Registration Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 7:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="validation-unique-entity" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                19.
+                        Validation with the UniqueEntity Constraint
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="conditional-validation-groups" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                20.
+                        Validation Groups: Conditional Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:00</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="automatic-login-handling" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                21.
+                        Automatically Login after Registration!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:10</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-security" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Configuring the Encoder in security.yml</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony Security: Beautiful Authentication, Powerful Authorization Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="authorization-roles#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="user-encoder-configuration#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="user-encoder-configuration#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep6-security/user-encoder-configuration.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Let's set some plain passwords! Where? In our fixtures! Open up <code>fixtures.yml</code> and
+scroll down. In theory, <em>all</em> we need to do is set the <code>plainPassword</code> property.
+The rest should happen auto-magically.</p>
+<p>Add <code>plainPassword: </code> and we'll keep with <code>iliketurtles</code>, because I've gotten good
+at typing that. And turtles are cool:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="cd62fe2f0b">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-27" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            27 lines <span class="meta-divider"></span> <span title="src/AppBundle/DataFixtures/ORM/fixtures.yml">src/AppBundle/DataFixtures/ORM/fixtures.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">AppBundle\Entity\User:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    user_{1..10}:</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-25" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... line 25
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code"><span class="hljs-attr">        plainPassword:</span> iliketurtles</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Change over to your terminal and load your fixtures:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:fixtures:load</div></code></pre>
+<p>Explosion!</p>
+<blockquote><p>No encoder has been configured for AppBundle\Entity\User</p>
+</blockquote>
+<p>This is basically Symfony's way of saying:</p>
+<blockquote><p>Ryan, you didn't tell me <em>how</em> you want to encode the passwords. I can't
+  read your mind - I'm just a PHP framework.</p>
+</blockquote>
+<p>Remember how I kept saying we would encrypt the passwords with <code>bcrypt</code>? Do you remember
+actually configuring that anywhere? Nope! We need to do that.</p>
+<p>Open <code>security.yml</code>. Add an <code>encoders</code> key, then <code>AppBundle\Entity\User: bcrypt</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="cfd87c407a">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-33" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            33 lines <span class="meta-divider"></span> <span title="app/config/security.yml">app/config/security.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-attr">security:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"><span class="hljs-attr">    encoders:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">        AppBundle\Entity\User: bcrypt</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-33" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 33
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>If you want, you can configure a few other options, but this is good enough.</p>
+<p><em>Now</em> Symfony knows how to encrypt our passwords. Try the fixtures again:</p>
+<pre><code class="language-bash"><div class="line">./bin/console doctrine:fixtures:load</div></code></pre>
+<p>No errors! So, that <em>probably</em> worked. Let's use it!</p>
+<h2 id="checking-the-encoded-password">Checking the Encoded Password <a class="headerlink" href="user-encoder-configuration#checking-the-encoded-password" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>In <code>LoginFormAuthenticator</code>, we can <em>finally</em> add some real password checking!
+How? By using that same <code>UserPasswordEncoder</code> object.</p>
+<p>Head back up to <code>__construct</code> and add a new <code>UserPasswordEncoder</code> argument. I'll
+use my <code>Option</code>+<code>Enter</code> shortcut to setup that property for me:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="46245d4997">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-80" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            80 lines <span class="meta-divider"></span> <span title="src/AppBundle/Security/LoginFormAuthenticator.php">src/AppBundle/Security/LoginFormAuthenticator.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">Security</span>\<span class="hljs-title">Core</span>\<span class="hljs-title">Encoder</span>\<span class="hljs-title">UserPasswordEncoder</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="12-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 12 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LoginFormAuthenticator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractFormLoginAuthenticator</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="18-20" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 18 - 20
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $passwordEncoder;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">(FormFactoryInterface $formFactory, EntityManager $em, RouterInterface $router, UserPasswordEncoder $passwordEncoder)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-27" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 27
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;passwordEncoder = $passwordEncoder;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="30-78" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 30 - 78
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And because we're using autowiring for this service, we don't need to change anything
+in <code>services.yml</code>.</p>
+<p>Now, in <code>checkCredentials()</code>, replace the <code>if</code> statement with
+<code>if ($this-&gt;passwordEncoder-&gt;isPasswordValid())</code> and pass that the <code>User</code> object
+and the plain-text password:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c8e30bfc74">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-80" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            80 lines <span class="meta-divider"></span> <span title="src/AppBundle/Security/LoginFormAuthenticator.php">src/AppBundle/Security/LoginFormAuthenticator.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-15" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 15
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LoginFormAuthenticator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractFormLoginAuthenticator</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="18-58" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 18 - 58
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="59"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">checkCredentials</span><span class="hljs-params">($credentials, UserInterface $user)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="60"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="61-62" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 61 - 62
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="63"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">$this</span>-&gt;passwordEncoder-&gt;isPasswordValid($user, $password)) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="64"></td>
+            <td class="blob-code">            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="65"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="66-67" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 66 - 67
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="68"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="69-78" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 69 - 78
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="79"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>That'll take care of securely checking things.</p>
+<p>Let's try it out: head to <code>/login</code>. Use <code>weaverryan+1@gmail.com</code> and <code>iliketurtles</code>.
+We're in! Password system check.</p>
+<p>Ok team, that's <em>it</em> for authentication. You can build your authenticator to behave
+however you want, and you can <em>even</em> have multiple authenticators. Oh, and if you
+<em>do</em> want to use any of the built-in authentication systems, like the <code>form_login</code>
+key I mentioned earlier - that's totally fine. Guard authentication takes more work,
+but has more flexibility. If you want another example, we created a cool JSON web
+token authenticator in our Symfony REST series.</p>
+<p>Now, let's start locking down the system.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3066168366" id="dsq-comment-3066168366">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3066168366">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-23</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3066168366" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3066168366" class="dsq-comment-text">
+	                                <p>Hey Nash,</p><p>The problem actually isn't in the $user variable but in variable from which you call isPasswordValid() method, i.e. it's the $this-&gt;passwordEncoder in your case. I bet if you dump $this-&gt;passwordEncoder property - you will get null. So you need to double check that you really injecting UserPasswordEncoder service and setting it properly to the $this-&gt;passwordEncoder somewhere in the __construct() method. Let me know if it doesn't help you.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3066030029" id="dsq-comment-3066030029">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/nashdelossantos/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/23609/4842/avatar92.jpg?1482501800">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3066030029">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-23</span>
+	                            <span class="dsq-commenter-name">Nash Delos Santos</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3066030029" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3066030029" class="dsq-comment-text">
+	                                <p>I've got this error Error: Call to a member function isPasswordValid() on a non-object.  I dumped the $user and password variables and can confirm that the $user is an object, $password also holds the value typed in from the form, so not sure what I did wrong.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3043741815" id="dsq-comment-3043741815">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3043741815">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-09</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3043741815" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3043741815" class="dsq-comment-text">
+	                                <p>Well, a big thumbs up for fixing it :). But I hate when things are mysterious... and that is *really* strange. But, unless you see something else weird, ignore it and keep going ;). Glad it worked out!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3043545114" id="dsq-comment-3043545114">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3043545114">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-09</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3043545114" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3043545114" class="dsq-comment-text">
+	                                <p>Haha, sometimes simple mistakes are very difficult to reveal. But they give us a good experience ;)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3043539273" id="dsq-comment-3043539273">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3043539273">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-09</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3043539273" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3043539273" class="dsq-comment-text">
+	                                <p>I actually had cleared the cache several times. I reloaded the database, manually went into the database to check that things looked the way they should, etc. Maybe someday when I die I can get God to show me where the error was. Perhaps some mischievous spirit was just screwing with me? :-/</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3041867192" id="dsq-comment-3041867192">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3041867192">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-08</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3041867192" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3041867192" class="dsq-comment-text">
+	                                <p>Wow, you have done a huge work restarting the tutorial from scratch :) Anyway, great that it works now! Well, probably the problem just was in cache, I always clear the cache first in any weird behavior - in most cases it helps  ;)</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3041459687" id="dsq-comment-3041459687">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3041459687">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-08</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3041459687" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3041459687" class="dsq-comment-text">
+	                                <p><a href="https://disq.us/url?url=https%3A%2F%2Fgoo.gl%2Fimages%2FpNq5Sh%3AwabNz5aKEl_GudBLn72d0hR6kdA&amp;cuid=1175718" rel="nofollow noopener">https://goo.gl/images/pNq5Sh</a> (no, not spam or hacked account, etc)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3041442202" id="dsq-comment-3041442202">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3041442202">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-08</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3041442202" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3041442202" class="dsq-comment-text">
+	                                <p>I never found the error, but I did fix it. I started the tutorial from scratch in a completely new project. I downloaded and installed the 'start' code and worked from there. This time, everything worked. Then I systematically went through and replaced every file from this tutorial in the non-working project with the corresponding file from new one. I still ran into the same problem. Finally, after double checking that I hadn't missed any random files, I just copied the src folder from the working project and pasted it into the non-working project. Wala, perfection! I checked Git to see if I could tell the difference, but other than some minor differences in previous non-related code (ie things like use statements in a different order in GenusAdminController), nothing jumped out at me.</p><p>Sooooo yeah... I don't know :P</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3040314639" id="dsq-comment-3040314639">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3040314639">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-07</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3040314639" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3040314639" class="dsq-comment-text">
+	                                <p>You can also - for now (to rule it out as a problem) - completely remove the <code>$this-&gt;password = null</code> line from your <code>User</code> class - this is only a "fix" for an edge case (the entire User not saving) that only affects updates, and only when the password is the only field that changed. Since we're inserting new users, this line doesn't help us (so removing it temporarily might clear things up).</p><p>Feel free to also post some code! We might be able to spot an issue if there is one!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3040245284" id="dsq-comment-3040245284">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3040245284">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-07</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3040245284" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3040245284" class="dsq-comment-text">
+	                                <p>Hey somecallmetim27,</p><p>Let's just try to add "die('HashPasswordListener debugging')" statement in HashPasswordListener class, I mean somewhere in HashPasswordListener::prePersist() since we create new users, not update them. And let me know do you see this debug text in console?</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3040238319" id="dsq-comment-3040238319">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3040238319">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-07</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3040238319" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3040238319" class="dsq-comment-text">
+	                                <p>Hey somecallmetim27,</p><p>Good debugging, now we know that authentication works, so you just have problem with password validation.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3040234999" id="dsq-comment-3040234999">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3040234999">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-07</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3040234999" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3040234999" class="dsq-comment-text">
+	                                <p>Hey somecallmetim27,</p><p>No, this warning relates to the translations and can't cause your problem with authentication.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3039466475" id="dsq-comment-3039466475">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3039466475">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3039466475" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3039466475" class="dsq-comment-text">
+	                                <p>The frustrating thing is, since load fixtures is something that is done from the console, I can't see how to tell if our HashPasswordListener class is working. I can't see anyway to debug that.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3039448197" id="dsq-comment-3039448197">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3039448197">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3039448197" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3039448197" class="dsq-comment-text">
+	                                <p>Ok, this goes back to the problem that several other people were having before. When you have this</p><p>        // forces the object to look "dirty" to Doctrine. Avoids<br>        // Doctrine *not* saving this entity, if only plainPassword changes<br>        $this-&gt;password = null;</p><p>in setPlainPassword, the fixtures won't load and you get that 'password' cannot be null error. If you put those lines at the end of the setPassword method instead, the fixtures will load, but then I get 'Invalid credentials' when I put in what should be the correct password in.</p><p>My take on this is that the 'iliketurtles' plainPassword from fixtures.yml isn't getting encrypted and presented to the DB for persisting. The only reason it works when you move the above bit of code around is because now the password is set to 'null' and, therefore, is no longer blank.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3039211653" id="dsq-comment-3039211653">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3039211653">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3039211653" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3039211653" class="dsq-comment-text">
+	                                <p>Just noticed I'm getting this from the debug toolbar. Could this be the problem?</p><p>These messages are not available for the given locale and cannot be found in the fallback locales. Add them to the translation catalogue to avoid Symfony outputting untranslated contents.</p><p>Locale	Domain	Times used	Message ID	Message Preview<br>en	messages	1	Username	Username<br>en	messages	1	Password	        Password</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3039127430" id="dsq-comment-3039127430">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3039127430">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3039127430" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3039127430" class="dsq-comment-text">
+	                                <p>That's fine, but the code still doesn't work. Just to see what would happen, I changed this</p><p>        if ($this-&gt;passwordEncoder-&gt;isPasswordValid($user, $password)) {<br>            return true;<br>        }</p><p>in the checkCredentials function to this</p><p>        if (!$this-&gt;passwordEncoder-&gt;isPasswordValid($user, $password)) {<br>            return true;<br>        }</p><p>and suddenly I was allowed to login. Which means isPasswordValid is returning a false value when it should be returning true. And I have no idea why.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3038207824" id="dsq-comment-3038207824">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3038207824">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3038207824" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3038207824" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="somecallmetim27:disqus" href="https://disqus.com/by/somecallmetim27/" rel="nofollow noopener">somecallmetim27</a> ,</p><p>No, this value is returned as encoded from the DB and keeps to be encoded all time in your application. Actually, you can't decoded this value if you encoded it with one-way algorithm like md5, sha1, bcrypt, etc.. Instead of decoding it, which is impossible, Symfony just encode a password, which user inputted and then compare the result hash of inputted password with one from the DB. If hashes is matched - then user inputted a valid password. And Symfony has a service which helps you to check if inputted user password is valid, i.e. matches with the one from DB - it's instance of UserPasswordEncoder class. We require this object in LoginFormAuthenticator::__construct() method and then call "$this-&gt;passwordEncoder-&gt;isPasswordValid(...)" on it. So you need to pass a user object to this method, and unencoded password from user input. Then the password encoder will do the remaining work for you: encode input password with the same algorithm and check if it matches with the one in DB as I said in the beginning. If input password is valid - isPasswordValid () method will return true.<br>Does it make sense for you?</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3037912538" id="dsq-comment-3037912538">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3037912538">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3037912538" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3037912538" class="dsq-comment-text">
+	                                <p>I keep getting "Invalid credentials." no matter what I do. I keep going over the code for this section, I've gone through my code looking for errors, I can't find anything I've missed in this lesson and I don't know how to troubleshoot further. That being said, this method,</p><p>    public function getPassword()<br>    {<br>        return $this-&gt;password;<br>    }</p><p>looks funny to me. Shouldn't there be something decoding what was stored? Did I miss something I a previous lesson?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3037895307" id="dsq-comment-3037895307">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/somecallmetim27/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11207/4244/avatar92.jpg?1479132540">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3037895307">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-06</span>
+	                            <span class="dsq-commenter-name">somecallmetim27</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3037895307" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3037895307" class="dsq-comment-text">
+	                                <p>I had same issue. Your fix saved me who knows how much time. :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977745811" id="dsq-comment-2977745811">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977745811">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977745811" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977745811" class="dsq-comment-text">
+	                                <p>Ah, very nice catch! Actually, it's the most common and tricky error - do not mark object as "dirty" for Doctrine.</p><p>No problem, I was glad to give you some tips ;)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977727281" id="dsq-comment-2977727281">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/daanhage/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13852/7521/avatar92.jpg?1479288095">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977727281">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Daan Hage</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977727281" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977727281" class="dsq-comment-text">
+	                                <p>OMG!!! I added this line:         <br>// forces the object to look "dirty" to Doctrine. Avoids<br>// Doctrine *not* saving this entity, if only plainPassword changes<br>$this-&gt;password = null;</p><p>to setPassword instead of setPlainPassword!<br>Very stupid, disadvantage of going to quickly through the tutorials.<br>Sorry for the trouble and thanks for your time and effort Victor!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977495929" id="dsq-comment-2977495929">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977495929">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977495929" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977495929" class="dsq-comment-text">
+	                                <p>So when you set a password in fixtures.yml - does it help you?</p><p>Yeah, I agree with you, sometimes its difficult to debug it. But Symfony has a nice web debug toolbar, where you can see triggered services and so many other useful things. Also <a href="http://disq.us/url?url=http%3A%2F%2FBlackfire.io%3AIW51sySQHAe7p3kQZY_XICQoKHw&amp;cuid=1175718" rel="nofollow noopener">Blackfire.io</a> and Xdebug can help with debugging more difficult things. But in the most cases I just use dump()/var_dump()/die() functions for debugging.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977412025" id="dsq-comment-2977412025">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/daanhage/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13852/7521/avatar92.jpg?1479288095">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977412025">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Daan Hage</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977412025" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977412025" class="dsq-comment-text">
+	                                <p>If I look at the fictures.yml files, password is never set. Although we've created a doctrine listener which should transform the plainpassword into the encoded password. However, it looks like it never gets triggered.</p><p>So far this hits exactly a reason why I don't like frameworks (although it has a lot of plus-sides and is awesome!), once you have  a error thrown and it's traced through a lot of classes, I find it very hard to debug.</p><p>How do you solve it? Were do you start? Dop I have to right all kinds of classes so I override the defaults stuff?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977266344" id="dsq-comment-2977266344">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977266344">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977266344" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977266344" class="dsq-comment-text">
+	                                <p>Hey Daan,</p><p>So the question is why does your password empty? If you answer it - you'll probably solve this problem. Could you debug it?</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2977237888" id="dsq-comment-2977237888">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/daanhage/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13852/7521/avatar92.jpg?1479288095">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2977237888">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-31</span>
+	                            <span class="dsq-commenter-name">Daan Hage</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2977237888" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2977237888" class="dsq-comment-text">
+	                                <p>I have the same error:<br>  SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'password' cannot be null</p><p>I also use symfony 3. Please help :(</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2953682237" id="dsq-comment-2953682237">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2953682237">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2953682237" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2953682237" class="dsq-comment-text">
+	                                <p>Cool! Really happy the entity-no-logic thing makes sense :). Honestly, this is one of the times when that "limitation" is the ugliest - in 99% of the use-cases it really makes for much more predictable and well-organized code. I really think this is one of the exceptional cases.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2953670976" id="dsq-comment-2953670976">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_TpYLfmqdqZ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13756/7661/avatar92.jpg?1477237174">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2953670976">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-16</span>
+	                            <span class="dsq-commenter-name">Johan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2953670976" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2953670976" class="dsq-comment-text">
+	                                <p>Ok cool, at first I was a bit disappointed about not being able to use the services inside my entity but after doing some research (got to this extremely elaborate stackoverflow answer: <a href="http://disq.us/url?url=http%3A%2F%2Fstackoverflow.com%2Fa%2F25533968%2F1719933%29%3AVGppStDoj2Ic42PxnfGqAIDCskw&amp;cuid=1175718" rel="nofollow noopener">http://stackoverflow.com/a/255...</a> I guess it makes sense. It prevents me from doing things that I shouldn't be doing inside my entity which would probably include anything that is not related to storing or retrieving data (or encoding passwords).</p><p>I think I am convinced that the listener is a pretty good solution :) The entity listener sounds cool, I'll definitely have a look at that later.</p><p>P.S. I agree that I shouldn't worry too much about performance in the beginning, but if I can grab some performance for free, I'll take it :)</p><p>Thanks for your help!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2953634710" id="dsq-comment-2953634710">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2953634710">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2953634710" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2953634710" class="dsq-comment-text">
+	                                <p>Hi Johan!</p><p>I actually agree in principle, but what you're proposing isn't quite possible: you don't have access to the service container (or any of your services) from within the proposed setPlainPassword(). In other words: there's no way for us to do the encoding login inside of this method (or inside of the User class at all). So, the encoding *must* be done external to User, which really leaves us with 2 options:</p><p>1) Use a listener pattern like we are, which definitely has complexity, but has the advantage that it just "works" after it's setup<br>2) Don't have a plainPassword property (or setter) at all. And instead, whenever you want to set the password, you encode it outside of the class and then call setPassword() with the encoded password (this could be centralized in a service of course, to avoid code duplication). This is simpler, but not as automatic - e.g. you would need to do a bit more work to get this to work with Alice fixtures (which, without any work, just call the setters and save).</p><p>I've had a similar conversation about this feature with a colleague of mine, which also thinks that this is too complex. But, there's not really a super easy way to do it. This is also modeled off of FOSUserBundle, which uses this listener approach (the advantage there, is that you don't need to actually do the work of setting up the listener).</p><p>P.S. On the performance note, I don't often worry about performance until later, and I doubt that this would be your bottleneck. BUT, there is an alternative thing called an "entity listener" - they're a bit newer, but effectively allow you to have a listener on only one entity. <a href="http://disq.us/url?url=http%3A%2F%2Fdocs.doctrine-project.org%2Fprojects%2Fdoctrine-orm%2Fen%2Flatest%2Freference%2Fevents.html%23entity-listeners%3A7x1xCr4cfKSks6XcMuoHuQG_wls&amp;cuid=1175718" rel="nofollow noopener">http://docs.doctrine-project.o...</a> and <a href="https://disq.us/url?url=https%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fbundles%2FDoctrineBundle%2Fentity-listeners.html%3A6sc8JXvDD0u0M7ncleWpEw7S1QI&amp;cuid=1175718" rel="nofollow noopener">https://symfony.com/doc/curren...</a></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2953600256" id="dsq-comment-2953600256">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_TpYLfmqdqZ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13756/7661/avatar92.jpg?1477237174">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2953600256">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-16</span>
+	                            <span class="dsq-commenter-name">Johan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2953600256" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2953600256" class="dsq-comment-text">
+	                                <p>I feel like this is more complicated than it needs to be. Why not do this:</p><p>1. Create a "password" field and persist it with Doctrine.<br>2. Create a getter (getPassword()) for this field. Don't create a (public) setter, it doesn't make any sense in my opinion.<br>3. Create a setter for plain password (setPlainPassword()) which takes the passed plain text, encodes it and stores it in the "password" field. So, NO "plainPassword" field. The argument directly gets encoded and stored in the "password" field. And of course, there is no getPlainPassword method.</p><p>I think it has two advantages:<br>- it's simpler. There are only a few lines of extra code in the User class.<br>- it is probably faster. There is no event listener that gets called on EVERY entity update. In a big application I can imagine millions of updates per second of which only a small proportion consists of password sets/updates. So, this event listener gets called millions of times, for no reason.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2864610757" id="dsq-comment-2864610757">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/leeravenberg/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9211/1488/avatar92.jpg?1399451108">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2864610757">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-29</span>
+	                            <span class="dsq-commenter-name">Lee Ravenberg</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2864610757" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2864610757" class="dsq-comment-text">
+	                                <p>Thanks, I had the same issue.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2853543989" id="dsq-comment-2853543989">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_Fm7yLXipi9/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2853543989">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-22</span>
+	                            <span class="dsq-commenter-name">James Hogan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2853543989" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2853543989" class="dsq-comment-text">
+	                                <p>I am not able to get past ...:fixtures:load</p><p>NOTE...using Symfony 3.1.3</p><p>  [Doctrine\DBAL\Exception\NotNullConstraintViolationException]                                                                                                         <br>  An exception occurred while executing 'INSERT INTO user (email, password, roles) VALUES (?, ?, ?)' with params ["weaverryan+1@gmail.com", null, "[\"ROLE_ADMIN\"]"]:  <br>  SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'password' cannot be null</p><p>  [Doctrine\DBAL\Driver\PDOException]                                                     <br>  SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'password' cannot be null</p><p>  [PDOException]                                                                          <br>  SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'password' cannot be null</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2806439015" id="dsq-comment-2806439015">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2806439015">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-27</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2806439015" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2806439015" class="dsq-comment-text">
+	                                <p>Cheers - thanks for sharing <a data-dsq-mention="andjii:disqus" href="https://disqus.com/by/andjii/" rel="nofollow noopener">Andjii</a>! No better way to learn than debugging ;)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2806130533" id="dsq-comment-2806130533">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/andjii/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12544/2740/avatar92.jpg?1482285604">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2806130533">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-27</span>
+	                            <span class="dsq-commenter-name">Andjii</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2806130533" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2806130533" class="dsq-comment-text">
+	                                <p>it caused because, I implemented EventSubscriberInterface instead of EventSubscriber, so that broke my app. I hope, this information may be useful for someone else who will have this course=))</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2806108412" id="dsq-comment-2806108412">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/andjii/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/12544/2740/avatar92.jpg?1482285604">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2806108412">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-07-27</span>
+	                            <span class="dsq-commenter-name">Andjii</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2806108412" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2806108412" class="dsq-comment-text">
+	                                <p>I got the error after all acts which were described in video...</p><p>ContextErrorException in EventManager.php line 137:Catchable Fatal Error: Argument 1 passed to Doctrine\Common\EventManager::addEventSubscriber() must be an instance of Doctrine\Common\EventSubscriber, instance of AppBundle\Doctrine\HashPassListener given, called in \var\cache\dev\appDevDebugProjectContainer.php on line 665 and defined</p><p>What have I done wrong?</p><p>(I use Symfony 3.1)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_user-encoder-configuration';var disqus_url = 'https://knpuniversity.com/screencast/symfony-security/user-encoder-configuration';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="authorization-roles#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-security/user-encoder-configuration" addthis:title="Symfony Security: Beautiful Authentication, Powerful Authorization">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-security","courseIsOwned":false,"chapter":"Configuring the Encoder in security.yml","chapterNumber":11,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony Security: Beautiful Authentication, Powerful Authorization';
+        Core.courseId = 78
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-security';
+                    Core.chapterTitle = 'Configuring the Encoder in security.yml';
+            Core.chapterNumber = 11;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'user-encoder-configuration';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

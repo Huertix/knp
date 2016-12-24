@@ -1,0 +1,187 @@
+/**
+ * Handles the Stripe Payment
+ */
+(function(window, $, Routing, Stripe){
+
+    var StripePayment = {
+
+        $formEl: null,
+        $submitButton: null,
+        $errorContainerEl: null,
+
+        /**
+         * This is messy because this class is used on checkout
+         * AND on the profile CC update form. But, the _bindForm()
+         * login here is ONLY used on checkout - the update CC profile
+         * form does its own thing :p
+         *
+         * @param $formEl
+         * @param handleFormSubmit
+         */
+        initialize: function($formEl, handleFormSubmit) {
+            this.$formEl = $formEl;
+            this.$submitButton = this.$formEl.find('.submit-button');
+            this.$errorContainerEl = this.$formEl.find('.js-payment-errors');
+            this.$formEl.find('.js-selectpicker').selectpicker();
+
+            this.$formEl.find('.card-number').payment('formatCardNumber');
+            this.$formEl.find('.card-cvc').payment('formatCardCVC');
+
+            if (handleFormSubmit) {
+                this._bindForm();
+            }
+        },
+
+        /**
+         * Sets up the form to go out to stripe
+         */
+        _bindForm: function() {
+            var payment = this;
+
+            this.$formEl.submit(function(event) {
+              // disable the submit button to prevent repeated clicks
+              payment._disableSubmitButton();
+              payment.hidePaymentErrors();
+
+              Stripe.createToken(
+                  payment.fetchFromData(payment.$formEl),
+                  $.proxy(payment._handleStripeResponse, payment)
+              );
+
+              // prevent the form from submitting with the default action
+              return false;
+            });
+        },
+
+        fetchFromData: function($formEl) {
+            return {
+                number: $formEl.find('.card-number').val(),
+                cvc: $formEl.find('.card-cvc').val(),
+                exp_month: $formEl.find('.card-expiry-month').val(),
+                exp_year: $formEl.find('.card-expiry-year').val(),
+                name: $formEl.find('.card-name').val(),
+                address_zip: $formEl.find('.card-zip').val()
+            }
+        },
+
+        /**
+         * Handles the response back from stripe
+         *
+         * @param status
+         * @param response
+         */
+        _handleStripeResponse: function(status, response) {
+            if (response.error) {
+                //show the errors on the form
+                this.showPaymentErrors(response.error);
+
+                this._enableSubmitButton();
+            } else {
+                // token contains id, last4, and card type
+                var token = response['id'];
+                var cardType = response['card']['type'];
+                var cardName = response['card']['name'];
+                var cardLast4 = response['card']['last4'];
+
+                // Serialize company details form data to pass to the server
+                var serializedFormData = this.$submitButton.closest('form.js-stripe-payment-form').serialize();
+
+                // sends the checkout request and handles what to do next!
+                CheckoutProcessor.sendCheckoutRequest(
+                    'stripe',
+                    {
+                        stripeToken: token,
+                        stripeCardName: cardName,
+                        stripeCardType: cardType,
+                        stripeCardLast4: cardLast4
+                    },
+                    serializedFormData
+                );
+            }
+        },
+
+        _enableSubmitButton: function() {
+            this.$submitButton
+                .removeAttr("disabled")
+                .loadingAnimation('hide')
+            ;
+        },
+
+        _disableSubmitButton: function() {
+            this.$submitButton
+                .attr("disabled", "disabled")
+                .loadingAnimation()
+            ;
+        },
+
+        /**
+         * @param error
+         * @link https://stripe.com/docs/api#errors List of Stripe's error codes
+         */
+        showPaymentErrors: function(error) {
+            // Check https://stripe.com/docs/api#errors for full error codes list
+            switch (error.code) {
+                case 'invalid_number':
+                case 'incorrect_number':
+                case 'expired_card':
+                case 'card_declined':
+                    this.$formEl
+                        .find('#card-number')
+                        .closest('.form-group')
+                        .addClass('has-error')
+                    ;
+                    break;
+                case 'invalid_cvc':
+                case 'incorrect_cvc':
+                    this.$formEl
+                        .find('#card-cvc')
+                        .closest('.form-group')
+                        .addClass('has-error')
+                    ;
+                    break;
+                case 'incorrect_zip':
+                    this.$formEl
+                        .find('#card-zip')
+                        .closest('.form-group')
+                        .addClass('has-error')
+                    ;
+                    break;
+                case 'invalid_expiry_month':
+                    this.$formEl
+                        .find('button.selectpicker[data-id="card-month"]')
+                        .addClass('form-control') // doesn't highlight without it
+                        .closest('.btn-group')
+                        .addClass('has-error')
+                        .closest('.form-group')
+                        .addClass('has-error') // highlight the expiration div
+                    ;
+                    break;
+                case 'invalid_expiry_year':
+                    this.$formEl
+                        .find('button.selectpicker[data-id="card-year"]')
+                        .addClass('form-control') // doesn't highlight without it
+                        .closest('.btn-group')
+                        .addClass('has-error')
+                        .closest('.form-group')
+                        .addClass('has-error') // highlight the expiration div
+                    ;
+                    break;
+            }
+            this.$errorContainerEl
+                .html(error.message)
+                .slideDown()
+            ;
+        },
+
+        hidePaymentErrors: function() {
+            this.$errorContainerEl
+                .hide()
+                .html('')
+            ;
+            this.$formEl.find('.has-error').removeClass('has-error');
+        }
+    };
+
+    window.StripePayment = StripePayment;
+
+}).call(this, window, jQuery, Routing, Stripe);

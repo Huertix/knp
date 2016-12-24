@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Date Format &amp; &quot;Sanity&quot; Validation > Symfony Forms: Build, Render &amp; Conquer! | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 36110
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Form\x20Rendering\x20and\x20Form\x20Variables <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-forms/form-rendering-and-variables#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Ah, forms: one of the most *powerful* - but sometimes
+hated - features in all of Symfony. Here&#039;s the deal: forms
+are just plain hard. You need to manage the HTML form elements,
+validation, data transformation and a lot more. The Form
+component is probably the most complex part of Symfony. But
+the more you work with it, the more you&#039;ll like it.
+
+In this episode, we&#039;ll learn how to use Symfony forms to
+handle simple situations as well as some complex setups.
+Most importantly, I&#039;ll show you how to avoid the pitalls
+that many developers often fall into that causes the form
+component to spiral into complexity hell. The form system
+is a tool: in this tutorial, we&#039;ll put the joy back into it:
+
+* Creating a basic form
+* Basic form rendering and customization
+* Handling a form submit
+* Backing your form with an entity
+* Adding validation
+* Form field guessing
+* Pre-filling with default data
+* Creating a form &quot;type&quot; class
+* Using forms to handle an API POST request
+* Understanding how forms *really* work
+* Flash messages
+
+... and form tips and tricks stuck in all over!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Date Format &amp; &quot;Sanity&quot; Validation">
+<meta property="og:description" content="Ah, forms: one of the most *powerful* - but sometimes
+hated - features in all of Symfony. Here&amp;#039;s the deal: forms
+are just plain hard">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-forms/date-format-sanity-validation">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-forms:f9cef13248ad1a424e63dbaddcf6d2c9186b052b/sf-ep5.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="date-format-sanity-validation#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        9.
+                            Date Format &amp; &quot;Sanity&quot; Validatio...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony Forms: Build, Render &amp; Conquer!</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="the-form-type-class" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        The Form Type Class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="render-form-bootstrap" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Render that Form Pretty (Bootstrap)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="process-that-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Process that Form!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="data-class-type-guessing" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Binding Forms to Objects: data_class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:44</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-redirect-set-flash" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Save, Redirect, setFlash (and Dance)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="field-types-and-options" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Field Types and Options
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:09</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="custom-entity-type-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Custom Query in EntityType
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:30</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="date-picker-field" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Creating a Date Picker Field
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:54</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="date-format-sanity-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Date Format &amp; &quot;Sanity&quot; Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:28</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="form-rendering-and-variables" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Form Rendering and Form Variables
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:33</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="disable-html5-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Disable HTML5 Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="beautiful-form-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Beautiful Form Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="changing-validation-messages" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Changing Validation Messages
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="easy-edit-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Easy Edit Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:01</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="form-template-include" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Sharing Form Templates with include()
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-forms" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Date Format &amp; &quot;Sanity&quot; Validation</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony Forms: Build, Render &amp; Conquer! Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="form-rendering-and-variables#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="date-format-sanity-validation#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="date-format-sanity-validation#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (10)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep5-forms/date-format-sanity-validation.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Let's use the fancy new date picker. Fill in the other fields and hit submit.</p>
+<p>Whoa! Validation Error!</p>
+<p>First, the good news: the error looks nice! And we didn't do any work for that.</p>
+<p>Now, the bad news: do you remember adding any validation? Because I don't! So, where
+is that coming from?</p>
+<h2 id="the-format-of-the-date-field">The Format of the Date Field <a class="headerlink" href="date-format-sanity-validation#the-format-of-the-date-field" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>What you're seeing is a really amazing automatic thing that Symfony does. And I
+invented a term for it: "sanity validation".</p>
+<p>Remember, even though this has a fancy date picker widget, this is <em>just</em> a text
+field, and it needs to be filled in with a very specific format. In this case, the
+widget fills in month/day/year.</p>
+<p>But what if Symfony expects a different format - like year/month/day?</p>
+<p>Well, that's <em>exactly</em> what's happening: Symfony expects the date in one format, but
+the widget is generating something else. When Symfony fails to parse the date, it
+adds the validation error. </p>
+<h2 id="sanity-validation">Sanity Validation <a class="headerlink" href="date-format-sanity-validation#sanity-validation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>So, it turns out that many fields have sanity validation. It basically makes sure
+that a <em>sane</em> value is submitted by the user. If an <em>insane</em> value is sent, it blocks
+the way and shows a message.</p>
+<p>For example, the <code>speciesCount</code> is using Symfony's <code>NumberType</code>, which renders as
+an HTML5 field with up and down arrows on some browsers:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="53f2ddc1ed">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-139" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            139 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-31" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 31
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="integer")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $speciesCount;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="36-137" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 36 - 137
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="138"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>If we tried to type a word here and submit, the <code>NumberType</code> would throw a validation
+error thanks to sanity validation.</p>
+<p>Our drop-down fields <em>also</em> have sanity validation. If a jerk user tries to hack
+the system by adding an option that we did <em>not</em> originally include, the field will
+fail validation. 99% of the time, you don't know or care that this is happening.
+Just know, Symfony has your back.</p>
+<h2 id="making-the-date-formats-match">Making the Date Formats Match <a class="headerlink" href="date-format-sanity-validation#making-the-date-formats-match" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>But how do we fix the date field? We just need to make Symfony's expected format match
+the format used by the datepicker. In fact, the <code>format</code> itself is an option on the
+<code>DateType</code>. I'll hold <code>command</code> and click into <code>DateType</code>. When you use the <code>single_text</code>
+widget, it expects this <code>HTML5_FORMAT</code>: so year-month-day.</p>
+<p>Let's update the JavaScript widget to match this.</p>
+<p>How? On its docs, you'll see that it <em>also</em> has a <code>format</code> option. Cool!</p>
+<p>Now, unfortunately, the format string used by the DateType and the format string
+used by the datepicker widget are not <em>exactly</em> the same format - each has its own
+system, unfortunately. So, you may need to do some digging or trial and error.
+It turns out, the correct format is <code>yyyy-mm-dd</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fac9529909">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-37" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            37 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/new.html.twig">app/Resources/views/admin/genus/new.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-8" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 8
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> javascripts %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="10-13" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 10 - 13
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        jQuery(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">            $(<span class="hljs-string">'.js-datepicker'</span>).datepicker({</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">                <span class="hljs-attr">format</span>: <span class="hljs-string">'yyyy-mm-dd'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            });</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        });</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="22-37" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 22 - 37
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>OK, go back and refresh that page. Fill out the top fields... and then select a
+date. Moment of truth. Got it!</p>
+<h2 id="data-transformers">Data Transformers <a class="headerlink" href="date-format-sanity-validation#data-transformers" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>So I keep telling you that the purpose of the field "types" is to control how a field
+is rendered. But that's only <em>half</em> of it. Behind the scenes, many fields have a
+"data transformer".</p>
+<p>Basically, the job of a data transformer is to transform the data that's inside of
+your PHP code to a format that's visible to your user. For example, the <code>firstDiscoveredAt</code>
+value on <code>Genus</code> is actually a <code>DateTime</code> object:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="06515373da">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-139" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            139 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/Genus.php">src/AppBundle/Entity/Genus.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-11" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 11
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Genus</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="14-46" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 14 - 46
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="47"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="48"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\Column(type="date")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="49"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="50"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $firstDiscoveredAt;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="51-137" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 51 - 137
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="138"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>The data transformer internally changes that into the string that's printed in the box.</p>
+<p>Then, when a date string is submitted, that same data transformer does its work in
+reverse: changing the string back into a <code>DateTime</code> object.</p>
+<p>The data transformer is also kicking butt on the <code>subFamily</code> field. The <code>id</code> of the
+selected <code>SubFamily</code> is submitted. Then, the data transformer uses that to query
+for a <code>SubFamily</code> object and set that on <code>Genus</code>.</p>
+<p>You don't need to know more about data transformers right now, I just want you to
+realize that this awesomeness is happening.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3030649309" id="dsq-comment-3030649309">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3030649309">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-02</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3030649309" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3030649309" class="dsq-comment-text">
+	                                <p>Good detective work <a data-dsq-mention="mvidal1:disqus" href="https://disqus.com/by/mvidal1/" rel="nofollow noopener">Mike</a>! The disabled thing is by default (but I could see how that could be a gotcha) - so that if you have a disabled field that already has a value, a "clever" user can't just modify it in the HTML and submit. I believe this is based on some official spec somewhere (that disabled input should be ignored, but readonly shouldn't), but I can't remember for sure :).</p><p>Glad you sorted it out!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3030303745" id="dsq-comment-3030303745">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/mvidal1/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/4558/7921/avatar92.jpg?1480633320">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3030303745">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-01</span>
+	                            <span class="dsq-commenter-name">Mike</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3030303745" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3030303745" class="dsq-comment-text">
+	                                <p>It turns out that if you set your input field to disabled it will return a NULL value. If you use readonly instead it will work just fine. I did not include the disabled bit in my code above, but that is how I had my form originally. I was also using a datepicker that did not include time so I needed to use the bootstrap datetimepicker to resolve that. In the end I decided to use readonly and add today's date by default.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3030075998" id="dsq-comment-3030075998">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/mvidal1/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/4558/7921/avatar92.jpg?1480633320">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3030075998">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-12-01</span>
+	                            <span class="dsq-commenter-name">Mike</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3030075998" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3030075998" class="dsq-comment-text">
+	                                <p>Thanks for getting back to me.</p><p>My @ORM\Colum is type="datetime". Take a look below at my setup:<br>Entity:<br></p><pre><code><br> /**<br>    * @ORM\Column(type="datetime")<br>    */<br>  protected $createdOn;<br></code></pre><p></p><p>Controller:<br></p><pre><code><br>$form = $this-&gt;createForm(JobTitleFormType::class);<br>$form-&gt;handleRequest($request);<br>if ($form-&gt;isSubmitted() &amp;&amp; $form-&gt;isValid()) {<br>    $jobTitle = $form-&gt;getData();<br><br>    $em = $this-&gt;getDoctrine()-&gt;getManager();<br>    $em-&gt;persist($jobTitle);<br>    $em-&gt;flush();<br><br>    $this-&gt;addFlash('success', 'Job Title "' . $form-&gt;get("jobTitle")-&gt;getData(). '" has been added.');<br><br>    //return new Response($email);<br>    return $this-&gt;redirectToRoute('setup_jobtitles');<br>}<br></code></pre><p></p><p>FormType:<br></p><pre><code><br>-&gt;add('createdOn', DateTimeType::class, [<br>                'widget' =&gt; 'single_text',<br>                'html5' =&gt; false,<br>            ]);<br></code></pre><p></p><p>Twig:<br></p><pre><code><br> &lt;div class="form-group" id="jsDatepicker"&gt;<br>   {{ form_label(jobTitleForm.createdOn) }}<br>   &lt;div class="input-group date"&gt;<br>      <span><i></i></span><br>       {{ form_widget(jobTitleForm.createdOn, { 'attr': {'class': 'form-control' } } ) }}<br>    &lt;/div&gt;<br> &lt;/div&gt;<br></code></pre><p></p><p>When I submit the form it will add it to the DB like this:<br>2016-11-30 00:00:00</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3028196179" id="dsq-comment-3028196179">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3028196179">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-30</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3028196179" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3028196179" class="dsq-comment-text">
+	                                <p>Yo <a data-dsq-mention="mvidal1:disqus" href="https://disqus.com/by/mvidal1/" rel="nofollow noopener">Mike</a>!</p><p>Hmm, is your @ORM\Column a type="date" or type="datetime"? If it's "date", change it to "datetime": our form is correctly submitting a DateTime with time, but then Doctrine is saving only the date part.</p><p>I'm not sure why the DateTimeType on the form would be returning null, however. If the above doesn't give you a hint, feel free to post some code (the important part if your entity, form, controller) and we'll see if we can spot the issue :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3028125970" id="dsq-comment-3028125970">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/mvidal1/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/4558/7921/avatar92.jpg?1480633320">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3028125970">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-30</span>
+	                            <span class="dsq-commenter-name">Mike</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3028125970" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3028125970" class="dsq-comment-text">
+	                                <p>Hi,</p><p>I have a similar setup where I have a value that is a DateTime object (your screen shot shows @ORM\Column(type="date")). I got everything to work, but when I submit the form the date is being added without the time. I have tried using the DateTime form type, but it returns NULL when I submit the form. Any ideas?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2930747212" id="dsq-comment-2930747212">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2930747212">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-03</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2930747212" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2930747212" class="dsq-comment-text">
+	                                <p>So much better! Thank you.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2930743507" id="dsq-comment-2930743507">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2930743507">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-03</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2930743507" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2930743507" class="dsq-comment-text">
+	                                <p>Yo Maksym,</p><p>Yes, you can customize it! Check out the "format" option of Date form type in <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Freference%2Fforms%2Ftypes%2Fdate.html%23format%3ActgHgxDUl76dDzaHaOikpiZdE3Y&amp;cuid=1175718" rel="nofollow noopener">docs</a>.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2930715044" id="dsq-comment-2930715044">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/maksymminenko/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9741/646/avatar92.jpg?1473824449">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2930715044">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-03</span>
+	                            <span class="dsq-commenter-name">Maksym Minenko</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2930715044" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2930715044" class="dsq-comment-text">
+	                                <p>Is there a way to change the Symfony's date format, without showing the ugly "2016-10-10" to the user?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2921533950" id="dsq-comment-2921533950">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2921533950">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-27</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2921533950" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2921533950" class="dsq-comment-text">
+	                                <p>Hey Joram,</p><p>Most probably you opened a wrong file. Please, double check the path - it should be: <code>./vendor/symfony/symfony/src/Symfony/Component/Form/Extension/Core/Type/DateType.php</code> . Also, the namespace of this file should be <code>Symfony\Component\Form\Extension\Core\Type </code>.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2920847130" id="dsq-comment-2920847130">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="date-format-sanity-validation">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2920847130">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-27</span>
+	                            <span class="dsq-commenter-name">joram</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2920847130" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2920847130" class="dsq-comment-text">
+	                                <p>i dont have the good  DateType file my is almost empty</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_date-format-sanity-validation';var disqus_url = 'https://knpuniversity.com/screencast/symfony-forms/date-format-sanity-validation';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="form-rendering-and-variables#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-forms/date-format-sanity-validation" addthis:title="Symfony Forms: Build, Render &amp; Conquer!">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-forms","courseIsOwned":false,"chapter":"Date Format & \"Sanity\" Validation","chapterNumber":9,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony Forms: Build, Render &amp; Conquer!';
+        Core.courseId = 77
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-forms';
+                    Core.chapterTitle = 'Date Format &amp; &quot;Sanity&quot; Validation';
+            Core.chapterNumber = 9;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'date-format-sanity-validation';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

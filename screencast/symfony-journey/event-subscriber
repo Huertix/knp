@@ -1,0 +1,2251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Interrupt Symfony with an Event Subscriber > Journey to the Center of Symfony: HttpKernel Request-Response | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 29392
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: HttpKernel\x3A\x3Ahandle\x28\x29\x20The\x20Heart\x20of\x20Everything <i class="fa fa-play"></i>',
+            'url': '/screencast/symfony-journey/httpkernel-handle#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Let&#039;s not just *use* Symfony, let&#039;s conquer it! In this series, you and
+I will journey to the center of Symfony by ripping open the source code,
+adding debug statements and seeing what *really* happens between the
+request and the response. It&#039;s as geeky-awesome as it sounds.
+
+[Besides dinosaurs](http://upload.wikimedia.org/wikipedia/commons/a/a0/Amazing_Stories_June_1926.jpg),
+expect to do the following on our adventure:
+
+* Create an event listener that does amazing things
+* Step through the `HttpKernel::handle()` method that&#039;s used in Symfony and Drupal 8
+* See where event like `kernel.request`, `kernel.response` and others are dispatched
+* Learn about request attributes and the magic they give us
+* Find out what is a sub-request and how to handle it
+* Create your own sub-request manually
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Interrupt Symfony with an Event Subscriber">
+<meta property="og:description" content="Let&amp;#039;s not just *use* Symfony, let&amp;#039;s conquer it! In this series, you and
+I will journey to the center of Symfony by ripping open the source code,
+adding debug statements and seeing what *really* happens between the
+request and the response. It&amp;#039;s as geeky-awesome as it sounds">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-journey/event-subscriber">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-journey:c7b574fe544fb7bbc1271c944cd04846d13f8156/sf2-journey-kernel.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="event-subscriber#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        1.
+                            Interrupt Symfony with an Event...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Journey to the Center of Symfony: HttpKernel Request-Response</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="event-subscriber" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Interrupt Symfony with an Event Subscriber
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 8:40</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="httpkernel-handle" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        HttpKernel::handle() The Heart of Everything
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="httpkernel-router-listener" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        kernel.request and the RouterListener
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 9:48</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="determine-the-controller" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Finding and Instantiating the Controller
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 6:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="kernel.controller-and-getarguments" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        kernel.controller Event &amp; Controller Arguments
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:54</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="kernel.view-event" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        The kernel.view Event
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:17</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="httpkernel-handle-finishing-up" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Finishing with kernel.response and kernel.exception
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:34</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="magically-replace-_controller" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Symfony Magic: Replace the _controller
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:23</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="magically-add-controller-args" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Making an Argument Available to All Controllers
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:57</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="sub-requests" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        What about Sub Requests?
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:31</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="sub-request-internals" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        How Sub-Requests Work
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:58</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-journey" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Interrupt Symfony with an Event Subscriber</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Journey to the Center of Symfony: HttpKernel Request-Response Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered "
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/536564448_960x600.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/140191188.hd.mp4?s=bdc1f1bcd257db5900de7e66a567e04f8bbd04a5&amp;profile_id=113&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/140191188.sd.mp4?s=68b03938f314f81e121369b7d05c04fb91e8710b&amp;profile_id=112&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="event-subscriber#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../tag/symfony" class="btn btn-lg btn-success">Back to the <i>Symfony 3</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="event-subscriber#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="httpkernel-handle#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="event-subscriber#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="event-subscriber#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony-journey/edit/master/knpu/http-kernel/event-subscriber.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Hey guys! Welcome to a series that we're calling: Journey to the Center of
+Symfony! In this first part, we'll be talking about the deep, dark core piece
+called the HttpKernel, a wondrous component that not only sits at the heart
+of Symfony, but also at the heart of Silex, Drupal 8, PhpBB and a lot of
+other stuff. How is that possible? We'll find out! And this stuff is really
+nerdy, so we're going to have some fun.</p>
+<h2 id="getting-the-project-running">Getting the Project Running <a class="headerlink" href="event-subscriber#getting-the-project-running" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>I already have the starting point of our app ready on my computer. You can
+download this right on the screencast page. I've already run <code>composer install</code>,
+I've already created my database, I've already created my schema: I won't
+show those things here because you guys are a bit more of experts. We do
+have fixtures, so let's load those.</p>
+<p>Now let's use the built-in PHP web server to get our site running.</p>
+<p>Perfect!</p>
+<p>So in true Journey to the Center of the "Symfony" theme, we're going to talk
+about dinosaurs. I've already created an app, which has 2 pages. We can list
+dinosaurs - these are coming out of the database - and if we click on one
+of them, we go to the show page for that dinosaur.</p>
+<h2 id="big-picture-request-route-controller-response">Big Picture: Request-Route-Controller-Response <a class="headerlink" href="event-subscriber#big-picture-request-route-controller-response" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>No matter what technology or framework we're using, our goal is always to
+start with a request and use that to create a response. Everything in between
+those 2 steps will be different based on your tech or framework. In our app,
+and in almost every framework, two things that are going to be between the
+request and response are the route and controller. In this case, you can see
+our homepage has a route, our function is a controller, and our controller
+returns a Response object::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="fbfd816c5a">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-42" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            42 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/DinosaurController.php">src/AppBundle/Controller/DinosaurController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@Route</span>("/", name="dinosaur_list")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">indexAction</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        $dinos = <span class="hljs-keyword">$this</span>-&gt;getDoctrine()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">            -&gt;getRepository(<span class="hljs-string">'AppBundle:Dinosaur'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            -&gt;findAll();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;render(<span class="hljs-string">'dinosaurs/index.html.twig'</span>, [</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">            <span class="hljs-string">'dinos'</span> =&gt; $dinos,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code">        ]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="24-42" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 24 - 42
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And we have the same thing down here with the other page: it has a route,
+a controller, and that returns a response::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="3620ccdfd2">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-42" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            42 lines <span class="meta-divider"></span> <span title="src/AppBundle/Controller/DinosaurController.php">src/AppBundle/Controller/DinosaurController.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-24" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 24
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@Route</span>("/dinosaurs/{id}", name="dinosaur_show")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showAction</span><span class="hljs-params">($id)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">        $dino = <span class="hljs-keyword">$this</span>-&gt;getDoctrine()</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">            -&gt;getRepository(<span class="hljs-string">'AppBundle:Dinosaur'</span>)</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">            -&gt;find($id);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code">        <span class="hljs-keyword">if</span> (!$dino) {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="35"></td>
+            <td class="blob-code">            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">$this</span>-&gt;createNotFoundException(<span class="hljs-string">'That dino is extinct!'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="36"></td>
+            <td class="blob-code">        }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="37"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="38"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;render(<span class="hljs-string">'dinosaurs/show.html.twig'</span>, [</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="39"></td>
+            <td class="blob-code">            <span class="hljs-string">'dino'</span> =&gt; $dino,</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">        ]);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So what we're going to look at is <em>how</em> that all works. Who actually runs
+the router? Who calls the controller? How do events work in between the
+request-response flow?</p>
+<p>But before we dive into that, what we're going to do first is create an event
+listener and hook into that process. Then we'll be able to play with that
+event listener as we dive into the core of things.</p>
+<h2 id="the-best-parts-of-the-web-profiler">The Best Parts of the Web Profiler <a class="headerlink" href="event-subscriber#the-best-parts-of-the-web-profiler" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>I'm going to open up the profiler and go to the timeline. This is going to
+be our guide to this whole process. This shows everything that happens between
+the request and the response. Even if you don't understand what's happening
+yet, after we go through everything, this is going to be a lot more interesting.
+You can already see where our controller is called, and under the controller
+you can see the Twig template and even some Doctrine calls being made.</p>
+<p>Before and after that, there are a lot of event listeners - you notice a
+lot of things that end in the word Listener. That's because most of the things
+that happen between the request and the response in Symfony are events: you
+have the chance to hook into them with event listeners.</p>
+<p>In fact, one other tab I really like on here is the Events tab. You can see
+there's some event called <code>kernel.request</code>. Maybe you already understand
+what that means, maybe you don't, but you will soon. There's another event
+called <code>kernel.controller</code> with listeners and several other events. We're
+going to see where these events are dispatched and why you would add a hook
+to one versus another.</p>
+<h2 id="creating-an-event-subscriber-listener">Creating an Event Subscriber/Listener <a class="headerlink" href="event-subscriber#creating-an-event-subscriber-listener" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Let's create a listener on that <code>kernel.request</code> event! In my <code>AppBundle</code>,
+I'll create a new directory called <code>EventListener</code> and a new class. Inside
+this event listener, we're going to read the <code>User-Agent</code> header off the
+request and do some things with that. So I'll call this <code>UserAgentSubscriber</code>::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="dcd58262ba">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            8 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="hljs-meta">&lt;?php</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">EventListener</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserAgentSubscriber</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>If you want to hook into Symfony, there are 2 ways to do it: with a listener
+or a subscriber. They're actually exactly the same, the only difference is
+where you configure <em>which</em> events you want to listen to.</p>
+<p>I'm going to create a subscriber here because it's a little more flexible.
+So <code>UserAgentSubscriber</code> needs to implement <code>EventSubscriberInterface</code>::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ae026f4ac0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-21" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            21 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"><span class="hljs-keyword">namespace</span> <span class="hljs-title">AppBundle</span>\<span class="hljs-title">EventListener</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">EventDispatcher</span>\<span class="hljs-title">EventSubscriberInterface</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserAgentSubscriber</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">EventSubscriberInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="9-19" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 9 - 19
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Notice that it added the <code>use</code> statement up there. And we're going to need
+to implement 1 method which is <code>getSubscribedEvents</code>. What this is going
+to return is a simple array that says: Hey, apparently there's some event
+whose name is <code>kernel.request</code> - we don't necessary know why it's called
+or what it does yet - but when that event happens, I want Symfony to call
+this  <code>onKernelRequest</code> function, which we're going to put inside of this
+class. For now, let's just put a <code>die('it works');</code>::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="10d76c8e37">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-21" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            21 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserAgentSubscriber</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">EventSubscriberInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onKernelRequest</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">        <span class="hljs-keyword">die</span>(<span class="hljs-string">'it works'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getSubscribedEvents</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">array</span>(</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">            <span class="hljs-string">'kernel.request'</span> =&gt; <span class="hljs-string">'onKernelRequest'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">        );</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Cool! The event subscriber is ready to go. No, Symfony doesn't automatically
+know this class is here or automatically scan the codebase. So to get Symfony
+to know that there's a new <code>UserEventSubscriber</code> that wants to listen on
+the <code>kernel.request</code> event, we're going to need to register this as a
+service.</p>
+<h3 id="registering-the-subscriber-listener">Registering the Subscriber/Listener <a class="headerlink" href="event-subscriber#registering-the-subscriber-listener" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h3>
+<p>So I'm going to go into <code>app/config/services.yml</code> and clear the comments
+out. And we'll give it a short, but descriptive name - <code>user_agent_subscriber</code>,
+the name of the service doesn't really matter in this case. There are no
+arguments yet, so I'll just put an empty array. Now in order for Symfony
+to know this is an event subscriber, we'll use something called a tag, and
+set its name to <code>kernel.event_subscriber</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="9333b8eb42">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-11" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            11 lines <span class="meta-divider"></span> <span title="app/config/services.yml">app/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">    user_agent_subscriber:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-attr">        class:</span> AppBundle\EventListener\UserAgentSubscriber</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-attr">        tags:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> { name: kernel.event_subscriber }</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Now, that tag is called a <a href="http://symfony.com/doc/current/reference/dic_tags.html">dependency injection tag</a>, which is really awesome,
+really advanced and really fun to work with inside of Symfony. And we're
+going to talk about it in a different part of this series. With just this
+configuration, Symfony will boot, it'll know about our subscriber, and when
+that <code>kernel.request</code> event happens, it <em>should</em> call our function.</p>
+<p>Sweet!</p>
+<h2 id="logging-something-in-the-subscriber">Logging Something in the Subscriber <a class="headerlink" href="event-subscriber#logging-something-in-the-subscriber" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Now inside of <code>onKernelRequest</code>, let's do some real work. For now, I want
+to log a message. I'm going to need the logger so I'll add a constructor
+and even type hint the argument with the PSR LoggerInterface. And I'll use
+a little PHPStorm shortcut to create and set that property for me::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="08a7f1d61d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-29" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            29 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-4" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 4
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Psr</span>\<span class="hljs-title">Log</span>\<span class="hljs-title">LoggerInterface</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="6-7" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 6 - 7
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserAgentSubscriber</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">EventSubscriberInterface</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $logger;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">(LoggerInterface $logger)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;logger = $logger;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="16-27" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 16 - 27
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Now in our function, we'll log a very important message::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="4dc80beb3a">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-29" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            29 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onKernelRequest</span><span class="hljs-params">()</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;logger-&gt;info(<span class="hljs-string">'Yea, it totally works!'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="21-29" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 21 - 29
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>And of course this isn't going to work unless we go back to <code>services.yml</code>
+and tell Symfony: Hey, we need the <code>@logger</code> service:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="8aeecd219d">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-12" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            12 lines <span class="meta-divider"></span> <span title="app/config/services.yml">app/config/services.yml</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-5" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 5
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code"><span class="hljs-attr">services:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-attr">    user_agent_subscriber:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"><span class="hljs-attr">        class:</span> AppBundle\EventListener\UserAgentSubscriber</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"><span class="hljs-attr">        arguments:</span> [<span class="hljs-string">"@logger"</span>]</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"><span class="hljs-attr">        tags:</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-bullet">            -</span> { name: kernel.event_subscriber }</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Cool!</p>
+<p>Let's refresh! It works, and if we click into the profiler, one of the
+tabs is called "Logs", and under "info" we can see the message. So this is
+already working, and if we go back to the Timeline and look closely, we should
+see our <code>UserAgentSubscriber</code>. And it's right there. Also, if we go back
+to the events tab, we see the <code>kernel.request</code> with all of its listeners.
+And if you look at the bottom, you see our <code>UserAgentSubscriber</code> on that
+list too.</p>
+<p>So we're hooking into that process already, even if we don't understand what's
+going on with it.</p>
+<h2 id="every-listener-gets-an-event-object">Every Listener Gets an Event Object <a class="headerlink" href="event-subscriber#every-listener-gets-an-event-object" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Whenever you listen to <em>any</em> event - whether it's one of Symfony's core events
+or it's an event from a third-party bundle you installed, your function is
+passed an <code>$event</code> argument. So, we'll add <code>$event</code>. The only trick is
+that you don't automatically know what type of object that is, because every
+event you listen to is going to pass you a different type of event object.</p>
+<p>But no worries! I'm going to use the new <code>dump()</code> function from Symfony 2.6::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6771a6bda5">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-30" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            30 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-16" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 16
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onKernelRequest</span><span class="hljs-params">($event)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        dump($event);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;logger-&gt;info(<span class="hljs-string">'Yea, it totally works!'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="22-30" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 22 - 30
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's go back a few pages, refresh, and the dump function prints that out
+right in the web debug toolbar. And we can see it's dumping a <code>GetResponseEvent</code>
+object. So that's awesome - now we know what type of object is being passed
+to us. And that's important because every event object will have different
+methods and different information on it.</p>
+<p>Let's type-hint the argument. Notice I'm using PHPStorm, so that added a
+nice <code>use</code> statement to the top - don't forget that::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ef91188a95">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-33" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            33 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-6" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 6
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"><span class="hljs-keyword">use</span> <span class="hljs-title">Symfony</span>\<span class="hljs-title">Component</span>\<span class="hljs-title">HttpKernel</span>\<span class="hljs-title">Event</span>\<span class="hljs-title">GetResponseEvent</span>;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="8-17" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 8 - 17
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onKernelRequest</span><span class="hljs-params">(GetResponseEvent $event)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="20-23" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 20 - 23
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-33" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 33
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>What I want to do is get the <code>User-Agent</code> header and print that out in a
+log message. Fortunately, this <code>getResponseEvent</code> object gives us access
+to the request object. And again, every event you listen to will give you
+a different event object, and every event object will have different methods
+and information on it. It just <em>happens</em> to be that this one has a <code>getRequest</code>
+method, which is really handy for what we want to do. Now I'll just read
+the <code>User-Agent</code> off of the headers, and log a message::</p>
+<p><div class="code-block-wrapper" data-code-block-guid="349cebef33">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-33" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            33 lines <span class="meta-divider"></span> <span title="src/AppBundle/EventListener/UserAgentSubscriber.php">src/AppBundle/EventListener/UserAgentSubscriber.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-17" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 17
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onKernelRequest</span><span class="hljs-params">(GetResponseEvent $event)</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">    </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">        $request = $event-&gt;getRequest();</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code">        $userAgent = $request-&gt;headers-&gt;get(<span class="hljs-string">'User-Agent'</span>);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code">        <span class="hljs-keyword">$this</span>-&gt;logger-&gt;info(<span class="hljs-string">'Hello there browser: '</span>.$userAgent);</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    }</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="25-33" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 25 - 33
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Let's try it! I'll get back into the profiler, then to the Logs... and it's
+working perfectly.</p>
+<p>Even if we don't understand everything that's happening between the request
+and response, we already know that there are these listeners that happen.
+But next, we're going to walk through the code that handles <em>all</em> of this.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2625041889" id="dsq-comment-2625041889">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2625041889">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-15</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2625041889" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2625041889" class="dsq-comment-text">
+	                                <p>Hey Diego!</p><p>Not currently - you're the first to ask! But that would be really (geeky) cool - it's something I'm going to keep thinking about :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2622026451" id="dsq-comment-2622026451">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/MolloKhan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/9429/4645/avatar92.jpg?1475260109">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2622026451">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-04-13</span>
+	                            <span class="dsq-commenter-name">Diego Aguiar</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2622026451" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2622026451" class="dsq-comment-text">
+	                                <p>Hello, is there a way to download this course code from console in linux ?</p><p>Cheers</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2480886358" id="dsq-comment-2480886358">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2480886358">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-01-27</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2480886358" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2480886358" class="dsq-comment-text">
+	                                <p>Hey Shairyar!</p><p>Ah, I see! So, depending on your configuration, Swiftmailer may send your email immediately (meaning, you can just do an unlink on the line after calling send) *or* will wait until the very end of the request (after the response has been sent) and *then* send the email. The second is the default in the Symfony Standard Edition - it's called "memory spooling". What happens is that Swiftmailer stores the Message object when you send it. Then, it has a listener on the kernel.terminate event, which actually sends any queued (spooled) messages: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2Fsymfony%2Fswiftmailer-bundle%2Fblob%2Fmaster%2FEventListener%2FEmailSenderListener.php%3AhgricOBSvoZ-1FZdyzfZPMVd7BM&amp;cuid=1175718" rel="nofollow noopener">https://github.com/symfony/swi...</a></p><p>So, this doesn't help you yet, except that the easiest solution is to turn off memory spooling and allow the message to be sent synchronously (so that you can unlink the file on the next line). The user will receive a slight performance degradation on page loads where you send an email... which is probably not very many.</p><p>Otherwise, the solution is more complicated. Unfortunately, Swiftmailer doesn't dispatch an event (that I know of) after it sends spooled emails. That's *really* what you need. However, check out this bundle: it appears to add that hook: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FTDMobility%2FSwiftmailerEventsBundle%3ARHjoIob3wdMBG8xK2IwqiILYWZ4&amp;cuid=1175718" rel="nofollow noopener">https://github.com/TDMobility/...</a>. If I'm correct, then you would register a listener on the "tdm.swiftmailer.mailer.post_send_cleanup" event and be able to delete the file.</p><p>Let me know if this helps!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2480614723" id="dsq-comment-2480614723">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2480614723">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-01-27</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2480614723" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2480614723" class="dsq-comment-text">
+	                                <p>Hi,</p><p>I am using SwiftMailer to sent email, I did some search on google and came across an option of "unlink(filename)" but using this option leads to an error may be the code deletes the file before the uploading is ever completed.</p><p>In another area of the app I am allowing people to generate files and download them, but there I am using BinaryFileResponse() which gives me an access to deleteFileAfterSend() and that seems to work perfectly fine, it deletes the file after sending it as a response.</p><p>I kind of want to avoid creating the event listener just to delete the file, I was hoping SwiftMail or Symfony had some other way for us to know that the file is attached now and can be deleted safely.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2479143571" id="dsq-comment-2479143571">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2479143571">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-01-26</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2479143571" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2479143571" class="dsq-comment-text">
+	                                <p>Hi Shairyar!</p><p>Cool question. The answer depends on *how* your email is sent:</p><p>1) If you are sending the email in your Symfony code somewhere (maybe via an app/console script or some other Symfony controller - it doesn't matter), then you could of course just delete the file right at that same moment. Or, more elegantly, you could dispatch your own event - e.g. "file.email_sent" and you would send it some new event object (e.g. FileEmailSentEvent) that has information about which email was just sent and which file should be deleted. Then, you could register a listener to this event to delete the file. The pro is that this makes your code very decentralized. The con is that it makes your code a little bit harder to understand: I can't immediately see what is happening when I look at your original code.</p><p>2) If some external service is sending the email (e.g. Mandrill), then you would need to look into webhooks that the service can send you when *it* completes sending. In that case, Symfony events wouldn't be involved.</p><p>Let me know if I somewhat answered your question... or if I misunderstood :).</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2476276310" id="dsq-comment-2476276310">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2476276310">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-01-25</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2476276310" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2476276310" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>I was wondering if it is possible via event listener or some other way in Symfony to know if an email has been sent. Reason I am asking this is because I am creating files for users on server and this file gets sent via email as an attachment. Once the email has been sent this file is no longer required so I want to delete it.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2113032041" id="dsq-comment-2113032041">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/juan_luis_garcia/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11144/1523/avatar92.jpg?1481447245">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2113032041">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-02</span>
+	                            <span class="dsq-commenter-name">Juan Luis Garcia</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2113032041" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2113032041" class="dsq-comment-text">
+	                                <p>Thanks so much Ryan!<br>You're very friendly.</p><p>Pd. I am eager to begin the tutorial on Continuous Deployment With Symfony2</p><p>Greetings!!! =)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2112537272" id="dsq-comment-2112537272">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2112537272">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-02</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2112537272" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2112537272" class="dsq-comment-text">
+	                                <p>Hi Juan!</p><p>Ah, I understand! So first, about sending an email after the response was sent, this is already a built-in feature called "memory spooling": <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fcookbook%2Femail%2Fspool.html%23spool-using-memory%3Ay-2Su2R6ugee6igSiFZj6sXvQAs&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a>. It works exactly like you expect: you send an email like normal, but it doesn't send immediately. Instead, a listener on kernel.terminate sends the email.</p><p>But, what if this weren't a feature and you needed to build it yourself? The process would look something like this (it is a little bit more difficult, but I hope you will understand the flow):</p><p>A) Create some class that helps you send emails - e.g. a MailerManager class - and give it two methods: queueEmail($message) and sendAllQueuedEmails(). Register this as a service (named, for example, "app.mailer_manager". The queueEmail() wouldn't actually send the email - it would just set it on some private property in the class (e.g. $queuedMessages). Then, the sendAllQueuedEmails() will eventually loop over this property and use the normal mailer service to send these.</p><p>B) In your controller, instead of getting the "mailer" service and using it to send the email directly, you would instead get your "app.mailer_manager" service and use your queueEmail() method:</p><p><code><pre>public function someAction()<br>{<br>    // ...<br>    $this-&gt;get('app.mailer_manager')-&gt;queueEmail($someMessageVariable);<br>}<br></pre></code></p><p>C) Finally, create a new event listener class and make it listen on kernel.terminate. You'll inject (via the constructor) the MailerManager service into this, and the code would look something like this:</p><p></p><pre><code><br>class MailSenderListener<br>{<br>    private $mailerManager;<br><br><br>    public function __construct(MailerManager $mailerManager)<br>    {<br>        $this-&gt;mailerManager = $mailerManager;<br>    }<br><br><br>    public function onKernelTerminate(PostResponseEvent $event)<br>    {<br>        $this-&gt;mailerManager-&gt;sendAllQueuedEmails();<br>    }<br>}<br></code></pre><p></p><p>The MailerManager::sendAllQueuedEmails() will loop over the queued messages and use the real mailer service to send those (so, the real mailer service would be passed into the constructor of MailerManager).</p><p>How does that sound? So you don't call something in kernel.terminate directly from your controller. Instead, that listener will *always* run. Your job is to make "store" information somewhere so that when your listener executes, it knows what you want it to do.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2111984196" id="dsq-comment-2111984196">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/juan_luis_garcia/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11144/1523/avatar92.jpg?1481447245">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2111984196">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-02</span>
+	                            <span class="dsq-commenter-name">Juan Luis Garcia</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2111984196" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2111984196" class="dsq-comment-text">
+	                                <p>Ryan thank you very much!<br>Now I understand.<br>Respect to events as kernel.terminate, I intend to send an email or pdf after sending the response to the user.</p><p>greetings and thanks Ryan!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2111247340" id="dsq-comment-2111247340">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2111247340">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-01</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2111247340" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2111247340" class="dsq-comment-text">
+	                                <p>Hi Juan!</p><p>Yes, what you say above about listeners and subscribers is true. But also,  you *can* specify a priority for a listener. But for a listener, this priority lives with your service definition:</p><p></p><pre><code><br>services:<br>    my_listener:<br>        class: AppBundle\EventListener\SomeListener<br>        arguments: []<br>        tags:<br>            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 100 }<br></code></pre><p></p><p>So again, a listener and a subscriber have the same abilities :).</p><p></p><blockquote>Respect to events as kernel.terminate there any way to make the event run by the controller?</blockquote><p></p><p>I don't think I understand. The kernel.terminate event happens after your controller. In other words, all listeners to the kernel.terminate event are called after your controller automatically. What do you want to accomplish with this event?</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2111062035" id="dsq-comment-2111062035">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/juan_luis_garcia/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11144/1523/avatar92.jpg?1481447245">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2111062035">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-07-01</span>
+	                            <span class="dsq-commenter-name">Juan Luis Garcia</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2111062035" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2111062035" class="dsq-comment-text">
+	                                <p>Now a little clearer. In the event we put subscriber execution priorities and in no event listener. I think it's not important priorities for most cases ....</p><p>Respect to events as kernel.terminate there any way to make the event run by the controller?</p><p>Thank you very much for your answer.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2109420465" id="dsq-comment-2109420465">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2109420465">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-30</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2109420465" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2109420465" class="dsq-comment-text">
+	                                <p>Hi Juan!</p><p>They are really the same thing :). I will say it again: a listener and a subscriber have the *same* purpose. Both have a function that Symfony calls when an event occurs.</p><p>So, what is the difference? Well, somewhere, you need to say "Hey Symfony, please call onKernelRequest when the kernel.request event happens". Listeners and subscribers keep this "configuration" in a different place:</p><p>Listener: This configuration is stored in the service definition, under the "event" and "method" options of the tag</p><p>Subscriber: This configuration is stored right inside the class, inside the getSubscribedEvents function.</p><p>Everything that can be done with a listener can be done with a subscriber, and vice-versa :). So, when you are choosing between them, the choice is entirely up to you. I tend to prefer subscribers, because I like to be able to look inside the class and see all my information in one spot.</p><p>Does that help?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2109065941" id="dsq-comment-2109065941">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/juan_luis_garcia/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11144/1523/avatar92.jpg?1481447245">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2109065941">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-30</span>
+	                            <span class="dsq-commenter-name">Juan Luis Garcia</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2109065941" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2109065941" class="dsq-comment-text">
+	                                <p>Hello,<br>Do not fail to understand the difference between listener vs subscriber?<br>Could you clarify my doubt? Thank you very much Wea Ryan!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2088179548" id="dsq-comment-2088179548">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2088179548">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-19</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2088179548" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2088179548" class="dsq-comment-text">
+	                                <p>Just wanted to say thanks. I will now be digging into dependency injection </p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2087796709" id="dsq-comment-2087796709">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2087796709">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-19</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2087796709" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2087796709" class="dsq-comment-text">
+	                                <p>Yea, you probably don't need that part (you're right that the other check should be enough) :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2087312219" id="dsq-comment-2087312219">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2087312219">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-19</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2087312219" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2087312219" class="dsq-comment-text">
+	                                <p>Thank you so much, by using the following piece of code I was able to see the 404 error</p><p></p><pre><code><br>if (!$token = $this-&gt;tokenStorage-&gt;getToken()) {<br>    // possible only if the security system didn't run, usually due to an error like a 404<br>    return;<br>}<br></code><br></pre><p></p><p>just wondering if i still need to use (my code works fine if i dont use it, i dont see any error)</p><p></p><pre><code><br><br>$user = $token-&gt;getUser();<br>if (!is_object($user)) {<br>    // there is no user - the user may not be logged in<br>    return;<br>}<br></code><br></pre>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2086572068" id="dsq-comment-2086572068">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2086572068">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2086572068" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2086572068" class="dsq-comment-text">
+	                                <p>Hey!</p><p>Oh yes yes, I know what's happening. Here's how it works:</p><p>A) the RouterListener runs. There is no route, so it throws an exception<br>B) The security system (which is also a listener) is never called, so security is never initialized. Your listener is also never called<br>C) To render the 404 page, a "sub request" is made. This calls all the listeners again. The security system is programmed to *not* run this time however, so there is still no user. BUT, your listener *does* run again.</p><p>To fix this, be a little more careful when getting the user (especially in a listener). I'd do:</p><p></p><pre><code><br>if (!$token = $this-&gt;tokenStorage-&gt;getToken()) {<br>    // possible only if the security system didn't run, usually due to an error like a 404<br>    return;<br>}<br><br><br>$user = $token-&gt;getUser();<br>if (!is_object($user)) {<br>    // there is no user - the user may not be logged in<br>    return;<br>}<br></code></pre><p></p><p>This kind of code is only needed in code that may be run somewhere when an error has happened (listeners, or your exception template, for example). It's kind of an ugly detail.</p><p>And nice work on the service setup - that's exactly what I had in mind! I still have no idea how the ContainerAware things was even working - I see nothing in the core code that would do that...</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2086431090" id="dsq-comment-2086431090">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2086431090">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-18</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2086431090" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2086431090" class="dsq-comment-text">
+	                                <p>Many thanks for the feedback, I got the code from searching answers online following different tutorials. I am not using any third party bundles yet just a plain simple Symfony framework.</p><p>1) Reason I asked the route query was I noticed when the route does not exist, instead of seeing the 404 error i see</p><p></p><pre><code><br>FatalErrorException in StudentApplicationSubscriber.php line 36:Error: Call to a member function getUser() on null<br></code></pre><p><code><br></code><br>The above error is because of using getUser() in event listener, just to check if i remove the event listener i do see the 404 error, how do i fix this?</p><p>2) Ok so following your instruction about getting rid of ContainerAware, i did that and it is working perfectly fine. this is how my services.yml looks like now</p><p></p><pre><code><br>services:<br>    student_application_subscriber:<br>        class: ProjectEverest\CoreBundle\EventListener\StudentApplicationSubscriber<br>        arguments:<br>            - @doctrine.orm.entity_manager<br>            - @security.token_storage<br>            - @security.authorization_checker<br>            - @twig<br>        tags:<br>            - { name: kernel.event_subscriber <br><br></code><br></pre><p><br>This is how my event listener looks like now</p><p></p><pre><br><code><br>namespace ProjectEverest\CoreBundle\EventListener;<br><br>use Doctrine\ORM\EntityManager;<br>use Symfony\Component\EventDispatcher\EventSubscriberInterface;<br><br>class StudentApplicationSubscriber implements EventSubscriberInterface<br>{<br>    protected $em;<br>    protected $twig;<br>    protected $tokenStorage;<br>    protected $authChecker;<br><br>    function __construct(EntityManager $em, $tokenStorage, $authChecker, $twig)<br>    {<br>        $this-&gt;em = $em;<br>        $this-&gt;twig = $twig;<br>        $this-&gt;tokenStorage = $tokenStorage;<br>        $this-&gt;authChecker = $authChecker;<br>    }<br><br>    public static function getSubscribedEvents()<br>    {<br><br>        return array(<br>            'kernel.request' =&gt; 'onKernelRequest'<br>        );<br><br>    }<br><br>    public function onKernelRequest()<br>    {<br><br>        //get details of logged in user<br>        $get_user_details = $this-&gt;tokenStorage-&gt;getToken()-&gt;getUser();<br><br>        //make sure to pull information when user is logged in<br>        if ($this-&gt;authChecker-&gt;isGranted('IS_AUTHENTICATED_FULLY')) {<br><br>            //get user id of logged in user<br>            $userId = $get_user_details-&gt;getId();<br><br>            //check if the user added a photo<br>            $get_user_image = $this-&gt;em-&gt;getRepository('CoreBundle:ProfileImage')-&gt;findBy(array('userId' =&gt; $userId));<br><br>            if ($get_user_image) {<br>                $profile_image_exist = 'yes';<br>            } else {<br>                $profile_image_exist = 'no';<br>            }<br>            // assign the value of photo to twig global variable<br>            $this-&gt;twig-&gt;addGlobal('profile_image_exist', $profile_image_exist);<br><br>            //check if user has filled the application<br>            $get_user_application = $this-&gt;em-&gt;getRepository('CoreBundle:Apply')-&gt;findBy(array('userid' =&gt; $userId));<br><br>            if ($get_user_application) {<br>                $user_application_exist = 'yes';<br>            } else {<br>                $user_application_exist = 'no';<br>            }<br>            // assign the value of application to twig global variable<br>            $this-&gt;twig-&gt;addGlobal('user_application_exist', $user_application_exist);<br>        }<br><br>    }<br><br>}<br><br></code><br></pre><p></p><p>Many thanks for all the help</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2086267212" id="dsq-comment-2086267212">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2086267212">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2086267212" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2086267212" class="dsq-comment-text">
+	                                <p>Hey!</p><p>Nice work - happy it's working! So:</p><p>1) "how do i get this to stop running on routes that don't exist?". The best answer is: you don't. Basically, why do you care? If the route doesn't exist, then it won't matter anyways. I think that's over-optimizing. But also, I *think* that this won't run anyways - the layer that runs the router is earlier than this listener, and when it fails to find a route, it throws an Exception and stops the rest of the listeners.</p><p>2) I see you're extending ContainerAware and this is giving you a `$this-&gt;container` property. Where did you get this code from? I don't think this is a core feature of Symfony itself - do you have a bundle installed? Basically, this is "ok", but there's a better way. You're already "injecting" the EntityManager via the __construct function. You should also add a few more arguments: $tokenStorage for security.token_storage, $authChecker for security.authorization_checker and $twig for twig. You would then set these on properties (just like you do with $em), update the arguments key in your services.yml to pass these (just like you did with the entity manager service), and then reference the properties directly (i.e. $this-&gt;twig instead of $this-&gt;container-&gt;get('twig')). Then, you won't need the ContainerAware class - and I'm not sure what's making that work anyways :). But more importantly, you'll be using "dependency injection" properly: passing your class all the other services it needs.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2085171389" id="dsq-comment-2085171389">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2085171389">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-18</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2085171389" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2085171389" class="dsq-comment-text">
+	                                <p>It sounds great, I was able to query database for the data i needed in my listener and I was able to set the outcome as twig global variable so i can now access that on every page, this is what my listener looks like, this is my first listener ever.....</p><p></p><pre><code><br>namespace ProjectEverest\CoreBundle\EventListener;<br>use Doctrine\ORM\EntityManager;<br>use Symfony\Component\DependencyInjection\ContainerAware;<br>use Symfony\Component\EventDispatcher\EventSubscriberInterface;<br><br>class StudentApplicationSubscriber extends ContainerAware implements EventSubscriberInterface<br>{<br>    protected $em;<br>    protected $twig;<br><br>    function __construct(EntityManager $em)<br>    {<br>        $this-&gt;em = $em;<br>    }<br><br>    public static function getSubscribedEvents()<br>    {<br><br>        return array(<br>            'kernel.request' =&gt; 'onKernelRequest'<br>        );<br><br>    }<br><br>    public function onKernelRequest()<br>    {<br><br>        //get details of logged in user<br>        $get_user_details = $this-&gt;container-&gt;get('security.token_storage')-&gt;getToken()-&gt;getUser();<br><br>        //make sure to pull information when user is logged in<br>        $securityContext = $this-&gt;container-&gt;get('security.authorization_checker');<br>        if ($securityContext-&gt;isGranted('IS_AUTHENTICATED_FULLY')) {<br>            // authenticated REMEMBERED, FULLY will imply REMEMBERED (NON anonymous)<br><br>            //get user id of logged in user<br>            $userId = $get_user_details-&gt;getId();<br><br>            //check if the user added a photo<br>            $get_user_image = $this-&gt;em-&gt;getRepository('CoreBundle:ProfileImage')-&gt;findBy(array('userId'=&gt;$userId));<br><br>            if($get_user_image){<br>                $profile_image_exist  = 'yes';<br>            }else{<br>                $profile_image_exist  = 'no';<br>            }<br>            // assign the value of photo to twig global variable<br>            $this-&gt;container-&gt;get('twig')-&gt;addGlobal('profile_image_exist', $profile_image_exist);<br><br>            //check if user has filled the application<br>            $get_user_application = $this-&gt;em-&gt;getRepository('CoreBundle:Apply')-&gt;findBy(array('userid' =&gt; $userId));<br><br>            if($get_user_application){<br>                $user_application_exist = 'yes';<br>            }else{<br>                $user_application_exist = 'no';<br>            }<br>            // assign the value of application to twig global variable<br>            $this-&gt;container-&gt;get('twig')-&gt;addGlobal('user_application_exist', $user_application_exist);<br>        }<br>    }<br>}<br><br></code><br></pre><p></p><p>I did run into a scenario where this event was being dispatched even on route that did not exist or even when a user was not logged in so I added the</p><p></p><pre><br><code><br><br>if ($securityContext-&gt;isGranted('IS_AUTHENTICATED_FULLY')) {...} <br></code><br></pre><p><br>to stop the query from running for non logged in user, but how do i stop this from running on routes that dont exist? <br></p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2084017451" id="dsq-comment-2084017451">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2084017451">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-17</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2084017451" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2084017451" class="dsq-comment-text">
+	                                <p>Hey again!</p><p>I see two comments, which I think are both asking nearly the same question - a good question :).</p><p>1) If you're dispatching your own events and want to pass the listeners some data (e.g. the data submitted via a form), you'll create a brand new Event object (that extends Symfony's Event), add any properties you need on it set that data on the custom event object before dispatching it. Check out the FOSUserBundle link from above - they do this exact thing. You're always free just to create a generic Symfony Event object, but if you're passing some extra data, create your own.</p><p>2) It sounds like you're querying for something via a listener in kernel.request and that you want to make this value available to all of your controllers and maybe templates too. There are a few ways of doing this. The most straightforward is to store this value on some service - fortunately I have an example of something like this handy :) <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fquestion-answer-day%2Fsymfony2-dynamic-subdomains%23determining-the-site-automatically-with-an-event-listener%3AcDkaQoM4ERnnoNaBfRmOG1eIt3w&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a>.</p><p>If you want to get *really* fancy, you could make this value available as an argument in any controller in your system by modifying the request attributes. This is easy - but quite advanced, and I only mention it because that advanced stuff is exactly what this tutorial is about :).</p><p><code><pre>// in the listener<br>public function onKernelRequest(GetResponseForEvent $event)<br>{<br>    $someObject = // ... make a query<br>    $request = $event-&gt;getRequest();<br>    $request-&gt;attributes-&gt;set('myCoolVar', $someObject);<br>}<br><br><br>// now in ANY controller in the system<br>public function showAction($id, $myCoolVar)<br>{<br>    // ...<br>}<br></pre></code></p><p>How's that sound? :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2083725869" id="dsq-comment-2083725869">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2083725869">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-17</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2083725869" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2083725869" class="dsq-comment-text">
+	                                <p>I was able to set it up fine thanks to this tutorial, what i am stuck at understanding now is what to do with the data being fetched at kernel.request. Using the dump() function I can see the results so the query is working fine in my event listener. How can i access this data now in any controller or twig template?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2083171408" id="dsq-comment-2083171408">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2083171408">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-17</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2083171408" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2083171408" class="dsq-comment-text">
+	                                <p>Thanks, makes more sense now. How can I share data submitted via a form from controller to an event so the event method can make use of that to perform its task.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2082535533" id="dsq-comment-2082535533">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2082535533">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-16</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2082535533" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2082535533" class="dsq-comment-text">
+	                                <p>Hey!</p><p>So even though they work together in Symfony, think of events and dependency injection as two separate things. Events are no different than in JavaScript. For example, I can register a "listener" to "listen" on the "click" event of a button (via jQuery) with</p><p></p><pre><code><br>$('.some-button').on('click', function() { console.log('this is a listener!'); });<br></code></pre><p></p><p>In Symfony, you register your event listeners as services, but technically, event listeners are flat functions. So, try to keep the ideas separate :).</p><p>To your question - you absolutely could create an event to generate an email after a user registers. In fact, FOSUserBundle does something like this: they dispatch a "registration success" event after a successful registration. You could add a listener to this in order to send the user an email: <a href="https://disq.us/url?url=https%3A%2F%2Fgithub.com%2FFriendsOfSymfony%2FFOSUserBundle%2Fblob%2Fmaster%2FController%2FRegistrationController.php%23L59%3AzxHa1Q0AgFINje-hvxJEA-cMNCU&amp;cuid=1175718" rel="nofollow noopener">https://github.com/FriendsOfSy...</a>. That's a perfect use-case.</p><p>And yes, this could be used to keep your controllers shorter. However, be a little careful: if you dispatch a lot of events, it makes your code ver modular and your controllers short. BUT, it also makes your code harder to follow: if I see an event dispatched in a controller, I can't easily see who listens to that or what those listeners do. But if I see the code right in the controller, OR a method call out to another service (which then sends an email and anything else), then the code is less abstract and easier to understand.</p><p>Make sense? Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2081943597" id="dsq-comment-2081943597">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/shairyarbaig/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10592/9062/avatar92.jpg?1469787361">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2081943597">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2015-06-16</span>
+	                            <span class="dsq-commenter-name">Shairyar Baig</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2081943597" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2081943597" class="dsq-comment-text">
+	                                <p>very nice tutorial. What is the difference between Events and Dependency Injection? Or similarity? Would it make sense to create enents to generate email. Forexampl if a user register on your website an event should be dispatched to send a welcome email. Can events be used or should they be used for a small tasks like these to keep the controller thin? </p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_event-subscriber';var disqus_url = 'https://knpuniversity.com/screencast/symfony-journey/event-subscriber';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="httpkernel-handle#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-journey/event-subscriber" addthis:title="Journey to the Center of Symfony: HttpKernel Request-Response">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-journey","courseIsOwned":false,"chapter":"Interrupt Symfony with an Event Subscriber","chapterNumber":1,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Journey to the Center of Symfony: HttpKernel Request-Response';
+        Core.courseId = 53
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-journey';
+                    Core.chapterTitle = 'Interrupt Symfony with an Event Subscriber';
+            Core.chapterNumber = 1;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'event-subscriber';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>The King of Relations: ManyToOne > Mastering Doctrine Relationships in Symfony | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: true,
+            courseChapterId: 34753
+        };
+
+                window.video.nextDetails = {
+            'type': 'video',
+            'title': 'Up Next: Saving\x20a\x20Relationship <i class="fa fa-play"></i>',
+            'url': '/screencast/doctrine-relations/save-relation#play'
+        };
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures.
+
+But, we left out *one* big piece: database relations. Once you&#039;ve mastered these,
+you&#039;ll be unstoppable. Unfortunately, a lot of information out there make Doctrine
+relations look over-complicated. Actually, they&#039;re simple and beautiful. Sure,
+they have some pitfalls - but they&#039;ll also help you build a complex data structure
+in no time.
+
+* ManyToOne relationships (associations)
+* The OneToMany side of a relation
+* The downfall of owning versus inverse sides of a relation
+* Doing magic with the ArrayCollection
+* Querying with Joins
+
+... and more - like some magic with the &quot;Param Conversion&quot;.
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="The King of Relations: ManyToOne">
+<meta property="og:description" content="In the [part 1 of the Doctrine Tutorial](http://knpuniversity.com/screencast/symfony-doctrine)
+we got a *sweet* setup with Doctrine: entities, queries, migrations and fixtures">
+<meta property="og:url" content="http://knpuniversity.com/screencast/doctrine-relations/many-to-one-relation">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/doctrine-relations:00a4bff155bef69e3d39bd9c91a18e6e37c3bbac/doctrine-relationships.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="many-to-one-relation#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        2.
+                            The King of Relations: ManyToOne
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Mastering Doctrine Relationships in Symfony</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="create-genus-note" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        Create Genus Note
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:16</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="many-to-one-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        The King of Relations: ManyToOne
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:27</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-relation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Saving a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:18</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="join-column-relation-fixtures" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        JoinColumn &amp; Relations in Fixtures
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:15</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="param-conversion" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Controller Magic: Param Conversion
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:13</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        OneToMany: Inverse Side of the Relation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="one-to-many-order-by" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Order By with a OneToMany
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:41</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="array-collection-tricks" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Tricks with ArrayCollection
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:43</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="relation-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Querying on a Relationship
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:24</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="query-with-join" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Query across a JOIN (and Love it)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:22</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/doctrine-relations" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">The King of Relations: ManyToOne</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Mastering Doctrine Relationships in Symfony Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                        <div class="hidden alert alert-danger js-video-not-supported" style="margin-bottom: 10px;">
+        <h4>Video not working?</h4>
+        It looks like your browser may not support the H264 codec.
+        If you're using Linux+Firefox, try a different browser or try
+        installing the
+        <code>gstreamer0.10-ffmpeg</code>
+        <code>gstreamer0.10-plugins-good</code> packages.
+        <br/><br/>
+        Thanks! This saves us
+        from needing to use Flash or encode videos in multiple formats. And that
+        let's us get back to making more videos :). But as always, please feel
+        free to <a href="../../contact">message us</a>.
+    </div>
+
+    <video id="js-video-player" class="video-js vjs-default-skin vjs-big-play-centered video-js-16x9"
+            controls preload="auto" width="auto" height="auto"
+            poster="http://i.vimeocdn.com/video/562072561_960x540.jpg?r=pad">
+        <source src="http://player.vimeo.com/external/160156613.hd.mp4?s=3d1012b9e7df2d0f88f622f07a5ef43d4404b79f&amp;profile_id=119&amp;oauth2_token_id=308801954" type="video/mp4" data-res="HD" data-default="true" />
+        <source src="http://player.vimeo.com/external/160156613.sd.mp4?s=db55eb445e92b519452863375b57ca9323d55007&amp;profile_id=165&amp;oauth2_token_id=308801954" type="video/mp4" data-res="SD" />
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+
+
+                            <div class="end-show js-post-play-wrapper" style="display: none;">
+                                <p class="end-show-header">You're Killing it!</p>
+
+                                <div class="text-center overlay-btn">
+                                    <!-- This is filled in via JS -->
+                                    <a href="many-to-one-relation#" class="btn btn-lg btn-warning js-next-item-anchor"></a>
+                                    <div class="js-all-finished-holder" style="display: none; color: #fff;">
+                                        Another Tutorial down!<br/><br/>
+                                                                                    <a href="../tag/symfony" class="btn btn-lg btn-success">Back to the <i>Symfony 3</i> Track</a>
+                                                                            </div>
+                                </div>
+
+                                <p class="end-show-link js-video-repeat"><a class="knp-color-white link-no-underline" href="many-to-one-relation#">
+                                    <i class="fa fa-repeat"></i> Watch again
+                                </a></p>
+                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="save-relation#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="many-to-one-relation#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="many-to-one-relation#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (14)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep3b-doctrine-relations/many-to-one-relation.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <h2 id="selecting-between-manytoone-and-manytomany">Selecting between ManyToOne and ManyToMany <a class="headerlink" href="many-to-one-relation#selecting-between-manytoone-and-manytomany" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Each <code>genus</code> will have <em>many</em> <code>genus_notes</code>. But, each <code>genus_note</code> that someone adds
+will relate to only <em>one</em> <code>genus</code>. There are only <em>two</em> possible types of relationships,
+and this is by far the most common. It's called a <em>ManyToOne</em> association.</p>
+<p>The second type is called a <em>ManyToMany</em> association. To use a different example,
+this would be if each <code>product</code> had many tags, but also each tag related to many
+products.</p>
+<p>And when it comes to Doctrine relations - don't trust the Internet! Some people
+will try to confuse you with other relationships like <code>OneToMany</code>, <code>OneToOne</code> and some
+garbage about unidirectional and bidirectional associations. Gross. Ignore it all.
+I guarantee, all of that will make sense really soon.</p>
+<p>So your first job is simple: decide if you have a <code>ManyToOne</code> or <code>ManyToMany</code> relationship.
+And it's easy. Just answer this question:</p>
+<blockquote><p>Do either of the sides of the relationship belong to only <em>one</em> of the other?</p>
+</blockquote>
+<p>Each <code>genus_note</code> belongs to only <em>one</em> <code>genus</code>, so we have a classic <code>ManyToOne</code> relationship.</p>
+<h2 id="setting-up-a-manytoone-relation">Setting up a ManyToOne Relation <a class="headerlink" href="many-to-one-relation#setting-up-a-manytoone-relation" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Forget about Doctrine: just think about the database. If every <code>genus_note</code> should
+belong to exactly <em>one</em> <code>genus</code>, How would you set that up? You'd probably add a
+<code>genus_id</code> column to the <code>genus_note</code> table. Simple!</p>
+<p>Since we need to add a new column to <code>GenusNote</code>, open that entity class. You <em>probably</em>
+feel like you want to add a <code>$genusId</code> integer property here. That makes sense. But
+don't! Instead, add a <code>$genus</code> property and give it a <code>ManyToOne</code> annotation. Inside
+that, add <code>targetEntity="Genus"</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="ed49a68e83">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-95" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            95 lines <span class="meta-divider"></span> <span title="src/AppBundle/Entity/GenusNote.php">src/AppBundle/Entity/GenusNote.php</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-10" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 10
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenusNote</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="13-39" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 13 - 39
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="40"></td>
+            <td class="blob-code">    <span class="hljs-comment">/**</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="41"></td>
+            <td class="blob-code">     * <span class="hljs-doctag">@ORM</span>\ManyToOne(targetEntity="Genus")</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="42"></td>
+            <td class="blob-code">     */</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="43"></td>
+            <td class="blob-code">    <span class="hljs-keyword">private</span> $genus;</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="44-93" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 44 - 93
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="94"></td>
+            <td class="blob-code">}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<div class="admonition tip"><p class="admonition-title"><span class="fa fa-lightbulb-o"></span> Tip</p><p>You can also use the <em>full</em> namespace: <code>AppBundle\Entity\Genus</code> - and that's required
+if the two entities do not live in the same namespace/directory.</p>
+</div><p>Umm, guys? That's it. Relationship finished. Seriously.</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3027506946" id="dsq-comment-3027506946">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/hakimch/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11252/3840/avatar92.jpg?1478465750">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3027506946">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-30</span>
+	                            <span class="dsq-commenter-name">Hakim Ch</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3027506946" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3027506946" class="dsq-comment-text">
+	                                <p>Thank you Victor !</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3027396771" id="dsq-comment-3027396771">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3027396771">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-30</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3027396771" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3027396771" class="dsq-comment-text">
+	                                <p>Hey Hakim,</p><p>Yes, there's a <a href="https://disq.us/url?url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FDatabase_normalization%3AdmxSUQJ9Dxd9BjF5WCaY-lttlaw&amp;cuid=1175718" rel="nofollow noopener">Database normalization</a> which has several <a href="https://disq.us/url?url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FDatabase_normalization%23List_of_Normal_Forms%3AfPSE_PiKXkPNbc1hsW_7q2XASnw&amp;cuid=1175718" rel="nofollow noopener">normal forms</a>. It's the first step on the way of database performance optimization.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026964021" id="dsq-comment-3026964021">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/hakimch/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11252/3840/avatar92.jpg?1478465750">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026964021">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">Hakim Ch</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026964021" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026964021" class="dsq-comment-text">
+	                                <p>You got a point about combining the tables!!! and thank for the extra :D<br>Another question, there is a track about tables creation strategy to avoid performance issues ?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026957621" id="dsq-comment-3026957621">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026957621">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026957621" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026957621" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="hakimch:disqus" href="https://disqus.com/by/hakimch/" rel="nofollow noopener">Hakim Ch</a>!</p><p>Yea, using OneToOne is fine :). I usually avoid it, because technically, you could just combine your Client and ClientInfo tables into one table. By separating them, you're causing yourself more complexity, because now you need to make sure you create a Client and ClientInfo object, and set the Client on the ClientInfo. This can be done well, but it's just easier to have one table (I realize having one big table can have performance drawbacks, so this is a tradeoff of complexity versus performance).</p><p>Also, on a more philosophical level, a OneToOne is nothing more than a ManyToOne, where Doctrine creates a unique index on your foreign key (client_id) to prevent you from having more than one. That's not relevant to your question - just a fun thing to think about (and heck, even ManyToMany is just two ManyToOne relationships automated for you - we talk about that in the new <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fcollections%3AXnrcFQLfg5hlodJckYQWBTfwbDs&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a> screencast).</p><p>Thanks for the question!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3026844616" id="dsq-comment-3026844616">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/hakimch/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11252/3840/avatar92.jpg?1478465750">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3026844616">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">Hakim Ch</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3026844616" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3026844616" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>I have 2 tables Client, ClientInfo (wich referenced by client_id). the OneToOne relation, so how i can manage that if it not good to use the OneToOne relation ?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2939084371" id="dsq-comment-2939084371">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2939084371">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-08</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2939084371" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2939084371" class="dsq-comment-text">
+	                                <p>Hi Yang!</p><p>This is as good a spot as any :). A few things:</p><p>1) It's subjective, but I'm not a huge fan of these "look-up" tables: tables that exist in your database, aren't really ever going to be dynamically updated, and just contain a very few, specific records. I actually like the setup you have in this situation: a normal string column. I use constants in my Post entity class for each valid "source" to keep a nice list of what is a valid source.</p><p>2) But, let's assume that you *do* want to do this: it's still totally valid. And you *can* train the Doctrine Migrations to do this, it's just not automatic. Here's how I do this:</p><p>A) Add the new entity and relationship (but don't remove the old source field yet). Generate a migration. This will contain *just* the code to add the new relationship/column.</p><p>B) Next, we want to migrate the old data into the new location. There are 2 ways to do this, depending on whether or not you're smart enough (I often am not) to write a query that will move the data for you. If you can, you'll simply manually update the migration file generated in step (A), add a new $this-&gt;addSql(), and write your new manual query there. This would need to insert the new source records and then update the foreign key column. That's a pretty tricky query (inserting and updating all at once). I don't think that you can insert with one addSql() line, then query for and reference those new columns in a second addSql(), because it's all done in a transaction and so the new records aren't available yet. That's what makes it tricky.</p><p>So if you can't write a big query to do this, then you have, actually, two more options :p. The one I typically do is to create a temporary, custom console command. Then, I will deploy, run the migration from step (A), then run this custom console command, which moves the data. Then on a future deploy, I'll generate and run the migration from step (C). The advantage here is that you have access to the container, entity manager, etc. A different, but similar approach is to get access to and use the container directly inside the migration itself (<a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fdoc%2Fcurrent%2Fbundles%2FDoctrineMigrationsBundle%2Findex.html%23container-aware-migrations%29%3AH-I1MP72XnvHhEu8CPbZOkvrH68&amp;cuid=1175718" rel="nofollow noopener">http://symfony.com/doc/current...</a>. I often do a console command instead, because it's much easier to handle things if this data migration fails, which is quite possible if you have a big data set (i.e. you could run out of memory). That's why I add a custom console command, and often make my code smart enough to continue where I left-off, in case the command failed in the middle.</p><p>Phew!</p><p>C) Finally, you'll remove the source column and generate a new migration. Depending on which strategy you use for part (B), you'll either do this at the same time as the other changes, or you'll need to do this in the future, after you deploy and migrate the data, so that the field is still there while you transfer the data.</p><p>So, great question! This isn't something that comes up *all* that often, but it does happen (maybe a few times a year for the KnpU site). I try to write the query if I can, but if I need a little more logic and access to the container, I prefer a console command.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2937970985" id="dsq-comment-2937970985">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_fSkgMG99ER/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/21577/5300/avatar92.jpg?1475849830">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2937970985">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-07</span>
+	                            <span class="dsq-commenter-name">Yang Liu</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2937970985" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2937970985" class="dsq-comment-text">
+	                                <p>Hi Ryan,</p><p>I can't find the exact tutorial part for my question, so I try to post in here. For example, I have my Entity Post, in which there is the column "source", which would be facebook, twitter, whatever.... In the current state, its just a simple string. easy...<br>But when I think of the future, there might be other new sources coming and it would be better when I create a new Entity, for example, Source, with an id and a name. and the id column will get the OneToMany-Relation to the source column in the Post-Entity. (I can recall somewhere in your symfony tutorial, you change the column "subfamily" of the genus and used a new Entity SubFamily instead, did you just recreate both Entities?).<br>Thing is, since my Post-table is pretty big now, I can't just recreate both tables. And manually, I would first create a new source table,  then add a new column source_id in Post-tabel, find out which id the sources has and update the source_id column, then remove the old source column. This will really suck when I need to do this every time on a different mashine.<br>So my question is: Can I do this with Doctrine Migrations, when I already have an existing Entity? How can I "teach" Doctrine Migrations to replace the string in the old Post-table with the correct id from the new Entity?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730741215" id="dsq-comment-2730741215">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/JLChafardet/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/239/4757/avatar92.jpg?1465781626">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730741215">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">JLChafardet</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730741215" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730741215" class="dsq-comment-text">
+	                                <p>I cant believe it! wow</p><p>@ORM\ManyToOne(targetEntity="EntityName") &lt;- SERIOUSLY?????? what have I done this past years? oh gawd, gimme my time back.</p><p>..... i want to go cry in a corner for a long while</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2730605653" id="dsq-comment-2730605653">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2730605653">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2730605653" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2730605653" class="dsq-comment-text">
+	                                <p>Yo!</p><p>Yep, this is a perfect case for OneToOne. I dismiss OneToOne here, because OneToOne is really the same in the database as a ManyToOne, except that Doctrine makes user_id on the profile table unique, to prevent you from creating multiple. I want people to focus on the big two: ManyToOne and ManyToMany. Also, sometimes, OneToOne can give you more work. In this example, you *could* simply just put all the field on Profile onto User, and eliminate the complexity. Of course, then the User table becomes bigger and bigger, so splitting this into a OneToOne situation is legitimate (but sometimes I see people over-doing this and adding complexity for no benefit).</p><p>So yes, you're in find shape :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2729968834" id="dsq-comment-2729968834">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/the_nuts/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/2244/9964/avatar92.jpg?1427243819">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2729968834">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-06-14</span>
+	                            <span class="dsq-commenter-name">the_nuts</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2729968834" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2729968834" class="dsq-comment-text">
+	                                <p>Hi,</p><p>I have an Entity User (with id, username, email, is_active, and other most used parameters) <br>and another entity Profile (with personal info such as first and last name, address, etc... which are rarely used in the application) <br>The PK ot the table profiles should be user_id, with <a href="http://disq.us/url?url=http%3A%2F%2Fusers.id%3ADvjuFArhwFr7byvs_1knwyC5uxw&amp;cuid=1175718" rel="nofollow noopener">users.id</a> as FK.</p><p>Can't I use OneToOne in this case?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2704919677" id="dsq-comment-2704919677">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2704919677">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-31</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2704919677" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2704919677" class="dsq-comment-text">
+	                                <p>Hey Dan!</p><p>Wow, you have a *very* good attention for detail! The truth is that nothing has changed - OneToMany still exists. In truth, you only *need* ManyToOne and ManyToMany. OneToMany is an optional way to look at a ManyToOne relationship. So really, ManyToOne and OneToMany are the *same* relationship, just looked to from different sides. So, I like to tell people initially just to worry about ManyToOne and ManyToMany. Later, we will learn about OneToMany, but it isn't really a true, new relationship type.</p><p>Also, there is another - OneToOne. But again, this is *really* just a ManyToOne (it looks the same in the database), but Doctrine helps you to guarantee that you only link one object to one other object. There is limited use for this relationship in my opinion, so I save it for later :).</p><p>Short answer: there is no difference! Just me simplifying how we explain this.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2698464501" id="dsq-comment-2698464501">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/dancostinel/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/19746/1394/avatar92.jpg?1480942412">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2698464501">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-05-27</span>
+	                            <span class="dsq-commenter-name">Dan Costinel</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2698464501" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2698464501" class="dsq-comment-text">
+	                                <p>Hey Ryan,</p><p>I'm having the old video, the one presented by Leanna, in which she says there are 3 (three) types of relationships: ManyToOne, ManyToMany and OneToMany. I know her version of Symfony, back then, was 2.4, and now, you are presenting this tutorial for Symfony 3, with just 2 (two) types of relationships: ManyToOne and ManyToMany.</p><p>My question: the difference between the number of relationships is because of the Symfony different versions?</p><p>Thank you.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2585032779" id="dsq-comment-2585032779">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2585032779">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-23</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2585032779" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2585032779" class="dsq-comment-text">
+	                                <p>Hopefully this week - but definitely by next week :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2584919427" id="dsq-comment-2584919427">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/andrewgrudin/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2584919427">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-03-23</span>
+	                            <span class="dsq-commenter-name">Andrew Grudin</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2584919427" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2584919427" class="dsq-comment-text">
+	                                <p>When?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_many-to-one-relation';var disqus_url = 'https://knpuniversity.com/screencast/doctrine-relations/many-to-one-relation';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="save-relation#play">
+            Next Chapter <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/doctrine-relations/many-to-one-relation" addthis:title="Mastering Doctrine Relationships in Symfony">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"doctrine-relations","courseIsOwned":false,"chapter":"The King of Relations: ManyToOne","chapterNumber":2,"chapterIsFree":true}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Mastering Doctrine Relationships in Symfony';
+        Core.courseId = 81
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'doctrine-relations';
+                    Core.chapterTitle = 'The King of Relations: ManyToOne';
+            Core.chapterNumber = 2;
+            Core.chapterIsFree = true;
+            Core.chapterSlug = 'many-to-one-relation';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>

@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head prefix="og: http://ogp.me/ns#">
+            <script src="https://cdn.optimizely.com/js/421270022.js"></script>
+    
+                    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Sharing Form Templates with include() > Symfony Forms: Build, Render &amp; Conquer! | KnpUniversity</title>
+
+                    <link href="../../builds/main-db6835bf19d99bcc09032789f3bd39e4.css" rel="stylesheet">
+
+        <link href='https://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Cedarville+Cursive' rel='stylesheet' type='text/css'>
+    
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/tomorrow-night.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/tomorrow-night.min.css">
+
+
+        <link rel="stylesheet" href="../../builds/code_block_styles-2d783e385d9dbb1ef88d9053d1b8d675.css">
+
+
+
+    <link href="../../builds/video-6b5fa6dfb768239b226d39d08bd4867e.css" rel="stylesheet">
+
+                        <script src="../../bundles/fosjsrouting/js/router.js"></script>
+
+        <script src="../../builds/main-1dfa89b76a105f9c2d98.js"></script>
+        <script src="../../js/routing?callback=fos.Router.setData"></script>
+            
+
+    <script>
+        // video settings
+        window.video = {
+            isCourseChapterPaid: false,
+            courseChapterId: 36116
+        };
+
+            </script>
+
+    <script src="../../builds/video-1dfa89b76a105f9c2d98.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            var hashValue = window.location.hash.substr(1);
+            if (hashValue.substr(0, 7) == 'comment') {
+                // this is a #comment link - open up the comment tab!
+                $('.nav-tabs a[href="#tab-comment"]').click();
+            }
+        });
+    </script>
+
+    <link rel="alternate" type="application/rss+xml" title="Blog feed with technical articles around PHP and screencast and tutorial updates from KnpUniversity.com" href="http://feeds.feedburner.com/knpuniversity" />
+
+    <meta name="description" content="Ah, forms: one of the most *powerful* - but sometimes
+hated - features in all of Symfony. Here&#039;s the deal: forms
+are just plain hard. You need to manage the HTML form elements,
+validation, data transformation and a lot more. The Form
+component is probably the most complex part of Symfony. But
+the more you work with it, the more you&#039;ll like it.
+
+In this episode, we&#039;ll learn how to use Symfony forms to
+handle simple situations as well as some complex setups.
+Most importantly, I&#039;ll show you how to avoid the pitalls
+that many developers often fall into that causes the form
+component to spiral into complexity hell. The form system
+is a tool: in this tutorial, we&#039;ll put the joy back into it:
+
+* Creating a basic form
+* Basic form rendering and customization
+* Handling a form submit
+* Backing your form with an entity
+* Adding validation
+* Form field guessing
+* Pre-filling with default data
+* Creating a form &quot;type&quot; class
+* Using forms to handle an API POST request
+* Understanding how forms *really* work
+* Flash messages
+
+... and form tips and tricks stuck in all over!
+">
+
+    <meta property="og:site_name" content="KnpUniversity - PHP and Symfony Video Tutorial Screencasts">
+    <meta name="twitter:site" content="@KnpUniversity"><link rel="shortcut icon" href="../../assets/images/favicon.ico">
+    <link rel="icon" type="image/png" href="../../assets/images/favicon.png">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <meta property="og:title" content="Sharing Form Templates with include()">
+<meta property="og:description" content="Ah, forms: one of the most *powerful* - but sometimes
+hated - features in all of Symfony. Here&amp;#039;s the deal: forms
+are just plain hard">
+<meta property="og:url" content="http://knpuniversity.com/screencast/symfony-forms/form-template-include">
+    <meta property="og:image" content="http://knpuniversity.com/imagine/course_video_poster_large/uploads/screencast/symfony-forms:f9cef13248ad1a424e63dbaddcf6d2c9186b052b/sf-ep5.png">
+
+<meta name="twitter:card" content="summary">
+
+
+                            
+    </head>
+<body data-user-id="" >
+<nav class="navbar navbar-inverse nav-margin navbar-learning-layout">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle toggle-button collapsed" data-toggle="collapse" data-target="#js-navbar" aria-expanded="false" aria-controls="js-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="../../logout" class="navbar-brand">
+                <span class="knp-color-blue">Knp</span>
+                <span class="knp-color-white">University</span>
+            </a>
+        </div>
+        <form class="navbar-form navbar-left navbar-form-border" role="search" method="GET" action="http://knpuniversity.com/search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Tutorials" value="" name="q">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div id="js-navbar" class="collapse-fix collapse navbar-right navbar-collapse">
+            
+
+<ul class="nav navbar-nav nav-narrowerOnSmall">
+            <li><a href="../../checkout/subscription/team_yearly/5" title="Cart"><i class="fa fa-shopping-cart"></i></a></li>
+        <li class="dropdown"><a href="form-template-include#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tutorials <i class="fa fa-angle-down"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="../../tracks.1">Tracks</a></li>
+          <li><a href="../../courses/all">All Courses</a></li>
+        </ul>
+    </li>
+            <li><a href="../../pricing.1">Pricing</a></li>
+        <li><a href="../../training">Training</a></li>
+                <li class="visible-xs"><a href="../../logout">My Profile</a></li>
+        <li class="visible-xs"><a href="../../logout">Sign Out</a></li>
+
+            <li><a href="../../login.1">Log In</a></li>
+        <li class="btn btn-sm btn-warning signup-btn"><a class="signup" href="../../signup/index.html">Sign Up</a></li>
+    </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+    
+
+
+
+
+<div class="table-contents-container">
+  <div class="container expandList" id="js-chapter-list">
+      <button class="table-contents-container-button js-expand-list" data-target="js-chapter-list" title="Chapter List">
+          <i class="fa fa-bars"></i>
+                        15.
+                            Sharing Form Templates with incl...
+                </button>
+      <div class="expandList-body">
+          <div class="expandList-bodyInner">
+              <h3 class="expandList-header">
+                  <a class="course-title-expand" href="resume">Symfony Forms: Build, Render &amp; Conquer!</a>
+              </h3>
+
+                                <div class="watched-tut-progress-container watched-tut-progress-container-overview">
+        <div class="watched-tut-progress-overview" style="width: 0%; margin-right: 100%;" title="0% complete"><span class="profile-progress-title">0%</span></div>
+    </div>
+
+
+              
+              <div class="expand-chapter-list">
+                      
+    
+    <!-- Table of contents -->
+    <div class="chapter-list">
+        <ul class="list-unstyled">
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="the-form-type-class" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                1.
+                        The Form Type Class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="render-form-bootstrap" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                2.
+                        Render that Form Pretty (Bootstrap)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:14</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="process-that-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                3.
+                        Process that Form!
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:46</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="data-class-type-guessing" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                4.
+                        Binding Forms to Objects: data_class
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:44</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="save-redirect-set-flash" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                5.
+                        Save, Redirect, setFlash (and Dance)
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:05</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="field-types-and-options" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                6.
+                        Field Types and Options
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 5:09</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="custom-entity-type-query" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                7.
+                        Custom Query in EntityType
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:30</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="date-picker-field" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                8.
+                        Creating a Date Picker Field
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:54</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="date-format-sanity-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                9.
+                        Date Format &amp; &quot;Sanity&quot; Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:28</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="form-rendering-and-variables" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                10.
+                        Form Rendering and Form Variables
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:33</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="disable-html5-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                11.
+                        Disable HTML5 Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 2:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="beautiful-form-validation" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                12.
+                        Beautiful Form Validation
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:03</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="changing-validation-messages" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                13.
+                        Changing Validation Messages
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:08</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item ">
+            <a href="easy-edit-form" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                14.
+                        Easy Edit Form
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 4:01</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+            
+                
+                                <li class="title chapter-list-item chapter-list-item-active">
+            <a href="form-template-include" class="">
+                <div class="row">
+                    <div class="col-xs-9">
+                                                15.
+                        Sharing Form Templates with include()
+                                            </div>
+
+                                    <div class="col-xs-3 text-right">
+                        <span> 3:42</span>
+                    </div>
+                                </div>
+            </a>
+            <div class="row">
+                <div class="col-xs-12">
+                                    </div>
+            </div>
+        </li>
+
+
+                    </ul>
+    </div>
+
+    
+              </div>
+          </div>
+      </div>
+  </div>
+  <div>
+                <a href="../../pricing/symfony-forms" class="btn btn-success pull-right-md download-buy-buttons">Buy <span class="hidden-xs">Access to Course</span></a>
+              </div>
+</div>
+
+
+        <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-9 col-lg-10">
+                <h1 class="account-header account-header-low-margin-top">Sharing Form Templates with include()</h1>
+                
+                                    <p class="hidden-xs">
+                        Course:
+                        <a class="knp-color-black" href="resume"><em>Symfony Forms: Build, Render &amp; Conquer! Tutorial</em></a>                    </p>
+                            </div>
+        </div>
+
+                <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="full-block-container">
+                    <div class="frame-padding">
+                        <div id="player">
+                                                                                <div>
+                                                                <div class="row">
+                                    <div class="end-show">
+                                        <div class="xs-col-12">
+                                            <p class="end-show-header">Keep learning!</p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link"><a href="../../pricing.1" class="btn btn-success btn-md">Start your All Access Pass</a></p>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p class="end-show-link text-center"><a href="../buy/collections" class="knp-color-white">Buy just this tutorial for $12.00</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                                            </div>
+                                                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <div class="row">
+            <div class="col-xs-12 col-md-10 col-md-offset-1">
+                <div class="pull-right">
+                                    <a class="btn btn-success"
+           href="resume">
+            Finish Course <i class="fa fa-caret-right"></i>
+        </a>
+    
+                </div>
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a data-toggle="tab" href="form-template-include#tab-script">Script</a></li>
+                    <li><a data-toggle="tab" href="form-template-include#tab-comment">
+                        <i class="fa fa-comment-o"></i>
+                                                    
+                                                                                                (25+)
+                                                                                        Conversation
+                                            </a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-script">
+                        <div class="js-script-content-wrapper top-margin-script markdown-content">
+                                                                                        <a href="https://github.com/knpuniversity/symfony/edit/master/knpu/ep5-forms/form-template-include.md" target="_blank" class="btn btn-default btn-circle pull-right js-tooltip" title="Edit on GitHub"><span class="fa fa-pencil"></span></a>
+                                                                    <p>Adding edit was quick! But the <em>entire</em> template is now duplicated. This includes
+the code to render the form <em>and</em> the other blocks that include the needed CSS
+and JS files.</p>
+<p>First, copy the form rendering code and move that into a new file: <code>_form.html.twig</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="c79ca5156a">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            13 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/_form.html.twig">app/Resources/views/admin/genus/_form.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="xml"></span><span class="hljs-template-variable">{{ form_start(genusForm) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ form_row(genusForm.name) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ form_row(genusForm.subFamily) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ form_row(genusForm.speciesCount, {</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">        'label': 'Number of Species'</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">    }) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ form_row(genusForm.funFact) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ form_row(genusForm.isPublished) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ form_row(genusForm.firstDiscoveredAt) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"submit"</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn btn-primary"</span> <span class="hljs-attr">formnovalidate</span>&gt;</span>Save<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code"></span><span class="hljs-template-variable">{{ form_end(genusForm) }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Paste it here.</p>
+<p>In edit, just include that template: <code>include('admin/genus/_form.html.twig')</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="5460e8d5d0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-34" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            34 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/edit.html.twig">app/Resources/views/admin/genus/edit.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"row"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col-xs-12"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Edit Genus<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">                </span><span class="hljs-template-variable">{{ <span class="hljs-name">include</span><span class="hljs-params">('admin/genus/_form.html.twig')</span> }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code"></span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Copy that, open <code>new.html.twig</code>, and paste it there:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="1de49cef81">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-34" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            34 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/new.html.twig">app/Resources/views/admin/genus/new.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-22" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 22
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="23"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="24"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="25"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"row"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="26"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col-xs-12"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="27"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>New Genus<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="28"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="29"></td>
+            <td class="blob-code">                </span><span class="hljs-template-variable">{{ <span class="hljs-name">include</span><span class="hljs-params">('admin/genus/_form.html.twig')</span> }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="30"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="31"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="32"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="33"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="34"></td>
+            <td class="blob-code"></span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Ok, I'm feeling better. Refresh now: everything still looks good.</p>
+<p>And by the way, if there <em>were</em> any customizations you needed to make between
+new and edit, I would pass a variable in through the second argument of the <code>include</code>
+function and use that to control the differences. </p>
+<h2 id="using-a-form-layout">Using a Form Layout <a class="headerlink" href="form-template-include#using-a-form-layout" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>So let's fix the last problem: the duplicated block overrides.</p>
+<p>To solve this, we'll need a shared layout between these two templates. Create a new
+file called <code>formLayout.html.twig</code>. This will <em>just</em> be used by these two templates.</p>
+<p>Copy the <code>extends</code> code all the way through the <code>javascripts</code> block and delete it
+from <code>edit.html.twig</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="6f8f969fd9">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-14" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            14 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/edit.html.twig">app/Resources/views/admin/genus/edit.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-expandable" data-range="1-2" data-last="0">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 1 - 2
+                            </td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"row"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col-xs-12"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Edit Genus<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">                </span><span class="hljs-template-variable">{{ <span class="hljs-name">include</span><span class="hljs-params">('admin/genus/_form.html.twig')</span> }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Paste it in <code>formLayout.html.twig</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="5846589678">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            22 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/formLayout.html.twig">app/Resources/views/admin/genus/formLayout.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="xml"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">extends</span></span> 'base.html.twig' %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> stylesheets %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ <span class="hljs-name">parent</span><span class="hljs-params">()</span> }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/css/bootstrap-datepicker.css"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> javascripts %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">    </span><span class="hljs-template-variable">{{ <span class="hljs-name">parent</span><span class="hljs-params">()</span> }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="15"></td>
+            <td class="blob-code">        jQuery(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="16"></td>
+            <td class="blob-code">            $(<span class="hljs-string">'.js-datepicker'</span>).datepicker({</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="17"></td>
+            <td class="blob-code">                <span class="hljs-attr">format</span>: <span class="hljs-string">'yyyy-mm-dd'</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="18"></td>
+            <td class="blob-code">            });</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="19"></td>
+            <td class="blob-code">        });</td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="20"></td>
+            <td class="blob-code">    </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="21"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="22"></td>
+            <td class="blob-code"></span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>So this template <em>itself</em> will extend <code>base.html.twig</code>, but not before adding some
+stylesheets and some JavaScripts. In edit, re-add the <code>extends</code> to use this template:
+<code>admin/genus/formLayout.html.twig</code>:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="379db3bfb3">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+                        <span class="js-expand-all" data-range="1-14" data-toggle="tooltip" title="Show All Lines" data-placement="top">
+                <i class="fa fa-expand js-icon-load-more"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </span>
+            
+            14 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/edit.html.twig">app/Resources/views/admin/genus/edit.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="xml"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">extends</span></span> 'admin/genus/formLayout.html.twig' %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-expandable" data-range="2-14" data-last="1">
+                <i class="fa fa-arrows-v js-icon-load-more" data-toggle="tooltip" title="Show Lines" data-placement="left"></i>
+                <i class="fa fa-spinner fa-spin js-icon-loading"></i>
+            </td>
+            <td class="gap-line">
+                                                    ... lines 2 - 14
+                            </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Copy that, open <code>new.html.twig</code> and repeat: delete the <code>javascripts</code> and <code>stylesheets</code>
+and paste in the new extends:</p>
+<p><div class="code-block-wrapper" data-code-block-guid="2ca068cdb0">
+    <div class="meta">
+        <div class="actions">
+            <span class="fa fa-clipboard js-activate-clipboard" data-toggle="tooltip" title="Copy Code" data-placement="top"></span>
+        </div>
+        <div class="info">
+            
+            14 lines <span class="meta-divider"></span> <span title="app/Resources/views/admin/genus/new.html.twig">app/Resources/views/admin/genus/new.html.twig</span>
+        </div>
+    </div>
+    <table class="hljs code-block-table">
+        <tbody class="js-tr-container">
+                <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="1"></td>
+            <td class="blob-code"><span class="xml"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">extends</span></span> 'admin/genus/formLayout.html.twig' %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="2"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="3"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">block</span></span> body %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="4"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"container"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="5"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"row"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="6"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col-xs-12"</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="7"></td>
+            <td class="blob-code">                <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>New Genus<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="8"></td>
+            <td class="blob-code"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="9"></td>
+            <td class="blob-code">                </span><span class="hljs-template-variable">{{ <span class="hljs-name">include</span><span class="hljs-params">('admin/genus/_form.html.twig')</span> }}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="10"></td>
+            <td class="blob-code">            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="11"></td>
+            <td class="blob-code">        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="12"></td>
+            <td class="blob-code">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="13"></td>
+            <td class="blob-code"></span><span class="hljs-template-tag">{% <span class="hljs-name"><span class="hljs-keyword">endblock</span></span> %}</span><span class="xml"></td>
+            </tr>
+    <tr>
+                    <td class="line-number line-number-displayed" data-line-number-displayed="14"></td>
+            <td class="blob-code"></span></td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+</p>
+<p>Try it! Cool! We're using our Twig tools to get rid of duplication!</p>
+<h2 id="a-word-of-caution">A Word of Caution <a class="headerlink" href="form-template-include#a-word-of-caution" title="Permalink to this headline"><i class="fa fa-link" aria-hidden="true"></i></a></h2>
+<p>Congrats team - that's it for our first form episode. You should feel dangerous.
+Most of the time, forms are easy, and amazing! They do <em>a lot</em> of work for you.</p>
+<p>Let me give you one last word of warning: because this is how I see people get into
+trouble.</p>
+<p>Right now, our form is bound to our entity and that makes this form super easy to
+use. But eventually, you'll need to build a form that does <em>not</em> look exactly like
+your entity: perhaps it has a few extra fields or is a combination of fields from
+several entities.</p>
+<p>When you run into this: here's what I want you to do. Don't bind your form to your
+entity class. Instead, create a brand new class: I usually put these classes inside
+my <code>Form</code> directory. For example, <code>GenusModel</code>. This class will have the <em>exact</em>
+properties that your form needs.</p>
+<p>Bind <em>this</em> class to your form and add all your validation rules like normal.
+After you submit your form, <code>$form-&gt;getData()</code> will return this <em>other</em> object.
+Then, it'll be your job to write a little bit of extra code that reads this data,
+updates your entities - or whatever else you need that data for - and saves things.</p>
+<p>If you have questions, let me know in the comments.</p>
+<p>There's certainly more to learn, but don't wait! Get out there and build something
+crazy cool!</p>
+<p>Seeya guys next time!</p>
+
+    
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-comment">
+                        <h3>Leave a comment!</h3>
+                                                        <div id="disqus_thread">
+                <style type="text/css">
+            #dsq-comments {padding: 10px 0 0}
+            .dsq-comment {position: relative;clear: both;margin: 0 0 1.5em;}
+            .dsq-avatar {left: 0;position: absolute;}
+            .dsq-avatar img {border: 0 none;border-radius: 3px;height: 36px;width: 36px;}
+            .dsq-comment-body {padding: 0 0 0 46px;}
+            .dsq-comment-header {border: 1px solid rgba(0, 0, 0, 0.15);border-radius: 3px;font-size: 13px;line-height: 14px;margin: 0 0 1em;max-height: 36px;overflow: hidden;padding: 10px;position: relative;text-overflow: ellipsis;white-space: nowrap;}
+            .dsq-comment-message {word-wrap: break-word;}
+            .dsq-comment-message {line-height: 1.5em;margin: 0 0 1em;}
+            .dsq-comment-text {display: inline;}
+            .dsq-comment-date {float: right;font-size: 90%;margin: 0 12px 0 0;}
+        </style>
+
+	    <div id="dsq-content">
+	        <ul id="dsq-comments">
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3025340962" id="dsq-comment-3025340962">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3025340962">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-29</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3025340962" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3025340962" class="dsq-comment-text">
+	                                <p>Ha, nice job thinking correctly! Being able to think clearly about what objects you need and how they are related are the most important thing you can do to keep things clearly. So, keeping going! My advice to keep things simple would be:</p><p>A) Build your model first (as you were already doing/describing) - make it as flexible as you need, but not more flexible :).</p><p>B) If your Symfony form gets too complex, stop using it. Symfony forms are great, but eventually, if you need a lot of flexibility and user interaction, then you really need to build a normal HTML+JS frontend that adds/updates/deletes data via AJAX by hitting API endpoints in your app. Sometimes I see people build HUGE forms, with many embedded layers, which is both hard, and ultimately not a great user experience (i.e. because it means that your user does a lot of work, and none of it saves until they hit the save button at the bottom).</p><p>Good luck Benjamin!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3023755989" id="dsq-comment-3023755989">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/benjaminquarta/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3023755989">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-28</span>
+	                            <span class="dsq-commenter-name">Benjamin Quarta</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3023755989" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3023755989" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="weaverryan:disqus" href="https://disqus.com/by/weaverryan/" rel="nofollow noopener">weaverryan</a>,</p><p>that are great news! I will go for the screencasts and let you if know how it worked out for me :)</p><p>For the following part: Apologies if my english may be strange now and then, but since I'm no native speaker, I'll try to explain the best I can :D...</p><p>To answer your question: The problem is much more complicated as it sounds, because in the finished version of the application the user should have *both* possibilities. Just imagine the use-case:<br>A user is adding a new Publication, let's say it is an album holding 10 Songs (the table is called "tracks"). Now these song's exist in the table. Half a year later the third song of the album (let's call it "Ducktrinity" :P) is re-released on a compilation, Now the user that adds the compilation should have the possibility to either add a new song, which is then directly added to the song-table or select one existing song from the songs that already exist.<br>But that is a problem which is "step 2", and I first want to get the simpler case of just "multiplying" forms going.</p><p>Later on it is getting even more complicated:<br>The application builds the groundwork of a netlabel-application, which means that we have to add lot's of meta-data, which an enduser does not really need, such as "ISRC" (International Standard Recording Code), which is kind of an EAN/UPC on the album-side, so that the track can uniquely be recognized as *this* song on *this* publication in the whole wide world.</p><p>This said, you can imagine, that it's getting more complicated, when it comes to joining tables. It is technically the same song, but the ISRC will differ. If I just build a joining table and select the same song, i won't cover the issue in a clean way. If I - on the other hand - make a new entry for the same song twice, then i will have some redundancy in my database, which i am aiming to avoid.</p><p>So my approach will be the following: Extending the "join tables". As I don't see by now that doctrine gives me the possibility to add additional fields to a join table (please tell me if I'm wrong) I need to make the join table a real table with an entity itself, so that we've got the following table-setup:<br>- publication (which holds all the data for the publication itself)<br>- join_publication_track (which holds the publication_id, the track_id PLUS ISRC and whatever else can differ)<br>- track (which holds all the data for the tracks)</p><p>-------------------<br>EDIT: I just catched a glimpse at the Doctrine course (Chapter 16) and i see my approach seems pretty much like that, what you cover here :D... Guess I'm intuitively doing the thing right... good sign :P<br>-------------------</p><p>Before I'm running off the track (pun intended :P) even more, I'll stop at this point (since there is a lot more to do as relating tracks to each other... think of live-versions, radio-edits, instrumental-versions, etc. of the same track), but you get an idea where this leads ;)</p><p>And thanks to Leanna, Victor and you it seems to be more fun than ever :) Keep up your great work!</p><p>best regards :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3023458146" id="dsq-comment-3023458146">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3023458146">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-28</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3023458146" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3023458146" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="benjaminquarta:disqus" href="https://disqus.com/by/benjaminquarta/" rel="nofollow noopener">Benjamin Quarta</a>!</p><p>Nice to meet you - and I'm happy you're getting more and more dangerous :p.</p><p>You've described your problem really well and you've setup your existing ManyToOne form setup perfectly. Well done :). And I have good news about your problem! We're covering it right now here: <a href="http://disq.us/url?url=http%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fcollections%3AvI8NnOUFF6AP1pgS74RsKcftPZM&amp;cuid=1175718" rel="nofollow noopener">http://knpuniversity.com/scree...</a>. Specifically, you will be interested in the chapters 19-23. Now, the situation is *slightly* different, but all the information is there. What I mean is:</p><p>A) In the tutorial, we first have a ManyToMany relationship. Here, we setup a form where the user checks checkboxes. In your app, this would be as if the user was simply *choosing* from existing "songs", not embedding a bunch of song forms.</p><p>B) But later, we change to a "join table" setup (you'll see what I mean, it's chapter 16). Then, with this, we actually embed using the CollectionType.</p><p>So, it sounds like you want to do what we do in part (B) from a form perspective, but with a ManyToMany relationship. I think if you go through those chapters, you'll have all the pieces you'll need (but you can ask here later if not).</p><p>But, I have do have one question :). When the user is creating a new publication, are they choosing existing Songs from the database or creating new ones right then? If they're creating new ones, then perfect: you'll want the exact setup we're talking about here. But if you want the user to choose *existing* songs, then you'll actually want to follow the "checkboxes" setup instead... well... mostly. If you actually want the user to choose existing songs (instead of creating new ones), let me know and I'll give you more details.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="3022462388" id="dsq-comment-3022462388">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/benjaminquarta/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-3022462388">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-11-27</span>
+	                            <span class="dsq-commenter-name">Benjamin Quarta</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-3022462388" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-3022462388" class="dsq-comment-text">
+	                                <p>Hello there Ryan,</p><p>thank you for the awesome courses, which make me feel "seriously dangerous" again :D...<br>Okay... not as dangerous as I'd like to be by now, so I've got a question ;)</p><p>To give it a context:<br>Since we're talking of Symfony and this sound's a lot like music (and we all like listening to music, right?), I'd like to build an application, where you can store albums and artists</p><p>I found out that, if I have another table "bound" to the entity-class (this is the job of doctrine), I simply can pass the other form to the first one like in my ArtistFormType... In the builder I simply can do the following:</p><p>-&gt;add('address', AddressFormType::class)</p><p>and get the required fields in the Twig-template like that: {{ form_row(artistForm.address.street) }}</p><p>This works just fine, but now I've got another challenge, which makes me a bit dizzy...</p><p>Since the upper example is a ManyToOne-Relationship, I only have to pass the nested form once, and this is clearly addressable.<br>But now, if I'm not storing Addresses but Album-Releases (which I'll call publications, because "release" is a reserved word), i have a ManyToMany Relationship, since many Releases can have many Songs (not OneToMany, since the song can appear on another publication, let's say a compilation too)...</p><p>If I fill out a "New-Publication-Form" I should have the possibility to add a bunch of songs all at once, so the SongFormType must appear "multiple times" or - let's think of the User-Experience - there should be an "Add Song-Button" which dynamically repeats the Song-Form within the Release-Form...</p><p>I really have no idea by now, how to approach that issue :D... Ryan and his team always have great ideas how to solve issues best practice... maybe you've got one for me ;)...</p><p>Thanks in advance :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2956818406" id="dsq-comment-2956818406">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2956818406">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-18</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2956818406" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2956818406" class="dsq-comment-text">
+	                                <p>Sweet! I'm happy it's clear :). Your plan makes sense to me!</p><p>Also, once User A edits the record, if you want to *force* them to fill in the missing fields, you can conditionally make those required by using NotBlank and validation groups: <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony-security%2Fconditional-validation-groups%3AoRqB_enCkWFi-WGtRnRzFsGRZCk&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a>. We do that in another tutorial to make some fields required on registration, but not required on a form that edits the user.</p><p>Cheers and good luck!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2956675933" id="dsq-comment-2956675933">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="form-template-include">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2956675933">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-18</span>
+	                            <span class="dsq-commenter-name">Matt-You</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2956675933" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2956675933" class="dsq-comment-text">
+	                                <p>Hi there,</p><p>Thank you for your answer! You are totally right, the problem comes from the database and it's that precise eror that I get. I knew that I could set it to "nullable=true" and allow another user (the admin for instance) to update the field (and set "@Assert\NotBlank" if I wanted the field to be updated anyway (the default value CANNOT be left like that). So, you made me think and came with this idea: I can set a default value that would be set automatically when the form creates a new entity. In my case, it's even better because it's more user-friendly. I explain myself: let's assume that user A is the admin and user B is a simple user of my platform. User B fills in the form (but he is allowed to fill only SOME fields, which are displayed). User A, then, edit the entity by completing the fields that user B were not allowed to do. Meanwhile, on a user B's page, I display the information that user B submitted and he/she waits for user A to "answer". So, it's better if by default, the field that user B couldn't fill in displays a value like "Waiting for user A to reply". And if I do that by default when the form is submitted, it's better both for my database and for my user B, C etc.</p><p>All in all, just thank you very much for your answer! Everything is clearer now!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2955491547" id="dsq-comment-2955491547">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2955491547">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-17</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2955491547" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2955491547" class="dsq-comment-text">
+	                                <p>Hey Matt!</p><p>Thanks for the nice words man! And cool question - I have at least one answer for you, depending on your exact situation :).</p><p>First, what you're doing is totally normal. In fact, it's really quite normal: it's really common to have a form that has some, but not all of your entity's fields mapped to it. When this happens, the *other* fields are just left completely untouched (i.e. if you're editing an entity, those fields will have the same value as when you fetched them from the database. If this is a new entity, they will remain null).</p><p>In your situation, you say that you "get an error when submitting the form saying that I can't leave the field 'null'". From what you've told me, I assume that error is coming from the database - something like "Integrity constraint violation - Column cannot be null"? Is that accurate? If so, then I'm also guessing that this is a "new" form (not an edit form), otherwise this field would already be set in the database. And if *that's* true (I could be off-base by now), then the question is: how *should* this field be set? What I mean is, if the nullable=false property is not meant to be set in this form, but this form is creating a new entity that is meant to be inserted into the database, then we have a problem ... because nothing is ever setting this nullable=false field :).</p><p>If I was right along my long line of assumptions, then you need to re-think this form: either that form should be nullable=true (because you *do* want it to be possible to create an entity from this form, but this user should not be able to set that value) *or* you'll need to set this value outside of the form (e.g. perhaps this user cannot edit this value, but that property should be given a default value, which you can do in the controller right before saving it).</p><p>Or maybe I'm way off :). If so, let me know!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2955437418" id="dsq-comment-2955437418">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="form-template-include">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2955437418">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-17</span>
+	                            <span class="dsq-commenter-name">Matt-You</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2955437418" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2955437418" class="dsq-comment-text">
+	                                <p>Hi everyone,</p><p>First of all, thanks for the tutorials which are remarkable!</p><p>My question is about the end of the course, when you say that we should not bind our forms to our entities. Well, I think I have a problem related to that. I'll explain: I created a form that hydrates an entity, but only partially (I only use "-&gt;add()" on some fields). One of  the attributes of my entity is set to "nullable=false" by default; this attribute is not part of my form because only one type of users can actually hydrate it (with a dfferent form). Nevertheless, I get an error when submitting the form, saying that I can't leave the field "null" whereas this very field is not in my form (I didn't use "-&gt;add()" on it).</p><p>Basically, my question is: can we hydrate an entity partially through a form, even though one of the attributes is set to "nullable = false"?</p><p>I hope I'm clear...<br>Thanks in advance!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2948799289" id="dsq-comment-2948799289">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_TpYLfmqdqZ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13756/7661/avatar92.jpg?1477237174">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2948799289">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-13</span>
+	                            <span class="dsq-commenter-name">Johan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2948799289" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2948799289" class="dsq-comment-text">
+	                                <p>Yea, they solved a lot of problems I had with Laravel. For example, one of them is having duplicated code in edit/create views. In a project these two views are often very similar, but not quite the same. One needs pre-filled fields, the other does not and validation requirements are slightly different. I was never able to find a really elegant solution for it in Laravel, but I think Symfony forms solved all those problems, it's beautiful :)</p><p>Time to rewrite all my Laravel projects in Symfony! Haha!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2948719663" id="dsq-comment-2948719663">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/weaverryan/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/32/6480/avatar92.jpg?1482356913">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2948719663">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-13</span>
+	                            <span class="dsq-commenter-name">weaverryan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2948719663" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2948719663" class="dsq-comment-text">
+	                                <p>And forms can be tough in some cases... but they do SO much work for you. Anytime I try to use something like Silex without Symfony forms... I regret it quickly.</p><p>Good luck and cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2944477089" id="dsq-comment-2944477089">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2944477089">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-11</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2944477089" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2944477089" class="dsq-comment-text">
+	                                <p>Hey Johan,</p><p>Haha, well, Laravel uses a lot of <a href="http://disq.us/url?url=http%3A%2F%2Fsymfony.com%2Fprojects%2Flaravel%3AGOdjkK34tht3dmuKQ1lpN1s4b00&amp;cuid=1175718" rel="nofollow noopener">Symfony components</a> inside itself, so I think Symfony will be very familiar to you ;)<br>Easy and interesting learning!</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2944471193" id="dsq-comment-2944471193">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_TpYLfmqdqZ/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/13756/7661/avatar92.jpg?1477237174">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2944471193">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-11</span>
+	                            <span class="dsq-commenter-name">Johan</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2944471193" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2944471193" class="dsq-comment-text">
+	                                <p>I'm used to Laravel, but I think I just fell in love with Symfony &lt;3</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2942880253" id="dsq-comment-2942880253">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2942880253">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-10</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2942880253" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2942880253" class="dsq-comment-text">
+	                                <p>OK, so speaking in terms, you have many-to-many relationship between Slide and Bank entities. Here's a link about this implementation using Doctrine ORM: <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony2-ep3%2Fmany-to-many-relationship%3Afx9nDA5gDvKJ1vu2TpRGzI1KAXA&amp;cuid=1175718" rel="nofollow noopener">https://knpuniversity.com/scre...</a> . Is it appropriate for you?</p><p>But with this approach, the SlideBank entity will be able to store only bank_id and slide_id. If you want to store a bit more information, like also a bank's name - you probably interested in a bit more complex relationships: Slide entity relates one-to-many to the SlideBank entity, which in turn relates many-to-one to the Bank entity, i.e. as a result you'll have the same many-to-many relationship between Bank and Slide, but you also will have ability to add more fields to the SlideBank entity except required bank_id and slide_id. This way you need 3 entities: Slide, Bank and SlideBank. I hope it makes sense for you.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2942746613" id="dsq-comment-2942746613">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/diarselimi92/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10788/8023/avatar92.jpg?1400745975">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2942746613">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-10</span>
+	                            <span class="dsq-commenter-name">diarselimi92</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2942746613" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2942746613" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="bocharsky25:disqus" href="https://disqus.com/by/bocharsky25/" rel="nofollow noopener">Victor Bocharsky</a> thanks for your response, but i think i can't do that !</p><p>i have a table where i have some banks in it but the problem is that i don't have to relate anything to that table i only have to get the banks and save them in another table that is related to the Slide Table</p><p>the stucture : | BANK |  i will get the data from this bank table, then i have | SLIDE | table where i will save the some slides here , then i have a table | SLIDE_BANK | where i will save every bank that i selected for a | SLIDE | here , so one SLIDE have multiple BANKS. note: I will not save the bank's id but the name in it.</p><p> I hope it is understandable. <br>I know how to do it in the PHP Way but i wan't to go by the symfony's rules.</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2942672651" id="dsq-comment-2942672651">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2942672651">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-10</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2942672651" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2942672651" class="dsq-comment-text">
+	                                <p>Hey <a data-dsq-mention="diarselimi92:disqus" href="https://disqus.com/by/diarselimi92/" rel="nofollow noopener">diarselimi92</a> ,</p><p>You can make relations first and then pass the new object to the createForm() as a second argument, i.e. build form on a object which already has relations with other objects. Look at the next example:</p><p></p><pre><code><br>// Use entity manager and repository to fetch any stored data from any tables<br>$category = $em-&gt;getCategoryRepository()-&gt;find($categoryId);<br><br>$post = new Post();<br>// Make relations fetched data<br>$post-&gt;setCategory($category);<br><br>$form = $this-&gt;createForm(PostType::class, $post)<br>// handle form...<br></code></pre><p></p><p>In the example above, the new Post object will be attached to the existent category.</p><p>I hope I understand you right and this example helps you. Let me know if you still have any questions.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2942578930" id="dsq-comment-2942578930">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/diarselimi92/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/10788/8023/avatar92.jpg?1400745975">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2942578930">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-10-10</span>
+	                            <span class="dsq-commenter-name">diarselimi92</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2942578930" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2942578930" class="dsq-comment-text">
+	                                <p>Hi<br>I was working on a form with symfony and i now wan't to save data to a table but i wan't to get the data from another table,<br>ex: Table1 is where i wan't to save main data and i have Table2 related with Table1 but i wan't to get The data from Table3 and save those to Table2, does anyone had this issue and how could this be solved ? <br>Thanks :)</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2888824994" id="dsq-comment-2888824994">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2888824994">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-12</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2888824994" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2888824994" class="dsq-comment-text">
+	                                <p>Ah, OK. So the correct way is pass the string value instead of array to the setter.</p><p>The best practices is to use a "$plainPassword" property on User entity and add an event listener to encode the plain password to the password hash before update its value in DB. In the event listener you should encode plain password if only the $plainPassword property is NOT null. The only notice, that you should also change any mapped field of User entity, otherwise you will not get in the listener (it's because the $plainPassword is not mapped to the DB usually). So when you handle your form and set the new password to the $planPassword, you also should manually change $updatedAt field too (or any other mapped field, but usually, it's a $updatedAt  field). It will be enough to trigger your event listener which in turn encode plain password and set its hash to the mapped $password property. But, first of all ensure you get the password inputed by user when handle the form.</p><p>BTW, do you have any listeners which could update user entity after you? Check them all and ensure they do not update password field.</p><p>P.S. You could see how to handle (encode) plain password with an entity listener in the next course <a href="https://disq.us/url?url=https%3A%2F%2Fknpuniversity.com%2Fscreencast%2Fsymfony-security%3AoNQQwRwhxh3aP0QSGyBcgQ-bS5E&amp;cuid=1175718" rel="nofollow noopener">Symfony Security: Beautiful Authentication, Powerful Authorization</a>. Please, take a look at it.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2888806519" id="dsq-comment-2888806519">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2fipiFRJYw/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2888806519">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-12</span>
+	                            <span class="dsq-commenter-name">james</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2888806519" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2888806519" class="dsq-comment-text">
+	                                <p>I already tried it also, same result:</p><p>string(8) "password" NULL</p><p>Which I really can't get it...</p><p>                    $userPassword = $formForgotPassword-&gt;getData();</p><p>                    var_dump($userPassword["plainPassword"]);</p><p>                    $user-&gt;setPassword($userPassword["plainPassword"]);<br>                    $em = $this-&gt;getDoctrine()-&gt;getManager();<br>                    $em-&gt;persist($user);<br>                    $em-&gt;flush();</p><p>                    var_dump($user-&gt;getPassword());</p><p>                    die();</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2888801493" id="dsq-comment-2888801493">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2888801493">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-12</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2888801493" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2888801493" class="dsq-comment-text">
+	                                <p>Hey James,</p><p>I think I see the problem ;). You dump <code>$userPassword["plainPassword"]</code> string value *but* then set <code>$userPassword</code> array to the user object. So try to change 3rd line to:<br></p><pre><code><br>$user-&gt;setPassword($userPassword["plainPassword"]);<br></code></pre><p></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2886396066" id="dsq-comment-2886396066">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2fipiFRJYw/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2886396066">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-09-10</span>
+	                            <span class="dsq-commenter-name">james</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2886396066" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2886396066" class="dsq-comment-text">
+	                                <p>Hi,</p><p>Another question on another subject, I have my login form and register form, all good until I try to create the forgot password form. When the user click on forgot password, an email is sent to his email address with a link, the link has got his email address and a token created just before the email was sent. When the user clicks the link he is redirected to a page with a form to renew his password, same password part of the form than in the register form. But when the user enters the password and the repeat password (I changed the encoder to plaintext):</p><p>Code:</p><p>$userPassword = $formForgotPassword-&gt;getData();</p><p>                    var_dump($userPassword["plainPassword"]);</p><p>                    $user-&gt;setPassword($userPassword);</p><p>                    $em = $this-&gt;getDoctrine()-&gt;getManager();</p><p>                    $em-&gt;persist($user);</p><p>                    $em-&gt;flush();</p><p>                    var_dump($user-&gt;getPassword());</p><p>                    die();</p><p>Result:</p><p>"password" NULL</p><p>What is the problem?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2867898120" id="dsq-comment-2867898120">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2867898120">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-30</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2867898120" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2867898120" class="dsq-comment-text">
+	                                <p>Hey James,</p><p>The second your example is correct. What does the quantities is? The second argument for path() Twig function should be an associative array, like <code>{param1: 'value1', param2: 'value2'}</code> if you declare your parameters in Twig. Try to set dummy data first and look if it works:<br></p><pre><code><br>{{ path('update_cart', {param1: 'value1', param2: 'value2'}) }}<br></code></pre><p></p><p>You should get some URL like this: "/your-update-cart-url?param1=value1&amp;param2=value2", and then in action you can get access to these params via request:<br></p><pre><code>dump($request-&gt;query-&gt;get('param1')); // will dump "value1" string</code></pre><p></p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2866878194" id="dsq-comment-2866878194">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2fipiFRJYw/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2866878194">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-30</span>
+	                            <span class="dsq-commenter-name">james</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2866878194" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2866878194" class="dsq-comment-text">
+	                                <p>Thanks for the quick answer! I tried something like this:</p><p>{{ path('update_cart', {quantities}) }}<br>and<br>{{ path('update_cart', quantities) }}</p><p>But it does not work, how do you insert the array as a parameter?</p><p>Also when trying to get the value of the quantity input ( {{ dump(form.quantity.vars.value) }} ) it does seem to work...</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2866701543" id="dsq-comment-2866701543">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2866701543">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-30</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2866701543" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2866701543" class="dsq-comment-text">
+	                                <p>Hey James,</p><p>Thanks to the Symfony Router component, it takes an array of parameters as a second argument, so you don't need to merge and encode your values, just pass your array as a second parameter to the "path()" or "url()" Twig functions and router do the job for you. If your route has some required parameters, then merge your parameters with it.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2866623639" id="dsq-comment-2866623639">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/disqus_2fipiFRJYw/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/1479321018/images/noavatar92.png">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2866623639">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-30</span>
+	                            <span class="dsq-commenter-name">james</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2866623639" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2866623639" class="dsq-comment-text">
+	                                <p>Hi,</p><p>Just a question concerning request of values form the twig template to a controller, is there any other way to get the values of twig template directly to our controller? I have for example a cart and a button to update the cart but form would not work because the quantity field will be included in each loop to get each product and so will appear as many time I have products. Any ideas?</p><p>At the moment as a solution I am creating an array in twig, then merging elements to it, then encode it and add it to the url (/{{ items }}) and in my controller I can then decode the json and get my values. Complicated? maybe...</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2828075835" id="dsq-comment-2828075835">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/bocharsky25/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/11445/2822/avatar92.jpg?1482506193">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2828075835">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-09</span>
+	                            <span class="dsq-commenter-name">Victor Bocharsky</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2828075835" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2828075835" class="dsq-comment-text">
+	                                <p>Hey,</p><p>Yes, Symfony plugin adds this method for backward compatibility, but you should avoid using it and since Symfony 2.8, the name defaults to the fully-qualified class name, i.e. Symfony generates this name for you behind the scene based on your FQCN. This class name is internal and used for generate unique form element names and CSS IDs. You could find it if inspect your form HTML code.</p><p>Cheers!</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	                <li class="dsq-comment dsq-clearfix" data-dsq-comment-id="2827803740" id="dsq-comment-2827803740">
+	                    <div class="dsq-avatar dsq-tt">
+	                        <a href="https://disqus.com/by/3amprogrammer/">
+	                            	                                <img alt="" src="http://a.disquscdn.com/uploads/users/18706/694/avatar92.jpg?1470710433">
+	                            	                        </a>
+	                    </div>
+	                    <div class="dsq-comment-body" id="dsq-comment-body-2827803740">
+	                        <div class="dsq-comment-header">
+	                            <span class="dsq-comment-date">2016-08-09</span>
+	                            <span class="dsq-commenter-name">3amprogrammer</span>
+	                        </div>
+
+	                        <div id="dsq-comment-message-2827803740" class="dsq-comment-message">
+	                            <div id="dsq-comment-text-2827803740" class="dsq-comment-text">
+	                                <p>Hey weaverryan!<br>After watching this series I am a little confused about getName method. I was trying to find the moment when you have added this, but there is no one (or I've missed it). Can you please explain it to me briefly what is the purpose of:<br></p><pre><code><br>public function getName()<br>{<br>    return 'app_bundle_genus_form_type';<br>}<br></code></pre><p></p><p>@Edit<br>I have found out that this method was added by Symfony Plugin. Anyway is there any reason for it?</p>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </li>
+	            	        </ul>
+	    </div>
+            </div>
+
+    <script type="text/javascript">
+    var disqus_shortname = 'knpuniversity';
+    var disqus_container_id = 'disqus_thread';var disqus_developer = 1;var disqus_identifier = 'course_video_form-template-include';var disqus_url = 'https://knpuniversity.com/screencast/symfony-forms/form-template-include';var disqus_config = function () {};
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+                                            </div>
+                    <div class="pull-left-xs pull-right-md">
+                                        <a class="btn btn-success"
+           href="resume">
+            Finish Course <i class="fa fa-caret-right"></i>
+        </a>
+    
+                    </div>
+                    <div class="pull-left addthis-module">
+                        
+    <div class="addthis_toolbox addthis_default_style js-analytics-addthis-wrapper addthis_32x32_style" addthis:url="http://knpuniversity.com/screencast/symfony-forms/form-template-include" addthis:title="Symfony Forms: Build, Render &amp; Conquer!">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer footer-styling">
+    <div class="container">
+        <div class="row">
+                        <div class="col-xs-7 col-sm-4">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../courses/all">All Courses</a></li>
+                                                            <li><a class="knp-color-black" href="../../pricing.1">Pricing</a></li>
+                                                        <li><a class="knp-color-black" href="../../faq">FAQ</a></li>
+                            <li><a class="knp-color-black" href="../../training">Training</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-6">
+                        <ul class="list-unstyled footer-link">
+                            <li><a class="knp-color-black" href="../../about">About</a></li>
+                            <li><a class="knp-color-black" href="../../blog">Blog</a></li>
+                            <li><a class="knp-color-black" href="../../contact">Contact Us</a></li>
+                            <li>
+                                <a class="knp-color-black" href="../../terms">Terms</a>
+                                <span class="knp-color-black">&amp;</span>
+                                <a class="knp-color-black" href="../../privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4">
+                <p class="disclaimer">Symfony is a registered trademark of Fabien Potencier in the United States and/or other countries.
+                This product is not endorsed or sponsored by Fabien Potencier.
+                </p>
+            </div>
+            <div class="col-xs-5 col-sm-4">
+                <div class="social-icons">
+                    <a class="btn btn-social-icon btn-twitter" href="https://twitter.com/KnpUniversity">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-facebook" href="https://www.facebook.com/KnpLabs/">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="btn btn-social-icon btn-github" href="https://github.com/knpuniversity">
+                        <i class="fa fa-github"></i>
+                    </a>
+                </div>
+            </div>
+                    </div>
+    </div>
+</footer>
+
+<!-- JS -->
+            <script>
+        Core.analyticsVideoStatsUrl = '/api/analytics/video/duration';
+    </script>
+
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+        <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-7062980-20']);
+        _gaq.push(['_trackPageview']);
+    </script>
+    <script>
+    
+    </script>
+    
+    <script type="text/javascript">
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    
+                <script type="text/javascript">
+      (function() {
+        var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+        uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/pOay2WLVabhXiEffbarO6Q.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+      })();
+
+      UserVoice = window.UserVoice || [];
+      UserVoice.push(['showTab', 'classic_widget', {
+          tab_position: 'bottom-right',
+          tab_label: 'Ideas or Feedback?',
+          tab_color: '#005E8E'
+      }]);
+    </script>
+        
+            
+        <script type="text/javascript">
+    var _sf_async_config={uid:54262,domain:"knpuniversity.com",useCanonical:true};
+    (function(){
+      function loadChartbeat() {
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+      }
+      var oldonload = window.onload;
+      window.onload = (typeof window.onload != 'function') ?
+         loadChartbeat : function() { oldonload(); loadChartbeat(); };
+    })();
+    </script>
+    
+            <script>
+            (function(){
+                var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+            })("woopra");
+
+            woopra.config({
+                domain: 'knpuniversity.com',
+                download_tracking: true,
+                outgoing_tracking: true
+            });
+
+                            woopra.identify({
+                    userType: 'anonymous',
+                    hasSubscription: 'no'
+                });
+                    </script>
+
+        <script>
+            woopra.track(
+            'course_view_chapter',
+            {"course":"symfony-forms","courseIsOwned":false,"chapter":"Sharing Form Templates with include()","chapterNumber":15,"chapterIsFree":false}
+        );
+    </script>
+
+        <script>
+            woopra.track();
+        </script>
+     
+        <script type="text/javascript">
+    var _qevents = _qevents || [];
+
+    (function() {
+    var elem = document.createElement('script');
+    elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+    elem.async = true;
+    elem.type = "text/javascript";
+    var scpt = document.getElementsByTagName('script')[0];
+    scpt.parentNode.insertBefore(elem, scpt);
+    })();
+
+    _qevents.push({
+    qacct:"p-8-SEHS37bhSQ0"
+    });
+    </script>
+
+    <noscript>
+    <div style="display:none;">
+    <img src="http://pixel.quantserve.com/pixel/p-8-SEHS37bhSQ0.gif" border="0" height="1" width="1" alt="Quantcast"/>
+    </div>
+    </noscript>
+    
+
+
+    <script type="text/javascript" src="../../assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script type="text/javascript" src="../../assets/vendor/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+    <script type="text/javascript" src="../../js/CodeBlocks.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/underscore.js"></script>
+    <script type="text/javascript" src="../../bundles/knpuniversity/sphinx/js/doctools.js"></script>
+
+    <script>
+        Core.courseTitle = 'Symfony Forms: Build, Render &amp; Conquer!';
+        Core.courseId = 77
+        Core.courseIsOwned = false;
+        Core.courseSlug = 'symfony-forms';
+                    Core.chapterTitle = 'Sharing Form Templates with include()';
+            Core.chapterNumber = 15;
+            Core.chapterIsFree = false;
+            Core.chapterSlug = 'form-template-include';
+        
+                var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:    '../../',
+            VERSION:     '1.0.0',
+            COLLAPSE_INDEX: false,
+            FILE_SUFFIX: '.html',
+            HAS_SOURCE:  true
+        };
+
+        jQuery(document).ready(function() {
+            // Stick left sidebar menu
+            $('.js-sticker').sticky();
+
+            var $scriptWrapper = $('.js-script-content-wrapper');
+            var codeBlocks = new Core.CodeBlocks($scriptWrapper);
+
+            var expandList = $('.js-expand-list');
+
+            expandList.on('click', function(){
+                var target = $(this).data('target');
+                var $expandArea = $('#' + target);
+                $expandArea.toggleClass('expanded');
+
+                // http://stackoverflow.com/questions/2868582/click-outside-menu-to-close-in-jquery
+                $(document).one('click', function closeExpandList (e){
+                    if($expandArea.has(e.target).length === 0){
+                        $expandArea.removeClass('expanded');
+                    } else {
+                        $(document).one('click', closeExpandList);
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+
+
+    <script type="text/javascript">
+    var addthis_share = {
+        templates: {
+            twitter: '{{title}} - {{url}} | via @KnpUniversity'
+        }
+    }
+</script>
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=weaverryan"></script>
+
+</body>
+</html>
